@@ -481,7 +481,7 @@
       '</div>';
     }
     byId('timetable-body').innerHTML = html;
-    byId('timetable-hint').textContent = Sched.semester + ' · ' + kid.name + ' (' + kid.alias + ') 평일 시간표';
+    byId('timetable-hint').textContent = Sched.semester + ' · ' + kid.name + ' 평일 시간표';
   }
 
   /* ---------------- 할 일 시트 ---------------- */

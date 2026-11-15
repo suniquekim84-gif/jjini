@@ -10,7 +10,6 @@
       naeun: {
         id: 'naeun',
         name: '나은찡',
-        alias: '나은이',
         char: 'rabbit',
         days: {
           1: { school: '15:25', items: [{ name: '수학', start: '17:00', end: '19:00' }] },
@@ -23,7 +22,6 @@
       jjini: {
         id: 'jjini',
         name: '찌니',
-        alias: '혁진이',
         char: 'hamster',
         days: {
           1: { school: '13:40', items: [{ name: '줄넘기', start: '14:10', end: '15:10' }, { name: '영어', start: '16:20', end: '17:30' }] },
