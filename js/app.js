@@ -9,7 +9,7 @@
   var Weather = window.FamilyWeather;
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
-  var TINTS = { jjini: '', naeun: 'pink', mom: 'mint', dad: 'lav' };
+  var TINTS = { jjini: '', naeun: 'pink' };
   var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star'];
 
   var state = null;
@@ -138,6 +138,7 @@
       return '<span class="chip-subject tone-' + tone(it.name) + (isNow ? ' is-now' : '') + '">' +
         esc(it.name) + ' <b>' + it.start + '~' + it.end + '</b></span>';
     }).join('');
+    if (!day.items.length) chips += '<span class="chip-subject">방과후 일정 없음</span>';
 
     return '<div class="schedule-row">' +
       '<div class="schedule-kid">' +
@@ -472,6 +473,7 @@
             '<span class="chip-subject tone-' + tone(it.name) + '">' + esc(it.name) + ' <b>' + it.start + '~' + it.end + '</b></span>' +
           '</div>';
         });
+        if (!day.items.length) items += '<div class="timetable-line">방과후 일정 없음</div>';
       } else {
         items = '<div class="timetable-line">일정 없음</div>';
       }

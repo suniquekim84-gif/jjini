@@ -12,7 +12,13 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 3;
+  var SCHEMA = 4;
+
+  /* 이제 쓰지 않는 구성원(엄마·아빠). 예전에 저장된 기록이 남아 있어도
+     불러올 때 깔끔히 지워서 두 아이 구성만 남깁니다. */
+  var REMOVED_MEMBERS = { mom: true, dad: true };
+  /* 예전 기본 동네 — 저장된 값이 이 이름이면 새 기본 동네(동탄2신도시)로 바꿉니다. */
+  var LEGACY_PLACES = { '시흥': true };
 
   /* ---------------- 날짜 도우미 ---------------- */
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -79,13 +85,11 @@
       version: SCHEMA,
       createdAt: Date.now(),
       settings: {
-        place: { name: '시흥', lat: 37.38, lon: 126.803 }
+        place: { name: '동탄2신도시', lat: 37.2001, lon: 127.0990 }
       },
       members: [
         { id: 'jjini', name: '찌니', sub: '햄찌와 함께', char: 'hamster', role: 'kid', stars: 3 },
-        { id: 'naeun', name: '나은찡', sub: '토끼와 함께', char: 'rabbit', role: 'kid', stars: 1 },
-        { id: 'mom', name: '엄마', sub: '고양이와 함께', char: 'mom', role: 'parent', stars: 0 },
-        { id: 'dad', name: '아빠', sub: '곰돌이와 함께', char: 'dad', role: 'parent', stars: 0 }
+        { id: 'naeun', name: '나은찡', sub: '토끼와 함께', char: 'rabbit', role: 'kid', stars: 1 }
       ],
       /* 반복 루틴 — 매일/평일 구분. group 은 찌니 보상 트래커에서 씁니다. */
       routines: {
@@ -101,21 +105,10 @@
           { id: 'r_ne_dictation', text: '받아쓰기 연습 1회', repeat: 'daily' },
           { id: 'r_ne_prep', text: '내일 준비물 챙기기', repeat: 'weekday' },
           { id: 'r_ne_diary', text: '일기 한 편 쓰기', repeat: 'weekday' }
-        ],
-        mom: [
-          { id: 'r_mo_dinner', text: '가족 저녁 준비하기', repeat: 'daily' },
-          { id: 'r_mo_market', text: '장보기 목록 정리하기', repeat: 'weekday' },
-          { id: 'r_mo_laundry', text: '빨래 정리하기', repeat: 'weekday' },
-          { id: 'r_mo_call', text: '할머니께 안부 전화드리기', repeat: 'daily' }
-        ],
-        dad: [
-          { id: 'r_da_homework', text: '아이들 숙제 확인하기', repeat: 'daily' },
-          { id: 'r_da_trash', text: '분리수거 내놓기', repeat: 'weekday' },
-          { id: 'r_da_talk', text: '가족과 30분 이야기하기', repeat: 'daily' }
         ]
       },
       days: {},
-      stamps: { jjini: {}, naeun: {}, mom: {}, dad: {} },
+      stamps: { jjini: {}, naeun: {} },
       mission: { date: '', id: '', together: 0, lastDoneDate: '' }
     };
   }
@@ -141,16 +134,41 @@
     var base = defaultState();
     if (!data || !Array.isArray(data.members) || !data.members.length) return base;
     // 빠진 항목은 기본값으로 채워요 (이전 버전 기록도 살아남도록)
+    var members = data.members.filter(function (m) {
+      return m && m.id && !REMOVED_MEMBERS[m.id];
+    }).map(function (m) {
+      return Object.assign({ stars: 0, role: 'kid' }, m);
+    });
+    if (!members.length) return base;
+
+    var settings = Object.assign({}, base.settings, data.settings || {});
+    if (!settings.place || !settings.place.name || LEGACY_PLACES[settings.place.name]) {
+      settings.place = base.settings.place;
+    }
+
+    // 지운 구성원(엄마·아빠)의 루틴·별·도장·할 일이 저장본에 남아 있으면 함께 지워요.
+    var routines = Object.assign({}, data.routines || {});
+    var stamps = Object.assign({}, data.stamps || {});
+    var days = {};
+    Object.keys(REMOVED_MEMBERS).forEach(function (id) {
+      delete routines[id];
+      delete stamps[id];
+    });
+    Object.keys(data.days || {}).forEach(function (d) {
+      var src = data.days[d] || {};
+      var tasks = Object.assign({}, src.tasks || {});
+      Object.keys(REMOVED_MEMBERS).forEach(function (id) { delete tasks[id]; });
+      days[d] = Object.assign({}, src, { tasks: tasks });
+    });
+
     var out = {
       version: SCHEMA,
       createdAt: data.createdAt || Date.now(),
-      settings: Object.assign({}, base.settings, data.settings || {}),
-      members: data.members.map(function (m) {
-        return Object.assign({ stars: 0, role: 'kid' }, m);
-      }),
-      routines: Object.assign({}, base.routines, data.routines || {}),
-      days: data.days || {},
-      stamps: Object.assign({ jjini: {}, naeun: {}, mom: {}, dad: {} }, data.stamps || {}),
+      settings: settings,
+      members: members,
+      routines: Object.assign({}, base.routines, routines),
+      days: days,
+      stamps: Object.assign({}, base.stamps, stamps),
       mission: Object.assign({}, base.mission, data.mission || {})
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });

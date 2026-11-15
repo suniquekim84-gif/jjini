@@ -113,62 +113,9 @@
     return wrap('char-rabbit', b, '#FFFFFF', '#FFF0F1');
   }
 
-  /* ---------- 엄마 : 고양이 ---------- */
-  function momCat() {
-    var b = '';
-    // 귀
-    b += '<path d="M34 44 q-4 -18 8 -20 8 0 10 12Z" fill="#FFEFE2" stroke="#EBCDB6" stroke-width="2" stroke-linejoin="round"/>';
-    b += '<path d="M86 44 q4 -18 -8 -20 -8 0 -10 12Z" fill="#FFEFE2" stroke="#EBCDB6" stroke-width="2" stroke-linejoin="round"/>';
-    b += '<path d="M39 40 q-1 -9 4 -10 4 0 5 6Z" fill="#F8C2CB"/>';
-    b += '<path d="M81 40 q1 -9 -4 -10 -4 0 -5 6Z" fill="#F8C2CB"/>';
-    // 얼굴
-    b += '<ellipse cx="60" cy="64" rx="31" ry="28.5" fill="#FFF3E7" stroke="#EBCDB6" stroke-width="2"/>';
-    b += eyesClosed(43, 62, 23, 11);
-    b += blush(36, 84, 71);
-    b += '<path d="M60 68 l-3 2.4 h6 Z" fill="#E9929C"/>';
-    b += '<path d="M60 71.5 q-4 4.4 -7 1 M60 71.5 q4 4.4 7 1" stroke="#C39A8E" stroke-width="1.9" fill="none" stroke-linecap="round"/>';
-    b += '<path d="M30 66 h-9 M30 71 h-8 M90 66 h9 M90 71 h8" stroke="#E4C3AA" stroke-width="1.7" stroke-linecap="round"/>';
-    // 리본
-    b += '<g><path d="M70 38 q9 -7 11 0 q-9 6 -11 0Z" fill="#F2919F"/><path d="M92 38 q-9 -7 -11 0 q9 6 11 0Z" fill="#F2919F"/>' +
-      '<circle cx="81" cy="38" r="3.2" fill="#E77F90"/></g>';
-    // 꽃을 든 손
-    b += '<ellipse cx="47" cy="95" rx="7" ry="6" fill="#FFF3E7" stroke="#EBCDB6" stroke-width="1.8"/>';
-    b += '<ellipse cx="73" cy="95" rx="7" ry="6" fill="#FFF3E7" stroke="#EBCDB6" stroke-width="1.8"/>';
-    b += '<path d="M60 96 v-13" stroke="#88C77C" stroke-width="2.4" stroke-linecap="round"/>';
-    b += '<g><circle cx="60" cy="79" r="4.2" fill="#F9A8B4"/><circle cx="55.6" cy="82.4" r="4.2" fill="#FBC3CB"/>' +
-      '<circle cx="64.4" cy="82.4" r="4.2" fill="#FBC3CB"/><circle cx="60" cy="85.4" r="4.2" fill="#FBC3CB"/>' +
-      '<circle cx="60" cy="82" r="2.6" fill="#FFE08A"/></g>';
-    b += sparkle(98, 54, 4.6, '#FFD37E');
-    return wrap('char-mom', b, '#FFFFFF', '#FFEFE2');
-  }
-
-  /* ---------- 아빠 : 곰 ---------- */
-  function dadBear() {
-    var b = '';
-    b += '<circle cx="36" cy="42" r="11.5" fill="#E9F1FB" stroke="#C9D9EC" stroke-width="2"/>';
-    b += '<circle cx="36" cy="42" r="6" fill="#D3E2F4"/>';
-    b += '<circle cx="84" cy="42" r="11.5" fill="#E9F1FB" stroke="#C9D9EC" stroke-width="2"/>';
-    b += '<circle cx="84" cy="42" r="6" fill="#D3E2F4"/>';
-    b += '<ellipse cx="60" cy="66" rx="32" ry="29" fill="#EDF4FC" stroke="#C9D9EC" stroke-width="2"/>';
-    b += '<ellipse cx="60" cy="73" rx="17" ry="12" fill="#F8FBFF"/>';
-    b += eyesClosed(43, 63, 23, 11);
-    b += blush(37, 83, 72);
-    b += '<ellipse cx="60" cy="69.5" rx="3.4" ry="2.6" fill="#8FA7C2"/>';
-    b += '<path d="M60 72.4 q-4.4 5 -8 1 M60 72.4 q4.4 5 8 1" stroke="#A9BDD3" stroke-width="2" fill="none" stroke-linecap="round"/>';
-    // 파란 나비 리본
-    b += '<g><path d="M52 92 q-11 -6 -12 0 q11 5 12 0Z" fill="#7FB2E5"/><path d="M68 92 q11 -6 12 0 q-11 5 -12 0Z" fill="#7FB2E5"/>' +
-      '<circle cx="60" cy="92" r="3.4" fill="#5F97D0"/></g>';
-    b += '<ellipse cx="40" cy="97" rx="7" ry="5.6" fill="#EDF4FC" stroke="#C9D9EC" stroke-width="1.8"/>';
-    b += '<ellipse cx="80" cy="97" rx="7" ry="5.6" fill="#EDF4FC" stroke="#C9D9EC" stroke-width="1.8"/>';
-    b += sparkle(96, 52, 4.6, '#FFD37E');
-    return wrap('char-dad', b, '#FFFFFF', '#EAF2FD');
-  }
-
   var CHARACTERS = {
     hamster: hamster,
-    rabbit: rabbit,
-    mom: momCat,
-    dad: dadBear
+    rabbit: rabbit
   };
 
   window.FamilyChars = {

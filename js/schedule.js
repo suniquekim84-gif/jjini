@@ -24,11 +24,11 @@
         name: '찌니',
         char: 'hamster',
         days: {
-          1: { school: '13:40', items: [{ name: '줄넘기', start: '14:10', end: '15:10' }, { name: '영어', start: '16:20', end: '17:30' }] },
-          2: { school: '13:40', items: [{ name: '검도', start: '16:30', end: '17:30' }] },
-          3: { school: '13:40', items: [{ name: '줄넘기', start: '14:10', end: '15:10' }, { name: '재능', start: '15:30', end: '15:50' }, { name: '영어', start: '16:20', end: '17:30' }] },
-          4: { school: '14:30', items: [{ name: '검도', start: '16:30', end: '17:30' }] },
-          5: { school: '13:40', items: [{ name: '줄넘기', start: '14:10', end: '15:10' }] }
+          1: { school: '13:40', items: [{ name: '영어', start: '16:20', end: '17:30' }] },
+          2: { school: '13:40', items: [{ name: '검도', start: '16:30', end: '17:30' }, { name: '줄넘기', start: '18:20', end: '19:20' }] },
+          3: { school: '13:40', items: [{ name: '재능', start: '15:30', end: '15:50' }, { name: '영어', start: '16:20', end: '17:30' }] },
+          4: { school: '14:30', items: [{ name: '검도', start: '16:30', end: '17:30' }, { name: '줄넘기', start: '18:20', end: '19:20' }] },
+          5: { school: '13:40', items: [] }
         }
       }
     },
