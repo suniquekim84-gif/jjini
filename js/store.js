@@ -14,11 +14,11 @@
   var KEY = 'uri-family-dashboard.v3';
   var SCHEMA = 4;
 
-  /* 이제 쓰지 않는 구성원(엄마·아빠). 예전에 저장된 기록이 남아 있어도
+  /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
      불러올 때 깔끔히 지워서 두 아이 구성만 남깁니다. */
   var REMOVED_MEMBERS = { mom: true, dad: true };
-  /* 예전 기본 동네 — 저장된 값이 이 이름이면 새 기본 동네(동탄2신도시)로 바꿉니다. */
-  var LEGACY_PLACES = { '시흥': true };
+  /* 예전 기본 동네의 좌표 — 저장된 값이 이 좌표면 새 기본 동네(동탄2신도시)로 바꿉니다. */
+  var LEGACY_PLACE = { lat: '37.380', lon: '126.803' };
 
   /* ---------------- 날짜 도우미 ---------------- */
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -130,6 +130,12 @@
     }
   }
 
+  function isLegacyPlace(place) {
+    if (place.lat == null || place.lon == null) return false;
+    return Number(place.lat).toFixed(3) === LEGACY_PLACE.lat &&
+      Number(place.lon).toFixed(3) === LEGACY_PLACE.lon;
+  }
+
   function migrate(data) {
     var base = defaultState();
     if (!data || !Array.isArray(data.members) || !data.members.length) return base;
@@ -142,11 +148,11 @@
     if (!members.length) return base;
 
     var settings = Object.assign({}, base.settings, data.settings || {});
-    if (!settings.place || !settings.place.name || LEGACY_PLACES[settings.place.name]) {
+    if (!settings.place || !settings.place.name || isLegacyPlace(settings.place)) {
       settings.place = base.settings.place;
     }
 
-    // 지운 구성원(엄마·아빠)의 루틴·별·도장·할 일이 저장본에 남아 있으면 함께 지워요.
+    // 지운 구성원의 루틴·별·도장·할 일이 저장본에 남아 있으면 함께 지워요.
     var routines = Object.assign({}, data.routines || {});
     var stamps = Object.assign({}, data.stamps || {});
     var days = {};
