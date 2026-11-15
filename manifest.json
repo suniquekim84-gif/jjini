@@ -1,0 +1,48 @@
+{
+  "name": "우리 가족 기록장",
+  "short_name": "가족 기록장",
+  "description": "우리 가족의 하루를 포근하게 기록하는 가족 대시보드 — 할 일, 별, 도장판, 오늘의 미션",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#FCF4D6",
+  "theme_color": "#FCF4D6",
+  "categories": ["lifestyle", "productivity", "education"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "오늘 할 일",
+      "url": "./index.html#todo",
+      "description": "가족 할 일 체크하기"
+    }
+  ]
+}

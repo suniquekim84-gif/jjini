@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>우리 가족 기록장</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
+<meta name="theme-color" content="#FCF4D7" />
+<meta name="description" content="우리 가족의 하루를 포근하게 기록하는 가족 대시보드 — 할 일, 별, 도장판, 오늘의 미션" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="우리 가족 기록장" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ================= HEADER ================= -->
+  <header class="app-header">
+    <div class="brand-row">
+      <span class="brand-mark" id="brand-mark" aria-hidden="true"></span>
+      <h1 class="brand-title">우리 가족 기록장</h1>
+      <div class="header-actions">
+        <button class="icon-pill" data-action="open-settings" id="btn-settings" aria-label="설정 열기" title="설정">
+          <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true">
+            <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M19.1 13.9c.06-.62.06-1.18 0-1.8l1.42-1.1-1.5-2.6-1.68.62c-.5-.36-1.06-.66-1.66-.86L15.4 6.4h-3l-.28 1.76c-.6.2-1.16.5-1.66.86l-1.68-.62-1.5 2.6 1.42 1.1c-.06.62-.06 1.18 0 1.8l-1.42 1.1 1.5 2.6 1.68-.62c.5.36 1.06.66 1.66.86l.28 1.76h3l.28-1.76c.6-.2 1.16-.5 1.66-.86l1.68.62 1.5-2.6-1.42-1.1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="icon-pill" data-action="share" id="btn-share" aria-label="가족에게 공유하기" title="공유">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path d="M8 15.5 16.5 7m0 0H10m6.5 0v6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="header-sub">
+      <div class="header-date-wrap">
+        <p class="header-date" id="header-date">11월 15일 일요일</p>
+        <p class="header-line">우리집의 포근한 하루</p>
+      </div>
+      <span class="pill pill-glow">✨ 오늘도 함께 기록해요</span>
+    </div>
+  </header>
+
+  <!-- ================= WEATHER ================= -->
+  <section class="weather-card" id="weather-card" aria-label="오늘 날씨와 미세먼지">
+    <div class="weather-main">
+      <span class="weather-icon" id="wx-icon" aria-hidden="true">🌤️</span>
+      <div class="weather-place">
+        <span class="wx-city" id="wx-city">시흥</span>
+        <span class="wx-temp" id="wx-temp">–°</span>
+        <span class="wx-cond" id="wx-cond">불러오는 중</span>
+      </div>
+      <span class="wx-range" id="wx-range">최저 –° · 최고 –°</span>
+    </div>
+    <div class="weather-foot">
+      <span class="badge badge-air" id="wx-pm10">미세먼지 –</span>
+      <span class="badge badge-air" id="wx-pm25">초미세먼지 –</span>
+      <span class="pill pill-tip" id="wx-tip">🌿 오늘 공기 확인 중</span>
+    </div>
+  </section>
+
+  <!-- ================= TODAY'S SCHOOL & ACADEMY ================= -->
+  <section class="card schedule-section" id="schedule-section" aria-label="오늘의 학교·학원 일정">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🏫 오늘의 학교·학원 일정</h2>
+        <p class="section-sub" id="schedule-sub">오늘 하루 두 아이의 시간표예요</p>
+      </div>
+      <span class="pill pill-day" id="schedule-day">일요일</span>
+    </header>
+    <div class="schedule-body" id="schedule-body"><!-- rendered --></div>
+    <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
+  </section>
+
+  <!-- ================= FAMILY MEMBERS ================= -->
+  <section class="card family-section" aria-label="우리 가족">
+    <div class="member-list" id="member-list"><!-- rendered --></div>
+  </section>
+
+  <!-- ================= TODAY'S TO-DO ================= -->
+  <section class="card todo-section" id="todo-section" aria-label="오늘 할 일">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">✅ 오늘 할 일</h2>
+        <p class="section-sub" id="todo-sub">가족이 각자 할 일을 체크해요</p>
+      </div>
+      <button class="btn btn-ghost" data-action="add-task" id="btn-add-task">+ 할 일 추가</button>
+    </header>
+    <div class="todo-list" id="todo-list"><!-- rendered --></div>
+  </section>
+
+  <!-- ================= 찌니 보상 트래커 ================= -->
+  <section class="card reward-section" id="reward-section" aria-label="찌니 보상 트래커">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🎁 <span id="reward-name">찌니</span> 보상 트래커</h2>
+        <p class="section-sub">문제집·재능을 끝내면 보상이 열려요</p>
+      </div>
+      <span class="pill pill-soft" id="reward-today">오늘</span>
+    </header>
+    <div class="reward-list" id="reward-list"><!-- rendered --></div>
+    <div class="reward-week" id="reward-week"><!-- rendered --></div>
+    <p class="reward-note" id="reward-note">평일 문제집 5일 완주 → 주말 닌텐도 +30분</p>
+  </section>
+
+  <!-- ================= STAMP BOARD ================= -->
+  <section class="card stamp-section" id="stamp-section" aria-label="도장판">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🐹 <span id="stamp-title">찌니</span> 도장판</h2>
+      </div>
+      <span class="badge badge-fire" id="stamp-streak">🔥 0일 연속</span>
+    </header>
+    <div class="stamp-tabs" id="stamp-tabs" role="tablist" aria-label="도장판 아이 선택"></div>
+    <p class="section-sub stamp-desc" id="stamp-desc">찌니가 그날 공부나 루틴을 하나라도 마치면 도장이 찍혀요</p>
+    <div class="stamp-week" id="stamp-week"><!-- rendered --></div>
+    <div class="stamp-foot">
+      <span class="pill pill-soft" id="stamp-summary">이번 달 도장 0개</span>
+      <button class="btn btn-light" data-action="open-calendar" id="btn-calendar">🗓️ 도장판 달력 보기</button>
+    </div>
+  </section>
+
+  <!-- ================= FAMILY MISSION ================= -->
+  <section class="card mission-section" aria-label="오늘의 가족 미션">
+    <header class="section-head">
+      <h2 class="section-title">🎲 오늘의 가족 미션</h2>
+      <span class="pill pill-soft" id="mission-count">함께 0번</span>
+    </header>
+    <div class="mission-body">
+      <div class="mission-emoji" id="mission-emoji">🥕</div>
+      <p class="mission-text" id="mission-text">저녁 준비 같이 돕기</p>
+    </div>
+    <div class="mission-actions">
+      <button class="btn btn-mint" data-action="mission-done" id="btn-mission-done">✅ 다 같이 했어요</button>
+      <button class="btn btn-light" data-action="mission-shuffle" id="btn-mission-shuffle">🔄 다른 미션 뽑기</button>
+    </div>
+    <p class="mission-note" id="mission-note">가족이 다 함께 하는 미션이에요. 하루에 한 번 가볍게 해봐요!</p>
+  </section>
+
+  <footer class="app-footer">
+    <p>우리 가족 기록장 · 기록은 이 기기에 저장돼요</p>
+    <p class="app-footer-small">홈 화면에 추가하면 앱처럼 열려요 · v1.0</p>
+  </footer>
+</div>
+
+<!-- ================= SHEETS ================= -->
+<div class="sheet-backdrop" id="sheet-backdrop" hidden>
+
+  <!-- 설정 -->
+  <section class="sheet" id="sheet-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+    <header class="sheet-head">
+      <h2 id="settings-title">⚙️ 설정</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="field-group">
+        <h3 class="field-title">우리 동네 (날씨)</h3>
+        <p class="field-hint">날씨와 미세먼지를 알려줄 동네를 골라주세요</p>
+        <div class="city-current">
+          <span>지금 설정</span><strong id="city-current">시흥</strong>
+        </div>
+        <div class="chip-wrap" id="city-presets"></div>
+        <div class="search-row">
+          <input type="search" id="city-search" placeholder="다른 동네 검색 (예: 일산, 해운대)" autocomplete="off" />
+          <button class="btn btn-light btn-compact" id="btn-city-search">검색</button>
+        </div>
+        <div class="search-results" id="city-results"></div>
+      </div>
+
+      <div class="field-group">
+        <h3 class="field-title">가족 이름</h3>
+        <p class="field-hint">이름과 한 줄 소개를 바꿀 수 있어요</p>
+        <div class="member-edit-list" id="member-edit-list"></div>
+      </div>
+
+      <div class="field-group">
+        <h3 class="field-title">홈 화면에 추가</h3>
+        <p class="field-hint">
+          아이폰 사파리: 공유 → <b>홈 화면에 추가</b><br />
+          안드로이드 크롬: 우측 상단 ⋮ → <b>앱 설치 / 홈 화면에 추가</b>
+        </p>
+      </div>
+
+      <div class="field-group field-danger">
+        <h3 class="field-title">기록 지우기</h3>
+        <p class="field-hint">할 일, 별, 도장, 미션 기록이 모두 사라져요. 되돌릴 수 없어요.</p>
+        <button class="btn btn-danger btn-wide" data-action="reset" id="btn-reset">모든 기록 지우기</button>
+      </div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-primary btn-wide" data-close>확인</button>
+    </footer>
+  </section>
+
+  <!-- 도장판 달력 -->
+  <section class="sheet" id="sheet-calendar" role="dialog" aria-modal="true" aria-labelledby="calendar-title" hidden>
+    <header class="sheet-head">
+      <h2 id="calendar-title">🗓️ <span id="calendar-kid">찌니</span> 도장판 달력</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="calendar-nav">
+        <button class="icon-round" data-action="cal-prev" id="cal-prev" aria-label="이전 달">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <strong id="cal-month">2026년 11월</strong>
+        <button class="icon-round" data-action="cal-next" id="cal-next" aria-label="다음 달">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="calendar-grid-head" id="cal-head"></div>
+      <div class="calendar-grid" id="cal-grid"></div>
+      <p class="calendar-legend" id="cal-summary">이번 달 도장 0개</p>
+      <p class="field-hint">도장을 찍고 싶은 날을 눌러도 돼요. 오늘 이후는 아직 비어 있어요.</p>
+    </div>
+  </section>
+
+  <!-- 주간 시간표 -->
+  <section class="sheet" id="sheet-timetable" role="dialog" aria-modal="true" aria-labelledby="timetable-title" hidden>
+    <header class="sheet-head">
+      <h2 id="timetable-title">🗓️ 주간 시간표</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="stamp-tabs" id="timetable-tabs" role="tablist" aria-label="아이 선택"></div>
+      <p class="field-hint" id="timetable-hint">2학기 · 평일 시간표</p>
+      <div class="timetable" id="timetable-body"></div>
+      <p class="timetable-note">방과후 일정은 학원·방과후 시간이에요. 바뀌면 <b>js/schedule.js</b>에서 고칠 수 있어요.</p>
+    </div>
+  </section>
+
+  <!-- 할 일 추가 / 고치기 -->
+  <section class="sheet" id="sheet-task" role="dialog" aria-modal="true" aria-labelledby="task-title" hidden>
+    <header class="sheet-head">
+      <h2 id="task-title">+ 할 일 추가</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="field-group">
+        <h3 class="field-title">누구의 할 일인가요?</h3>
+        <div class="chip-wrap" id="task-member-chips"></div>
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">할 일 내용</h3>
+        <input type="text" id="task-text" maxlength="40" placeholder="예) 책 30분 읽기" autocomplete="off" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">반복</h3>
+        <p class="field-hint">평일을 고르면 토·일요일에는 자동으로 쉬어요</p>
+        <div class="chip-wrap" id="task-repeat-chips">
+          <button class="chip chip-choice" data-action="task-repeat" data-repeat="once" aria-pressed="true">오늘만</button>
+          <button class="chip chip-choice" data-action="task-repeat" data-repeat="daily" aria-pressed="false">매일</button>
+          <button class="chip chip-choice" data-action="task-repeat" data-repeat="weekday" aria-pressed="false">평일 (월~금)</button>
+        </div>
+      </div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-ghost btn-wide" data-action="task-delete" id="task-delete" hidden>지우기</button>
+      <button class="btn btn-primary btn-wide" data-action="task-save" id="task-save">저장</button>
+    </footer>
+  </section>
+
+  <!-- 별 조정 -->
+  <section class="sheet" id="sheet-star" role="dialog" aria-modal="true" aria-labelledby="star-title" hidden>
+    <header class="sheet-head">
+      <h2 id="star-title">⭐️ 별 저금통</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="star-hero">
+        <div class="star-hero-avatar" id="star-avatar"></div>
+        <div>
+          <p class="star-hero-name" id="star-name">찌니</p>
+          <p class="star-hero-count"><span>⭐️</span> <b id="star-count">0</b>개</p>
+        </div>
+      </div>
+      <p class="field-hint center">할 일을 하나 끝내면 별 1개가 쌓여요.<br />칭찬 별은 여기서 직접 더하거나 줄일 수 있어요.</p>
+      <div class="star-actions">
+        <button class="btn btn-mint" data-action="star-plus" id="star-plus">⭐️ 별 하나 더</button>
+        <button class="btn btn-light" data-action="star-minus" id="star-minus">➖ 별 하나 줄이기</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="confetti-layer" id="confetti" aria-hidden="true"></div>
+
+<noscript>
+  <style>.app{display:none}</style>
+  <p style="padding:24px;font-family:sans-serif">이 기록장은 자바스크립트가 필요해요. 브라우저 설정에서 자바스크립트를 켜주세요.</p>
+</noscript>
+
+<script src="js/characters.js"></script>
+<script src="js/schedule.js"></script>
+<script src="js/store.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
