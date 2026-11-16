@@ -1,4 +1,4 @@
-/* 우리 가족 기록장 — 데이터 저장소
+/* 찌니 대시보드 — 데이터 저장소
    ------------------------------------------------------------------
    모든 기록은 localStorage 에 저장됩니다. 화면 코드는 이 파일의 API만
    쓰기 때문에, 나중에 여러 기기에서 함께 쓰고 싶다면 아래 setAdapter()에
@@ -12,11 +12,11 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 4;
+  var SCHEMA = 5;
 
   /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
-     불러올 때 깔끔히 지워서 두 아이 구성만 남깁니다. */
-  var REMOVED_MEMBERS = { mom: true, dad: true };
+     불러올 때 깔끔히 지워서 찌니 한 명 구성만 남깁니다. */
+  var REMOVED_MEMBERS = { mom: true, dad: true, naeun: true };
   /* 예전 기본 동네의 좌표 — 저장된 값이 이 좌표면 새 기본 동네(동탄2신도시)로 바꿉니다. */
   var LEGACY_PLACE = { lat: '37.380', lon: '126.803' };
 
@@ -88,8 +88,7 @@
         place: { name: '동탄2신도시', lat: 37.2001, lon: 127.0990 }
       },
       members: [
-        { id: 'jjini', name: '찌니', sub: '햄찌와 함께', char: 'hamster', role: 'kid', stars: 3 },
-        { id: 'naeun', name: '나은찡', sub: '토끼와 함께', char: 'rabbit', role: 'kid', stars: 1 }
+        { id: 'jjini', name: '찌니', sub: '햄찌와 함께', char: 'hamster', role: 'kid', stars: 3 }
       ],
       /* 반복 루틴 — 매일/평일 구분. group 은 찌니 보상 트래커에서 씁니다. */
       routines: {
@@ -99,16 +98,10 @@
           { id: 'r_jj_hanja', text: '한자어휘문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
           { id: 'r_jj_history', text: '역사문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
           { id: 'r_jj_read', text: '책 30분 읽기', repeat: 'daily' }
-        ],
-        naeun: [
-          { id: 'r_ne_read', text: '책 30분 읽기', repeat: 'daily' },
-          { id: 'r_ne_dictation', text: '받아쓰기 연습 1회', repeat: 'daily' },
-          { id: 'r_ne_prep', text: '내일 준비물 챙기기', repeat: 'weekday' },
-          { id: 'r_ne_diary', text: '일기 한 편 쓰기', repeat: 'weekday' }
         ]
       },
       days: {},
-      stamps: { jjini: {}, naeun: {} },
+      stamps: { jjini: {} },
       mission: { date: '', id: '', together: 0, lastDoneDate: '' }
     };
   }

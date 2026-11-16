@@ -2,14 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<title>우리 가족 기록장</title>
+<meta name="robots" content="noindex, nofollow" />
+<script>try{if(localStorage.getItem('jjini.lock.v1')!=='ok'){document.documentElement.className+=' is-locked';}}catch(e){document.documentElement.className+=' is-locked';}</script>
+<title>찌니 대시보드</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
 <meta name="theme-color" content="#FCF4D7" />
-<meta name="description" content="우리 가족의 하루를 포근하게 기록하는 가족 대시보드 — 할 일, 별, 도장판, 오늘의 미션" />
+<meta name="description" content="찌니의 하루를 포근하게 기록하는 대시보드 — 할 일, 별, 도장판, 오늘의 미션" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="우리 가족 기록장" />
+<meta name="apple-mobile-web-app-title" content="찌니 대시보드" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
@@ -18,13 +20,38 @@
 </head>
 <body>
 
+<!-- ================= 잠금 화면 ================= -->
+<div class="lock" id="lock">
+  <div class="lock-inner">
+    <div class="lock-avatar" id="lock-avatar" aria-hidden="true"></div>
+    <h1 class="lock-title">찌니 대시보드</h1>
+    <p class="lock-sub">비밀번호 4자리를 눌러 주세요</p>
+    <div class="lock-dots" id="lock-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p class="lock-msg" id="lock-msg" role="status" aria-live="polite"></p>
+    <div class="lock-pad" id="lock-pad">
+      <button class="lock-key" type="button" data-key="1" aria-label="1">1</button>
+      <button class="lock-key" type="button" data-key="2" aria-label="2">2</button>
+      <button class="lock-key" type="button" data-key="3" aria-label="3">3</button>
+      <button class="lock-key" type="button" data-key="4" aria-label="4">4</button>
+      <button class="lock-key" type="button" data-key="5" aria-label="5">5</button>
+      <button class="lock-key" type="button" data-key="6" aria-label="6">6</button>
+      <button class="lock-key" type="button" data-key="7" aria-label="7">7</button>
+      <button class="lock-key" type="button" data-key="8" aria-label="8">8</button>
+      <button class="lock-key" type="button" data-key="9" aria-label="9">9</button>
+      <span class="lock-key is-blank" aria-hidden="true"></span>
+      <button class="lock-key" type="button" data-key="0" aria-label="0">0</button>
+      <button class="lock-key is-del" type="button" data-key="del" aria-label="한 자리 지우기">⌫</button>
+    </div>
+  </div>
+</div>
+
 <div class="app" id="app">
 
   <!-- ================= HEADER ================= -->
   <header class="app-header">
     <div class="brand-row">
       <span class="brand-mark" id="brand-mark" aria-hidden="true"></span>
-      <h1 class="brand-title">우리 가족 기록장</h1>
+      <h1 class="brand-title">찌니 대시보드</h1>
       <div class="header-actions">
         <button class="icon-pill" data-action="open-settings" id="btn-settings" aria-label="설정 열기" title="설정">
           <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true">
@@ -42,7 +69,7 @@
     <div class="header-sub">
       <div class="header-date-wrap">
         <p class="header-date" id="header-date">11월 15일 일요일</p>
-        <p class="header-line">우리집의 포근한 하루</p>
+        <p class="header-line">찌니의 포근한 하루</p>
       </div>
       <span class="pill pill-glow">✨ 오늘도 함께 기록해요</span>
     </div>
@@ -71,7 +98,7 @@
     <header class="section-head">
       <div class="section-title-wrap">
         <h2 class="section-title">🏫 오늘의 학교·학원 일정</h2>
-        <p class="section-sub" id="schedule-sub">오늘 하루 두 아이의 시간표예요</p>
+        <p class="section-sub" id="schedule-sub">오늘 찌니의 하루 시간표예요</p>
       </div>
       <span class="pill pill-day" id="schedule-day">일요일</span>
     </header>
@@ -79,8 +106,8 @@
     <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
   </section>
 
-  <!-- ================= FAMILY MEMBERS ================= -->
-  <section class="card family-section" aria-label="우리 가족">
+  <!-- ================= 찌니 카드 ================= -->
+  <section class="card family-section" aria-label="찌니">
     <div class="member-list" id="member-list"><!-- rendered --></div>
   </section>
 
@@ -89,7 +116,7 @@
     <header class="section-head">
       <div class="section-title-wrap">
         <h2 class="section-title">✅ 오늘 할 일</h2>
-        <p class="section-sub" id="todo-sub">가족이 각자 할 일을 체크해요</p>
+        <p class="section-sub" id="todo-sub">오늘 할 일을 하나씩 체크해요</p>
       </div>
       <button class="btn btn-ghost" data-action="add-task" id="btn-add-task">+ 할 일 추가</button>
     </header>
@@ -145,7 +172,7 @@
   </section>
 
   <footer class="app-footer">
-    <p>우리 가족 기록장 · 기록은 이 기기에 저장돼요</p>
+    <p>찌니 대시보드 · 기록은 이 기기에 저장돼요</p>
     <p class="app-footer-small">홈 화면에 추가하면 앱처럼 열려요 · v1.0</p>
   </footer>
 </div>
@@ -175,7 +202,7 @@
       </div>
 
       <div class="field-group">
-        <h3 class="field-title">가족 이름</h3>
+        <h3 class="field-title">찌니 이름</h3>
         <p class="field-hint">이름과 한 줄 소개를 바꿀 수 있어요</p>
         <div class="member-edit-list" id="member-edit-list"></div>
       </div>
@@ -186,6 +213,12 @@
           아이폰 사파리: 공유 → <b>홈 화면에 추가</b><br />
           안드로이드 크롬: 우측 상단 ⋮ → <b>앱 설치 / 홈 화면에 추가</b>
         </p>
+      </div>
+
+      <div class="field-group">
+        <h3 class="field-title">잠금</h3>
+        <p class="field-hint">지금 잠그면 다음에 열 때 비밀번호를 물어봐요</p>
+        <button class="btn btn-light btn-wide" data-action="lock-now" id="btn-lock">🔒 지금 잠그기</button>
       </div>
 
       <div class="field-group field-danger">
@@ -301,6 +334,7 @@
 <script src="js/characters.js"></script>
 <script src="js/schedule.js"></script>
 <script src="js/store.js"></script>
+<script src="js/lock.js"></script>
 <script src="js/weather.js"></script>
 <script src="js/app.js"></script>
 </body>

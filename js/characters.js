@@ -1,7 +1,7 @@
-/* 우리 가족 기록장 — 가족 캐릭터 (인라인 SVG)
-   각 캐릭터는 120x120 viewBox 기준으로 그려집니다.
-   가족 이름을 바꿔도 그림은 그대로예요. 새 캐릭터를 추가하려면 아래
-   CHARACTERS 목록에 키를 하나 더 넣고 함수를 만들면 됩니다. */
+/* 찌니 대시보드 — 찌니 캐릭터 (인라인 SVG)
+   120x120 viewBox 기준으로 그려집니다.
+   다른 캐릭터를 추가하려면 아래 CHARACTERS 목록에 키를 하나 더 넣고
+   함수를 만들면 됩니다. */
 (function () {
   'use strict';
 
@@ -91,31 +91,8 @@
     return wrap('char-hamster', b, '#FFFFFF', '#FFF3DF');
   }
 
-  /* ---------- 나은찡 : 토끼 ---------- */
-  function rabbit() {
-    var b = '';
-    // 긴 귀
-    b += '<g transform="rotate(-9 45 30)"><ellipse cx="45" cy="28" rx="8.6" ry="19" fill="#FFFDFA" stroke="#EEDCD4" stroke-width="2"/>' +
-      '<ellipse cx="45" cy="29" rx="4.4" ry="12" fill="#F9C4CE"/></g>';
-    b += '<g transform="rotate(9 76 28)"><ellipse cx="76" cy="26" rx="8.6" ry="19" fill="#FFFDFA" stroke="#EEDCD4" stroke-width="2"/>' +
-      '<ellipse cx="76" cy="27" rx="4.4" ry="12" fill="#F9C4CE"/></g>';
-    // 얼굴
-    b += '<ellipse cx="60" cy="66" rx="29" ry="26.5" fill="#FFFDFA" stroke="#EEDCD4" stroke-width="2"/>';
-    b += eyesClosed(44, 64, 22, 11);
-    b += blush(38, 82, 73);
-    b += '<path d="M60 69.5 l-3.2 2.6 h6.4 Z" fill="#F0919F"/>';
-    b += '<path d="M60 73.5 q-4 4.6 -7.4 1 M60 73.5 q4 4.6 7.4 1" stroke="#C79A93" stroke-width="1.9" fill="none" stroke-linecap="round"/>';
-    // 당근
-    b += '<path d="M60 84 q8 6 6.5 13.5 Q60 101 53.5 97.5 52 90 60 84Z" fill="#F6A24E" stroke="#E08B37" stroke-width="1.6"/>';
-    b += '<path d="M60 84 q-3.6 -6 -8 -6.4 1 5.4 5 7.4 M60 84 q3.6 -6 8 -6.4 -1 5.4 -5 7.4" fill="#8CCB7B" stroke="#6FB463" stroke-width="1.4"/>';
-    b += heart(92, 44, 6.2, '#F7A8B6');
-    b += sparkle(28, 46, 5, '#FFD37E');
-    return wrap('char-rabbit', b, '#FFFFFF', '#FFF0F1');
-  }
-
   var CHARACTERS = {
-    hamster: hamster,
-    rabbit: rabbit
+    hamster: hamster
   };
 
   window.FamilyChars = {

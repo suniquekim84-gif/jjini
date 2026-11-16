@@ -1,4 +1,4 @@
-/* 우리 가족 기록장 — 화면 동작
+/* 찌니 대시보드 — 화면 동작
    데이터는 모두 FamilyStore 를 통해서만 읽고 씁니다. */
 (function () {
   'use strict';
@@ -9,14 +9,14 @@
   var Weather = window.FamilyWeather;
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
-  var TINTS = { jjini: '', naeun: 'pink' };
+  var TINTS = { jjini: '' };
   var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star'];
 
   var state = null;
   var weather = null;
   var weatherFailed = false;
   var stampKid = 'jjini';
-  var timetableKid = 'naeun';
+  var timetableKid = 'jjini';
   var calCursor = null;
   var starMember = 'jjini';
   var taskCtx = { mode: 'add', memberId: 'jjini', taskId: null, repeat: 'once' };
@@ -169,8 +169,8 @@
       return;
     }
 
-    var rows = ['naeun', 'jjini'].map(scheduleRow).join('');
-    byId('schedule-sub').textContent = '오늘 하루 두 아이의 시간표예요';
+    var rows = ['jjini'].map(scheduleRow).join('');
+    byId('schedule-sub').textContent = '오늘 찌니의 하루 시간표예요';
     byId('schedule-body').innerHTML = rows;
     byId('btn-timetable').textContent = '🗓️ 주간 시간표 보기';
   }
@@ -230,7 +230,7 @@
       '</div>';
     }).join('');
 
-    byId('todo-sub').textContent = '가족이 각자 할 일을 체크해요';
+    byId('todo-sub').textContent = '오늘 할 일을 하나씩 체크해요';
   }
 
   /* ---------------- 찌니 보상 트래커 ---------------- */
@@ -321,6 +321,7 @@
 
     var kid = Store.member(stampKid) || kidList[0];
     byId('stamp-tabs').setAttribute('role', 'tablist');
+    byId('stamp-tabs').hidden = kidList.length < 2; // 혼자면 탭 없이 바로 보여요
     byId('stamp-tabs').innerHTML = kidList.map(function (k) {
       var active = k.id === stampKid;
       return '<button class="stamp-tab' + (active ? ' is-active' : '') + '" data-action="stamp-kid" data-kid="' + k.id + '" ' +
@@ -452,13 +453,15 @@
   /* ---------------- 주간 시간표 ---------------- */
   function renderTimetable() {
     var kidList = kids();
-    byId('timetable-tabs').innerHTML = kidList.map(function (k) {
+    var tabRow = byId('timetable-tabs');
+    tabRow.hidden = kidList.length < 2; // 혼자면 탭 없이 바로 보여요
+    tabRow.innerHTML = kidList.map(function (k) {
       var active = k.id === timetableKid;
       return '<button class="stamp-tab' + (active ? ' is-active' : '') + '" data-action="tt-kid" data-kid="' + k.id + '">' +
         '<span class="tab-avatar">' + Chars.svg(k.char) + '</span>' + esc(k.name) + '</button>';
     }).join('');
 
-    var kid = Sched.kids[timetableKid] || Sched.kids.naeun;
+    var kid = Sched.kids[timetableKid] || Sched.kids.jjini;
     var todayDow = Store.parseDate(Store.todayISO()).getDay();
     var html = '';
 
@@ -604,8 +607,8 @@
 
     'share': function () {
       var payload = {
-        title: '우리 가족 기록장',
-        text: '우리 가족 기록장 — 오늘도 함께 기록해요 ✨',
+        title: '찌니 대시보드',
+        text: '찌니 대시보드 — 오늘도 함께 기록해요 ✨',
         url: location.href
       };
       if (navigator.share) {
@@ -830,6 +833,11 @@
 
     'close': function () {
       closeSheets();
+    },
+
+    'lock-now': function () {
+      closeSheets();
+      if (window.FamilyLock) window.FamilyLock.lock();
     },
 
     'reset': function () {
