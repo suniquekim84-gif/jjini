@@ -1568,43 +1568,28 @@ html.is-locked .tabbar { display: none; }
 .reward-math {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   gap: 4px;
   margin-top: 5px;
+  font-weight: 700;
 }
 
-.reward-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-size: 10.5px;
+.reward-term {
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: -0.2px;
   white-space: nowrap;
-  background: #F4EEE3;
-  border: 1px solid #EDE2D0;
-  color: #A2937F;
+  color: #B3A48F;
 }
 
-.reward-chip.is-on {
-  background: #E9F8EC;
-  border-color: #CDEBD5;
-  color: #3E8A57;
-}
+.reward-term.is-on { color: #3E8A57; }
+.reward-term-book.is-on { color: #41719F; }
 
-.reward-chip-book.is-on {
-  background: #EAF3FC;
-  border-color: #D3E4F7;
-  color: #41719F;
-}
-
-.reward-plus { font-size: 10px; font-weight: 700; color: #B7A78F; }
+.reward-op { font-size: 10.5px; font-weight: 700; color: #C0B2A0; }
 
 .reward-total {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #9C8B78;
   letter-spacing: -0.2px;

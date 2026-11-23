@@ -329,10 +329,10 @@
         '<p class="reward-name">노트북(엔트리코딩)</p>' +
         '<p class="reward-cond">' + codingCond + pips(j) + '</p>' +
         '<p class="reward-math">' +
-          '<span class="reward-chip' + (baseOn ? ' is-on' : '') + '">재능 30분</span>' +
-          '<span class="reward-plus">+</span>' +
-          '<span class="reward-chip reward-chip-book' + (bookBonus ? ' is-on' : '') + '">📚 책 10분</span>' +
-          '<span class="reward-plus">=</span>' +
+          '<span class="reward-term' + (baseOn ? ' is-on' : '') + '">재능 30분</span>' +
+          '<span class="reward-op">+</span>' +
+          '<span class="reward-term reward-term-book' + (bookBonus ? ' is-on' : '') + '">책 10분</span>' +
+          '<span class="reward-op">=</span>' +
           '<b class="reward-total' + (codingMin > 0 ? ' is-on' : '') + '">' + (codingMin > 0 ? codingMin + '분' : '아직 0분') + '</b>' +
         '</p>' +
       '</div>' +
