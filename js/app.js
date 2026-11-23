@@ -107,7 +107,8 @@
   /* ---------------- 오늘의 학교·학원 일정 ---------------- */
   function kidStatus(day, now) {
     var schoolEnd = minutesOf(day.school);
-    if (now < 8 * 60) return { text: '일정 시작 전', now: false };
+    var schoolStart = Prep ? Prep.minutesOf(Prep.SCHOOL_DEPART) : 8 * 60 + 30;
+    if (now < schoolStart) return { text: '일정 시작 전', now: false };
     if (now < schoolEnd) return { text: '학교 다니는 중', now: true };
     var i, cur;
     for (i = 0; i < day.items.length; i++) {
