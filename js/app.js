@@ -24,6 +24,7 @@
   var starMember = 'jjini';
   var taskCtx = { mode: 'add', memberId: 'jjini', taskId: null, repeat: 'once' };
   var lectureCtx = { mode: 'add', id: null };
+  var lectureExpanded = false;
   var bookCtx = { mode: 'add', id: null };
   var lastToday = null;
   var toastTimer = null;
@@ -520,7 +521,7 @@
     var today = Store.todayISO();
     var todayList = Lectures.onDate(today);
     var upcomingAll = Lectures.countUpcoming(today);
-    var upcoming = Lectures.upcoming(today, 6);
+    var upcoming = Lectures.upcoming(today, lectureExpanded ? 0 : 6);
 
     byId('lecture-sub').textContent = upcomingAll
       ? '다가오는 강의 ' + upcomingAll + '개'
@@ -537,8 +538,11 @@
 
     var up = '<div class="lecture-head">' +
         '<span class="lecture-head-title">다가오는 일정</span>' +
-        (upcomingAll > upcoming.length
-          ? '<span class="lecture-more">외 ' + (upcomingAll - upcoming.length) + '개</span>' : '') +
+        (upcomingAll > 6
+          ? '<button class="lecture-more" type="button" data-action="toggle-lecture-more">' +
+              (lectureExpanded ? '접기 ▴' : '외 ' + (upcomingAll - upcoming.length) + '개 더 보기 ▾') +
+            '</button>'
+          : '') +
       '</div>';
     up += upcoming.length
       ? '<div class="lecture-list">' + upcoming.map(function (it) { return lectureRow(it, true); }).join('') + '</div>'
@@ -1070,6 +1074,11 @@
       } else {
         toast('체크를 풀었어요');
       }
+    },
+
+    'toggle-lecture-more': function () {
+      lectureExpanded = !lectureExpanded;
+      renderLectures();
     },
 
     'add-lecture': function () {

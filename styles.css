@@ -1323,8 +1323,14 @@ input { font: inherit; color: inherit; }
 .lecture-more {
   font-size: 11px;
   font-weight: 700;
-  color: #A2907F;
+  color: #8B76B0;
+  background: #F4F0FF;
+  border: 1px solid #E4DCF5;
+  border-radius: 999px;
+  padding: 3px 9px;
+  letter-spacing: -0.2px;
 }
+.lecture-more:active { transform: scale(.97); }
 
 .lecture-list {
   display: flex;
