@@ -7,7 +7,7 @@
 <title>찌니 대시보드</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
 <meta name="theme-color" content="#FCF4D7" />
-<meta name="description" content="찌니의 하루를 포근하게 기록하는 대시보드 — 등교·학원 준비, 할 일, 별, 도장판" />
+<meta name="description" content="찌니의 하루를 포근하게 기록하는 대시보드 — 등교·학원 준비, 할 일, 별, 도장판, 독서 기록" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -118,6 +118,19 @@
     <div class="prep-body" id="prep-body"><!-- rendered --></div>
   </section>
 
+  <!-- ================= 엄마 강의 일정 ================= -->
+  <section class="card lecture-section" id="lecture-section" aria-label="엄마 강의 일정">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🎤 엄마 강의 일정</h2>
+        <p class="section-sub" id="lecture-sub">오늘과 다가오는 강의를 모아 봐요</p>
+      </div>
+      <button class="btn btn-ghost" data-action="add-lecture" id="btn-add-lecture">+ 일정 추가</button>
+    </header>
+    <div class="lecture-today" id="lecture-today"><!-- rendered --></div>
+    <div class="lecture-upcoming" id="lecture-upcoming"><!-- rendered --></div>
+  </section>
+
   <!-- ================= 찌니 카드 ================= -->
   <section class="card family-section" aria-label="찌니">
     <div class="member-list" id="member-list"><!-- rendered --></div>
@@ -164,6 +177,18 @@
       <span class="pill pill-soft" id="stamp-summary">이번 달 도장 0개</span>
       <button class="btn btn-light" data-action="open-calendar" id="btn-calendar">🗓️ 도장판 달력 보기</button>
     </div>
+  </section>
+
+  <!-- ================= 독서 기록 ================= -->
+  <section class="card book-section" id="book-section" aria-label="독서 기록">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📚 독서 기록</h2>
+        <p class="section-sub" id="book-sub">읽은 책과 짧은 감상평을 남겨요</p>
+      </div>
+      <button class="btn btn-ghost" data-action="add-book" id="btn-add-book">+ 기록 추가</button>
+    </header>
+    <div class="book-list" id="book-list"><!-- rendered --></div>
   </section>
 
   <footer class="app-footer">
@@ -316,6 +341,64 @@
       </div>
     </div>
   </section>
+  <!-- 강의 일정 추가 / 고치기 -->
+  <section class="sheet" id="sheet-lecture" role="dialog" aria-modal="true" aria-labelledby="lecture-sheet-title" hidden>
+    <header class="sheet-head">
+      <h2 id="lecture-sheet-title">🎤 강의 일정</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="field-group">
+        <h3 class="field-title">날짜</h3>
+        <input type="date" id="lecture-date" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">시간</h3>
+        <p class="field-hint">예: 09:50 또는 10:00~12:00 (모르면 비워 두세요)</p>
+        <input type="text" id="lecture-time" maxlength="20" placeholder="09:50" autocomplete="off" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">일정 이름</h3>
+        <input type="text" id="lecture-name" maxlength="40" placeholder="예: 화성남양초" autocomplete="off" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">메모 (선택)</h3>
+        <p class="field-hint">비대면·서부·북부처럼 덧붙일 말이 있으면 적어 주세요</p>
+        <input type="text" id="lecture-note" maxlength="20" placeholder="예: 비대면 / 서부" autocomplete="off" />
+      </div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-ghost btn-wide" data-action="lecture-delete" id="lecture-delete" hidden>지우기</button>
+      <button class="btn btn-primary btn-wide" data-action="lecture-save" id="lecture-save">저장</button>
+    </footer>
+  </section>
+
+  <!-- 독서 기록 추가 / 고치기 -->
+  <section class="sheet" id="sheet-book" role="dialog" aria-modal="true" aria-labelledby="book-sheet-title" hidden>
+    <header class="sheet-head">
+      <h2 id="book-sheet-title">📚 독서 기록</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="field-group">
+        <h3 class="field-title">읽은 날</h3>
+        <input type="date" id="book-date" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">책 제목</h3>
+        <input type="text" id="book-title" maxlength="60" placeholder="예: 긴긴밤" autocomplete="off" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">감상평</h3>
+        <p class="field-hint">한두 줄이면 충분해요 (최대 400자)</p>
+        <textarea id="book-review" rows="4" maxlength="400" placeholder="어떤 점이 좋았는지 적어 보세요"></textarea>
+      </div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-ghost btn-wide" data-action="book-delete" id="book-delete" hidden>지우기</button>
+      <button class="btn btn-primary btn-wide" data-action="book-save" id="book-save">저장</button>
+    </footer>
+  </section>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -329,6 +412,8 @@
 <script src="js/characters.js"></script>
 <script src="js/schedule.js"></script>
 <script src="js/prep.js"></script>
+<script src="js/lectures.js"></script>
+<script src="js/books.js"></script>
 <script src="js/store.js"></script>
 <script src="js/lock.js"></script>
 <script src="js/weather.js"></script>

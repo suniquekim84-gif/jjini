@@ -7,11 +7,13 @@
   var Chars = window.FamilyChars;
   var Sched = window.FamilySchedule;
   var Prep = window.FamilyPrep;
+  var Lectures = window.FamilyLectures;
+  var Books = window.FamilyBooks;
   var Weather = window.FamilyWeather;
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var TINTS = { jjini: '' };
-  var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star'];
+  var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star', 'sheet-lecture', 'sheet-book'];
 
   var state = null;
   var weather = null;
@@ -21,6 +23,8 @@
   var calCursor = null;
   var starMember = 'jjini';
   var taskCtx = { mode: 'add', memberId: 'jjini', taskId: null, repeat: 'once' };
+  var lectureCtx = { mode: 'add', id: null };
+  var bookCtx = { mode: 'add', id: null };
   var lastToday = null;
   var toastTimer = null;
   var weatherTimer = null;
@@ -42,6 +46,11 @@
     return d.getHours() * 60 + d.getMinutes();
   }
   function tone(name) { return (Sched.colors && Sched.colors[name]) || 'blue'; }
+  function shortDate(dateISO, withWeekday) {
+    var d = Store.parseDate(dateISO);
+    var s = (d.getMonth() + 1) + '/' + d.getDate();
+    return withWeekday === false ? s : s + ' ' + DAYS[d.getDay()];
+  }
 
   /* ---------------- 헤더 ---------------- */
   function renderHeader() {
@@ -485,6 +494,88 @@
     });
   }
 
+  /* ---------------- 엄마 강의 일정 ---------------- */
+  function lectureRow(it, withDate) {
+    return '<div class="lecture-row">' +
+      '<div class="lecture-top">' +
+        '<span class="lecture-time' + (it.time ? '' : ' is-empty') + '">' +
+          (it.time ? esc(it.time) : '시간 미정') + '</span>' +
+        '<span class="lecture-title">' + esc(it.title) + '</span>' +
+      '</div>' +
+      '<div class="lecture-meta">' +
+        (withDate ? '<span class="lecture-date">' + esc(shortDate(it.date)) + '</span>' : '') +
+        (it.note ? '<span class="lecture-note">' + esc(it.note) + '</span>' : '') +
+        '<span class="lecture-actions">' +
+          '<button class="mini-btn" data-action="edit-lecture" data-id="' + it.id + '" ' +
+            'aria-label="' + esc(it.title) + ' 고치기">✏️</button>' +
+          '<button class="mini-btn del" data-action="delete-lecture" data-id="' + it.id + '" ' +
+            'aria-label="' + esc(it.title) + ' 지우기">✕</button>' +
+        '</span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderLectures() {
+    if (!Lectures) return;
+    var today = Store.todayISO();
+    var todayList = Lectures.onDate(today);
+    var upcomingAll = Lectures.countUpcoming(today);
+    var upcoming = Lectures.upcoming(today, 6);
+
+    byId('lecture-sub').textContent = upcomingAll
+      ? '다가오는 강의 ' + upcomingAll + '개'
+      : '오늘과 다가오는 강의를 모아 봐요';
+
+    var html = '<div class="lecture-head">' +
+        '<span class="lecture-head-title">오늘 · ' + esc(shortDate(today)) + '</span>' +
+        '<span class="pill pill-soft">' + (todayList.length ? todayList.length + '개' : '없음') + '</span>' +
+      '</div>';
+    html += todayList.length
+      ? '<div class="lecture-list">' + todayList.map(function (it) { return lectureRow(it, false); }).join('') + '</div>'
+      : '<p class="lecture-empty">오늘은 강의가 없어요 ☕</p>';
+    byId('lecture-today').innerHTML = html;
+
+    var up = '<div class="lecture-head">' +
+        '<span class="lecture-head-title">다가오는 일정</span>' +
+        (upcomingAll > upcoming.length
+          ? '<span class="lecture-more">외 ' + (upcomingAll - upcoming.length) + '개</span>' : '') +
+      '</div>';
+    up += upcoming.length
+      ? '<div class="lecture-list">' + upcoming.map(function (it) { return lectureRow(it, true); }).join('') + '</div>'
+      : '<p class="lecture-empty">다가오는 강의는 아직 없어요</p>';
+    byId('lecture-upcoming').innerHTML = up;
+  }
+
+  /* ---------------- 독서 기록 ---------------- */
+  function renderBooks() {
+    if (!Books) return;
+    var list = Books.list();
+    byId('book-sub').textContent = list.length
+      ? '지금까지 ' + list.length + '권 남겼어요'
+      : '읽은 책과 짧은 감상평을 남겨요';
+
+    byId('book-list').innerHTML = list.length
+      ? list.map(function (b) {
+          return '<article class="book-row">' +
+            '<div class="book-top">' +
+              '<span class="book-emoji" aria-hidden="true">📖</span>' +
+              '<div class="book-info">' +
+                '<p class="book-title">' + esc(b.title) + '</p>' +
+                '<p class="book-date">' + esc(shortDate(b.date, false)) + '</p>' +
+              '</div>' +
+              '<span class="book-actions">' +
+                '<button class="mini-btn" data-action="edit-book" data-id="' + b.id + '" ' +
+                  'aria-label="' + esc(b.title) + ' 고치기">✏️</button>' +
+                '<button class="mini-btn del" data-action="delete-book" data-id="' + b.id + '" ' +
+                  'aria-label="' + esc(b.title) + ' 지우기">✕</button>' +
+              '</span>' +
+            '</div>' +
+            (b.review ? '<p class="book-review">' + esc(b.review) + '</p>' : '') +
+          '</article>';
+        }).join('')
+      : '<p class="book-empty">아직 독서 기록이 없어요.<br />읽은 책을 첫 권으로 남겨 볼까요? 📚</p>';
+  }
+
   /* ---------------- 설정 ---------------- */
   function renderSettings() {
     byId('city-current').textContent = state.settings.place.name;
@@ -644,6 +735,43 @@
     openSheet('sheet-star');
   }
 
+  /* ---------------- 강의 일정 시트 ---------------- */
+  function openLectureSheet(opts) {
+    lectureCtx = {
+      mode: opts.mode || 'add',
+      id: (opts.item && opts.item.id) || null
+    };
+    var it = opts.item || { date: Store.todayISO(), time: '', title: '', note: '' };
+
+    byId('lecture-sheet-title').textContent = lectureCtx.mode === 'edit' ? '✏️ 강의 일정 고치기' : '+ 강의 일정 추가';
+    byId('lecture-date').value = it.date || Store.todayISO();
+    byId('lecture-time').value = it.time || '';
+    byId('lecture-name').value = it.title || '';
+    byId('lecture-note').value = it.note || '';
+    byId('lecture-delete').hidden = lectureCtx.mode !== 'edit';
+
+    openSheet('sheet-lecture');
+    setTimeout(function () { byId('lecture-name').focus(); }, 120);
+  }
+
+  /* ---------------- 독서 기록 시트 ---------------- */
+  function openBookSheet(opts) {
+    bookCtx = {
+      mode: opts.mode || 'add',
+      id: (opts.item && opts.item.id) || null
+    };
+    var b = opts.item || { date: Store.todayISO(), title: '', review: '' };
+
+    byId('book-sheet-title').textContent = bookCtx.mode === 'edit' ? '✏️ 독서 기록 고치기' : '+ 독서 기록 추가';
+    byId('book-date').value = b.date || Store.todayISO();
+    byId('book-title').value = b.title || '';
+    byId('book-review').value = b.review || '';
+    byId('book-delete').hidden = bookCtx.mode !== 'edit';
+
+    openSheet('sheet-book');
+    setTimeout(function () { byId('book-title').focus(); }, 120);
+  }
+
   /* ---------------- 토스트 / 축하 ---------------- */
   function toast(message, opts) {
     var t = byId('toast');
@@ -700,6 +828,8 @@
     renderRewards();
     renderStamps();
     renderPrep();
+    renderLectures();
+    renderBooks();
   }
 
   function renderAfterTaskChange() {
@@ -940,6 +1070,123 @@
       } else {
         toast('체크를 풀었어요');
       }
+    },
+
+    'add-lecture': function () {
+      openLectureSheet({ mode: 'add' });
+    },
+
+    'edit-lecture': function (el) {
+      var it = Lectures.get(el.dataset.id);
+      if (!it) return;
+      openLectureSheet({ mode: 'edit', item: it });
+    },
+
+    'delete-lecture': function (el) {
+      var it = Lectures.remove(el.dataset.id);
+      if (!it) return;
+      renderLectures();
+      toast('강의 일정을 지웠어요', {
+        label: '되돌리기',
+        onAction: function () {
+          Lectures.restore(it);
+          renderLectures();
+          toast('일정을 되돌렸어요');
+        }
+      });
+    },
+
+    'lecture-save': function () {
+      var date = byId('lecture-date').value;
+      var title = byId('lecture-name').value.trim();
+      if (!date) {
+        toast('날짜를 골라 주세요 📅');
+        return;
+      }
+      if (!title) {
+        toast('일정 이름을 적어 주세요 ✏️');
+        byId('lecture-name').focus();
+        return;
+      }
+      var payload = {
+        date: date,
+        time: byId('lecture-time').value.trim(),
+        title: title,
+        note: byId('lecture-note').value.trim()
+      };
+      if (lectureCtx.mode === 'edit') {
+        Lectures.update(lectureCtx.id, payload);
+        toast('강의 일정을 고쳤어요');
+      } else {
+        Lectures.add(payload);
+        toast('강의 일정을 추가했어요');
+      }
+      closeSheets();
+      renderLectures();
+    },
+
+    'lecture-delete': function () {
+      if (lectureCtx.mode !== 'edit') return;
+      Lectures.remove(lectureCtx.id);
+      closeSheets();
+      renderLectures();
+      toast('강의 일정을 지웠어요');
+    },
+
+    'add-book': function () {
+      openBookSheet({ mode: 'add' });
+    },
+
+    'edit-book': function (el) {
+      var b = Books.get(el.dataset.id);
+      if (!b) return;
+      openBookSheet({ mode: 'edit', item: b });
+    },
+
+    'delete-book': function (el) {
+      var b = Books.remove(el.dataset.id);
+      if (!b) return;
+      renderBooks();
+      toast('독서 기록을 지웠어요', {
+        label: '되돌리기',
+        onAction: function () {
+          Books.restore(b);
+          renderBooks();
+          toast('기록을 되돌렸어요');
+        }
+      });
+    },
+
+    'book-save': function () {
+      var title = byId('book-title').value.trim();
+      if (!title) {
+        toast('책 제목을 적어 주세요 📖');
+        byId('book-title').focus();
+        return;
+      }
+      var payload = {
+        date: byId('book-date').value || Store.todayISO(),
+        title: title,
+        review: byId('book-review').value.trim()
+      };
+      if (bookCtx.mode === 'edit') {
+        Books.update(bookCtx.id, payload);
+        toast('독서 기록을 고쳤어요');
+      } else {
+        Books.add(payload);
+        toast('독서 기록을 남겼어요 📚');
+        confetti();
+      }
+      closeSheets();
+      renderBooks();
+    },
+
+    'book-delete': function () {
+      if (bookCtx.mode !== 'edit') return;
+      Books.remove(bookCtx.id);
+      closeSheets();
+      renderBooks();
+      toast('독서 기록을 지웠어요');
     },
 
     'pick-city': function (el) {
