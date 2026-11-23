@@ -333,7 +333,7 @@
           '<span class="reward-plus">+</span>' +
           '<span class="reward-chip reward-chip-book' + (bookBonus ? ' is-on' : '') + '">📚 책 10분</span>' +
           '<span class="reward-plus">=</span>' +
-          '<b class="reward-total' + (codingMin > 0 ? ' is-on' : '') + '">' + codingMin + '분</b>' +
+          '<b class="reward-total' + (codingMin > 0 ? ' is-on' : '') + '">' + (codingMin > 0 ? codingMin + '분' : '아직 0분') + '</b>' +
         '</p>' +
       '</div>' +
       '<span class="reward-state' + codingStateCls + '">' + codingState + '</span>' +
@@ -931,6 +931,7 @@
   function renderAfterTaskChange() {
     renderMembers();
     renderTodos();
+    renderBooks();
     renderRewards();
     renderStamps();
   }
