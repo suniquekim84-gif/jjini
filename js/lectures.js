@@ -6,10 +6,18 @@
 
   var KEY = 'jjini.lectures.v1';
 
+  /* 강의 저장 형식 버전 — 기기마다 한 번만 마이그레이션합니다.
+     1 → 2: 기본값에서 뺀 2026-11-24 서부 강의를 이미 저장해 둔 기기에서 정리 */
+  var SCHEMA = 2;
+  var SCHEMA_KEY = 'jjini.lectures.schema';
+
+  /* 2026-11-24 평택 디지털안전지도사 10회(서부)는 삭제되어 기본 일정에서 뺐습니다.
+     예전 버전을 열어 기본값이 기기에 저장된 경우도 아래 마이그레이션에서 함께 지웁니다. */
+  var RETIRED = { id: 'lec03', date: '2026-11-24', note: '서부' };
+
   var SEED = [
     { id: 'lec01', date: '2026-11-23', time: '09:50', title: '화성남양초', note: '' },
     { id: 'lec02', date: '2026-11-24', time: '09:50', title: '남양주도곡초', note: '비대면' },
-    { id: 'lec03', date: '2026-11-24', time: '10:00~12:00', title: '평택 디지털안전지도사 10회', note: '서부' },
     { id: 'lec04', date: '2026-11-24', time: '14:00~16:00', title: '평택 디지털안전지도사 10회', note: '북부' },
     { id: 'lec05', date: '2026-11-25', time: '14:00~16:00', title: '평택 디지털안전지도사 10회', note: '남부' },
     { id: 'lec06', date: '2026-11-26', time: '', title: '대전', note: '' },
@@ -27,17 +35,51 @@
     try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) { /* 용량 초과 등 */ }
   }
 
+  function storedSchema() {
+    try {
+      var v = parseInt(localStorage.getItem(SCHEMA_KEY), 10);
+      return isNaN(v) ? 1 : v; /* 이전 버전에는 표시가 없었으니 1로 봅니다 */
+    } catch (e) {
+      return SCHEMA; /* 저장소를 못 읽으면 마이그레이션을 건너뜁니다 */
+    }
+  }
+
+  function saveSchema() {
+    try { localStorage.setItem(SCHEMA_KEY, String(SCHEMA)); } catch (e) { /* noop */ }
+  }
+
+  /* 기본값으로 들어 있던 서부 일정인지 — 기본 ID 이거나, 같은 날짜에 '서부' 표기가 붙은 항목 */
+  function isRetired(it) {
+    if (!it) return false;
+    if (it.id === RETIRED.id) return true;
+    return it.date === RETIRED.date && String(it.note || '').trim() === RETIRED.note;
+  }
+
+  function migrate(list) {
+    if (storedSchema() >= SCHEMA) return list;
+    var changed = false;
+    var next = list.filter(function (it) {
+      if (!isRetired(it)) return true;
+      changed = true;
+      return false;
+    });
+    if (changed) write(next);
+    saveSchema();
+    return next;
+  }
+
   function read() {
     try {
       var raw = localStorage.getItem(KEY);
       if (!raw) {
         var seed = clone(SEED);
         write(seed);
+        saveSchema();
         return seed;
       }
       var data = JSON.parse(raw);
       if (!Array.isArray(data)) return clone(SEED);
-      return data.filter(function (it) { return it && it.date && it.title; });
+      return migrate(data.filter(function (it) { return it && it.date && it.title; }));
     } catch (e) {
       return clone(SEED);
     }
