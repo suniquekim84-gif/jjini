@@ -50,36 +50,29 @@
     } catch (e) { /* 아주 오래된 브라우저 */ }
     return null;
   }
+  function parseNowOverride() {
+    try {
+      var v = new URLSearchParams(location.search).get('now');
+      var m = v && /^(\d{1,2}):(\d{2})$/.exec(v);
+      if (m && Number(m[1]) < 24 && Number(m[2]) < 60) return { h: Number(m[1]), m: Number(m[2]) };
+    } catch (e) { /* 아주 오래된 브라우저 */ }
+    return null;
+  }
   var overrideDate = parseOverride();
+  var overrideNow = parseNowOverride();
 
   function todayISO() { return overrideDate || iso(new Date()); }
-  /** 오늘 날짜. ?today= 로 날짜를 바꿔도 시각은 지금 시각을 그대로 씁니다. */
+  /** 오늘 날짜·시각. ?today=·?now= 로 바꿔 미리 볼 수 있습니다. */
   function nowDate() {
-    if (!overrideDate) return new Date();
     var real = new Date();
-    var d = ymd(overrideDate);
-    d.setHours(real.getHours(), real.getMinutes(), real.getSeconds(), 0);
+    var h = overrideNow ? overrideNow.h : real.getHours();
+    var mi = overrideNow ? overrideNow.m : real.getMinutes();
+    var d = overrideDate ? ymd(overrideDate) : new Date();
+    d.setHours(h, mi, overrideNow ? 0 : real.getSeconds(), 0);
     return d;
   }
 
   /* ---------------- 기본값 ---------------- */
-  var MISSIONS = [
-    { id: 'cook', emoji: '🥕', text: '저녁 준비 같이 돕기' },
-    { id: 'walk', emoji: '🚶', text: '다 같이 동네 한 바퀴 산책하기' },
-    { id: 'praise', emoji: '💌', text: '서로 칭찬 한 마디 해주기' },
-    { id: 'game', emoji: '🎲', text: '보드게임 한 판 같이 하기' },
-    { id: 'read', emoji: '📖', text: '가족이 함께 10분 책 읽기' },
-    { id: 'fruit', emoji: '🍎', text: '과일 깎아서 같이 나눠 먹기' },
-    { id: 'tidy', emoji: '🧹', text: '거실 10분 같이 정리하기' },
-    { id: 'music', emoji: '🎵', text: '좋아하는 노래 같이 듣기' },
-    { id: 'photo', emoji: '📷', text: '오늘의 가족 사진 한 장 남기기' },
-    { id: 'water', emoji: '🥛', text: '물 한 잔 같이 마시기' },
-    { id: 'socks', emoji: '🧦', text: '양말 짝 맞추기 게임 하기' },
-    { id: 'thanks', emoji: '🙏', text: '고마웠던 일 한 가지 말하기' },
-    { id: 'bedtime', emoji: '🌙', text: '자기 전에 오늘 이야기 나누기' },
-    { id: 'snack', emoji: '🍳', text: '간단한 간식 같이 만들기' }
-  ];
-
   function defaultState() {
     return {
       version: SCHEMA,
@@ -101,8 +94,7 @@
         ]
       },
       days: {},
-      stamps: { jjini: {} },
-      mission: { date: '', id: '', together: 0, lastDoneDate: '' }
+      stamps: { jjini: {} }
     };
   }
 
@@ -167,8 +159,7 @@
       members: members,
       routines: Object.assign({}, base.routines, routines),
       days: days,
-      stamps: Object.assign({}, base.stamps, stamps),
-      mission: Object.assign({}, base.mission, data.mission || {})
+      stamps: Object.assign({}, base.stamps, stamps)
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });
     return out;
@@ -282,39 +273,18 @@
     return Object.keys(map).filter(function (k) { return k.indexOf(prefix) === 0; }).length;
   }
 
-  /* ---------------- 미션 ---------------- */
-  function hashStr(str) {
-    var h = 0;
-    for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 100000;
-    return h;
-  }
-  function missionById(id) {
-    for (var i = 0; i < MISSIONS.length; i++) if (MISSIONS[i].id === id) return MISSIONS[i];
-    return MISSIONS[0];
-  }
-  function syncMissionDate() {
-    var today = todayISO();
-    if (state.mission.date !== today) {
-      state.mission.date = today;
-      state.mission.id = MISSIONS[hashStr(today) % MISSIONS.length].id;
-      persist(true);
-    }
-  }
-
   /* ---------------- 공개 API ---------------- */
   var api = {
     KEY: KEY,
-    MISSIONS: MISSIONS,
 
     init: function () {
       state = migrate(readLocal());
-      syncMissionDate();
       // 원격 어댑터가 있으면 그쪽 기록을 우선 사용
       if (adapter && typeof adapter.load === 'function') {
         return Promise.resolve()
           .then(function () { return adapter.load(); })
           .then(function (remote) {
-            if (remote) { state = migrate(remote); syncMissionDate(); notify(); }
+            if (remote) { state = migrate(remote); notify(); }
             return state;
           })
           .catch(function () { return state; });
@@ -329,7 +299,6 @@
         adapter.subscribe(function (remote) {
           if (!remote || typeof remote !== 'object') return;
           state = migrate(remote);
-          syncMissionDate();
           persist(true);
           notify();
         });
@@ -500,37 +469,6 @@
       return result;
     },
 
-    mission: function () {
-      syncMissionDate();
-      var m = missionById(state.mission.id);
-      return {
-        id: m.id,
-        emoji: m.emoji,
-        text: m.text,
-        together: state.mission.together || 0,
-        doneToday: state.mission.lastDoneDate === todayISO()
-      };
-    },
-    completeMission: function () {
-      var today = todayISO();
-      if (state.mission.lastDoneDate === today) {
-        return { ok: false, reason: 'already', together: state.mission.together || 0 };
-      }
-      state.mission.lastDoneDate = today;
-      state.mission.together = (state.mission.together || 0) + 1;
-      persist(false);
-      return { ok: true, together: state.mission.together };
-    },
-    shuffleMission: function () {
-      var current = state.mission.id;
-      var pool = MISSIONS.filter(function (m) { return m.id !== current; });
-      var pick = pool[Math.floor(Math.random() * pool.length)];
-      state.mission.id = pick.id;
-      state.mission.date = todayISO();
-      persist(false);
-      return missionById(pick.id);
-    },
-
     setPlace: function (place) {
       state.settings.place = {
         name: place.name,
@@ -549,7 +487,6 @@
 
     reset: function () {
       state = defaultState();
-      syncMissionDate();
       try { localStorage.removeItem(KEY); } catch (e) { /* noop */ }
       persist(true);
       notify();

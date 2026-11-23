@@ -6,6 +6,7 @@
   var Store = window.FamilyStore;
   var Chars = window.FamilyChars;
   var Sched = window.FamilySchedule;
+  var Prep = window.FamilyPrep;
   var Weather = window.FamilyWeather;
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -361,16 +362,126 @@
     byId('stamp-summary').textContent = '이번 달 도장 ' + monthCount + '개 · ' + todayNote;
   }
 
-  /* ---------------- 미션 ---------------- */
-  function renderMission() {
-    var mission = Store.mission();
-    byId('mission-emoji').textContent = mission.emoji;
-    byId('mission-text').textContent = mission.text;
-    byId('mission-count').textContent = '함께 ' + mission.together + '번';
-    byId('btn-mission-done').textContent = mission.doneToday ? '✅ 오늘 함께했어요' : '✅ 다 같이 했어요';
-    byId('mission-note').textContent = mission.doneToday
-      ? '오늘 미션 완료! 내일 또 새로운 미션이 찾아와요 😊'
-      : '가족이 다 함께 하는 미션이에요. 하루에 한 번 가볍게 해봐요!';
+  /* ---------------- 등교·학원 준비 ---------------- */
+  function prepBlockState(name) {
+    return name ? ' data-state="' + name + '"' : '';
+  }
+
+  function prepCheckButton(opts) {
+    return '<button class="prep-check' + (opts.checked ? ' is-on' : '') + '" type="button" ' +
+      'data-action="' + opts.action + '" data-item="' + opts.id + '"' +
+      (opts.start ? ' data-start="' + opts.start + '"' : '') +
+      ' aria-pressed="' + (opts.checked ? 'true' : 'false') + '">' +
+      '<span class="prep-box" aria-hidden="true">✓</span>' +
+      '<span class="prep-check-label">' + opts.emoji + ' ' + esc(opts.label) + '</span>' +
+    '</button>';
+  }
+
+  function renderPrep() {
+    if (!state || !Prep) return;
+    var dateISO = Store.todayISO();
+    var d = Store.parseDate(dateISO);
+    var dow = d.getDay();
+    byId('prep-day').textContent = DAYS[dow] + '요일';
+
+    var kid = Sched.kids.jjini;
+    var day = kid && kid.days[dow];
+
+    if (!day) {
+      byId('prep-sub').textContent = '주말은 준비할 게 없어요';
+      byId('prep-body').innerHTML =
+        '<div class="prep-free">' +
+          '<div class="prep-free-emoji">🌈</div>' +
+          '<p class="prep-free-title">주말엔 등교·학원 준비가 없어요</p>' +
+          '<p class="prep-free-sub">내일 준비물은 위의 주간 시간표를 보고 미리 챙겨 둬요</p>' +
+        '</div>';
+      return;
+    }
+
+    byId('prep-sub').textContent = '나가기 전에 챙길 것만 확인해요';
+
+    var now = nowMinutes();
+    var schoolDep = Prep.minutesOf(Prep.SCHOOL_DEPART);
+    var sState = Prep.status(schoolDep, null, now);
+    var items = Prep.schoolList(dateISO);
+    var doneCount = items.filter(function (it) { return it.checked; }).length;
+    var allDone = doneCount === items.length;
+
+    var html = '<div class="prep-block prep-block-school" data-prep-dep="' + schoolDep + '"' +
+        prepBlockState(sState.state) + '>' +
+      '<div class="prep-head">' +
+        '<span class="prep-title">🏫 등교 준비</span>' +
+        '<span class="prep-left" data-prep-left>' + esc(sState.text) + '</span>' +
+      '</div>' +
+      '<div class="prep-depart-row">' +
+        '<span class="prep-depart">' + Prep.SCHOOL_DEPART + '</span>' +
+        '<span class="prep-depart-label">출발</span>' +
+        '<span class="prep-check-count' + (allDone ? ' is-done' : '') + '">' + doneCount + '/' + items.length + '</span>' +
+      '</div>' +
+      '<div class="prep-checks">' + items.map(function (it) {
+        return prepCheckButton({
+          action: 'prep-school-toggle',
+          id: it.id,
+          label: it.label,
+          emoji: it.emoji,
+          checked: it.checked
+        });
+      }).join('') + '</div>' +
+      '<p class="prep-note' + (allDone ? ' is-done' : '') + '">' +
+        (allDone ? '다 챙겼어요! 등교 준비 완료 🎉' : '안경·외투·핸드폰을 하나씩 체크해요') +
+      '</p>' +
+    '</div>';
+
+    var list = Prep.academyList(dateISO, day.items);
+    html += '<div class="prep-block prep-block-academy">' +
+      '<div class="prep-head">' +
+        '<span class="prep-title">🎓 학원 준비</span>' +
+        '<span class="prep-count-sub">' + (list.length ? '수업 ' + list.length + '개 · 10분 전 출발' : '오늘은 없음') + '</span>' +
+      '</div>';
+
+    if (!list.length) {
+      html += '<p class="prep-empty">오늘은 학원 일정이 없어요 😌</p>';
+    } else {
+      html += list.map(function (it) {
+        var st = Prep.status(it.departMin, it.endMin, now);
+        return '<div class="prep-academy-row" data-prep-dep="' + it.departMin + '" data-prep-end="' + it.endMin + '"' +
+            prepBlockState(st.state) + '>' +
+          '<div class="prep-head">' +
+            '<span class="chip-subject tone-' + tone(it.name) + '">' + esc(it.name) + ' <b>' + it.start + '~' + it.end + '</b></span>' +
+            '<span class="prep-left" data-prep-left>' + esc(st.text) + '</span>' +
+          '</div>' +
+          '<div class="prep-depart-row">' +
+            '<span class="prep-depart">' + it.depart + '</span>' +
+            '<span class="prep-depart-label">출발</span>' +
+          '</div>' +
+          '<div class="prep-checks">' + prepCheckButton({
+            action: 'prep-academy-toggle',
+            id: it.check.id,
+            start: it.start,
+            label: it.check.label,
+            emoji: it.check.emoji,
+            checked: it.check.checked
+          }) + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    html += '</div>';
+    byId('prep-body').innerHTML = html;
+  }
+
+  function refreshPrepTimers() {
+    if (!Prep) return;
+    var now = nowMinutes();
+    var nodes = document.querySelectorAll('[data-prep-dep]');
+    Array.prototype.forEach.call(nodes, function (node) {
+      var dep = Number(node.getAttribute('data-prep-dep'));
+      var endAttr = node.getAttribute('data-prep-end');
+      var st = Prep.status(dep, endAttr ? Number(endAttr) : null, now);
+      node.setAttribute('data-state', st.state);
+      var label = node.querySelector('[data-prep-left]');
+      if (label) label.textContent = st.text;
+    });
   }
 
   /* ---------------- 설정 ---------------- */
@@ -587,7 +698,7 @@
     renderTodos();
     renderRewards();
     renderStamps();
-    renderMission();
+    renderPrep();
   }
 
   function renderAfterTaskChange() {
@@ -804,21 +915,30 @@
       renderTimetable();
     },
 
-    'mission-done': function () {
-      var res = Store.completeMission();
-      renderMission();
-      if (res.ok) {
+    'prep-school-toggle': function (el) {
+      var res = Prep.toggleSchool(Store.todayISO(), el.dataset.item);
+      renderPrep();
+      refreshPrepTimers();
+      if (res.done) {
         confetti();
-        toast('오늘의 미션 완료! 함께 ' + res.together + '번째 🎉');
+        toast('등교 준비 완료! 잘 다녀와요 🎒');
+      } else if (res.checked) {
+        toast('챙겼어요 ' + res.count + '/' + res.total + ' ✓');
       } else {
-        toast('오늘은 이미 함께했어요. 내일 또 만나요 😊');
+        toast('체크를 풀었어요');
       }
     },
 
-    'mission-shuffle': function () {
-      var m = Store.shuffleMission();
-      renderMission();
-      toast(m.emoji + ' 새로운 미션이에요!');
+    'prep-academy-toggle': function (el) {
+      var res = Prep.toggleAcademy(Store.todayISO(), el.dataset.start, el.dataset.item);
+      renderPrep();
+      refreshPrepTimers();
+      if (res.checked) {
+        confetti();
+        toast('학원 준비 확인 완료 ✓');
+      } else {
+        toast('체크를 풀었어요');
+      }
     },
 
     'pick-city': function (el) {
@@ -841,7 +961,7 @@
     },
 
     'reset': function () {
-      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장, 미션 기록이 모두 사라지고 되돌릴 수 없어요.')) return;
+      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장 기록이 모두 사라지고 되돌릴 수 없어요.')) return;
       Store.reset();
       closeSheets();
       renderAll();
@@ -939,6 +1059,7 @@
       loadWeather(false);
     } else {
       renderSchedule();
+      refreshPrepTimers();
     }
   }
 
@@ -956,6 +1077,7 @@
         renderAll();
       });
       setInterval(tick, 30000);
+      setInterval(refreshPrepTimers, 15000);
       weatherTimer = setInterval(function () { loadWeather(false); }, 20 * 60 * 1000);
     });
 

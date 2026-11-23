@@ -1,7 +1,7 @@
 {
   "name": "찌니 대시보드",
   "short_name": "찌니 대시보드",
-  "description": "찌니의 하루를 포근하게 기록하는 대시보드 — 할 일, 별, 도장판, 오늘의 미션",
+  "description": "찌니의 하루를 포근하게 기록하는 대시보드 — 등교·학원 준비, 할 일, 별, 도장판",
   "lang": "ko",
   "dir": "ltr",
   "start_url": "./index.html",

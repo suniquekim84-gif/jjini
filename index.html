@@ -7,7 +7,7 @@
 <title>찌니 대시보드</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
 <meta name="theme-color" content="#FCF4D7" />
-<meta name="description" content="찌니의 하루를 포근하게 기록하는 대시보드 — 할 일, 별, 도장판, 오늘의 미션" />
+<meta name="description" content="찌니의 하루를 포근하게 기록하는 대시보드 — 등교·학원 준비, 할 일, 별, 도장판" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -106,6 +106,18 @@
     <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
   </section>
 
+  <!-- ================= 등교·학원 준비 ================= -->
+  <section class="card prep-section" id="prep-section" aria-label="등교·학원 준비">
+    <header class="section-head">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🎒 등교·학원 준비</h2>
+        <p class="section-sub" id="prep-sub">나가기 전에 챙길 것만 확인해요</p>
+      </div>
+      <span class="pill pill-day" id="prep-day">월요일</span>
+    </header>
+    <div class="prep-body" id="prep-body"><!-- rendered --></div>
+  </section>
+
   <!-- ================= 찌니 카드 ================= -->
   <section class="card family-section" aria-label="찌니">
     <div class="member-list" id="member-list"><!-- rendered --></div>
@@ -152,23 +164,6 @@
       <span class="pill pill-soft" id="stamp-summary">이번 달 도장 0개</span>
       <button class="btn btn-light" data-action="open-calendar" id="btn-calendar">🗓️ 도장판 달력 보기</button>
     </div>
-  </section>
-
-  <!-- ================= FAMILY MISSION ================= -->
-  <section class="card mission-section" aria-label="오늘의 가족 미션">
-    <header class="section-head">
-      <h2 class="section-title">🎲 오늘의 가족 미션</h2>
-      <span class="pill pill-soft" id="mission-count">함께 0번</span>
-    </header>
-    <div class="mission-body">
-      <div class="mission-emoji" id="mission-emoji">🥕</div>
-      <p class="mission-text" id="mission-text">저녁 준비 같이 돕기</p>
-    </div>
-    <div class="mission-actions">
-      <button class="btn btn-mint" data-action="mission-done" id="btn-mission-done">✅ 다 같이 했어요</button>
-      <button class="btn btn-light" data-action="mission-shuffle" id="btn-mission-shuffle">🔄 다른 미션 뽑기</button>
-    </div>
-    <p class="mission-note" id="mission-note">가족이 다 함께 하는 미션이에요. 하루에 한 번 가볍게 해봐요!</p>
   </section>
 
   <footer class="app-footer">
@@ -223,7 +218,7 @@
 
       <div class="field-group field-danger">
         <h3 class="field-title">기록 지우기</h3>
-        <p class="field-hint">할 일, 별, 도장, 미션 기록이 모두 사라져요. 되돌릴 수 없어요.</p>
+        <p class="field-hint">할 일, 별, 도장, 준비 체크가 모두 사라져요. 되돌릴 수 없어요.</p>
         <button class="btn btn-danger btn-wide" data-action="reset" id="btn-reset">모든 기록 지우기</button>
       </div>
     </div>
@@ -333,6 +328,7 @@
 
 <script src="js/characters.js"></script>
 <script src="js/schedule.js"></script>
+<script src="js/prep.js"></script>
 <script src="js/store.js"></script>
 <script src="js/lock.js"></script>
 <script src="js/weather.js"></script>
