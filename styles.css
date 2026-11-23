@@ -89,7 +89,7 @@ input { font: inherit; color: inherit; }
 .app {
   max-width: 430px;
   margin: 0 auto;
-  padding: calc(16px + env(safe-area-inset-top)) 16px calc(30px + env(safe-area-inset-bottom));
+  padding: calc(16px + env(safe-area-inset-top)) 16px calc(104px + env(safe-area-inset-bottom));
 }
 
 /* ===================== 공통 조각 ===================== */
@@ -1486,6 +1486,198 @@ input { font: inherit; color: inherit; }
 }
 .app-footer-small { font-size: 10.5px; color: #C4B4A1; margin-top: 2px; }
 
+/* ===================== 페이지 전환 · 하단 탭 바 ===================== */
+.page { display: block; }
+.page[hidden] { display: none !important; }
+.page:not([hidden]) { animation: pageIn .24s ease-out; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  display: flex;
+  gap: 2px;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+  background: rgba(255, 253, 246, .94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(228, 208, 172, .75);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 24px rgba(176, 145, 100, .16);
+  animation: tabbarIn .34s cubic-bezier(.22, .9, .28, 1.08);
+}
+
+html.is-locked .tabbar { display: none; }
+
+@keyframes tabbarIn {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: none; }
+}
+
+.tabbar-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 2px 5px;
+  border: none;
+  border-radius: 15px;
+  background: none;
+  color: #A2907F;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, transform .12s ease;
+}
+
+.tabbar-btn:active { transform: scale(.95); }
+
+.tabbar-icon {
+  font-size: 19px;
+  line-height: 1;
+  filter: grayscale(.55);
+  opacity: .72;
+  transition: filter .18s ease, opacity .18s ease, transform .18s ease;
+}
+
+.tabbar-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+.tabbar-btn.is-active {
+  background: linear-gradient(180deg, #FFF7E2, #FDECC8);
+  box-shadow: inset 0 0 0 1px #F2DFB4;
+  color: #A5741F;
+}
+.tabbar-btn.is-active .tabbar-icon { filter: none; opacity: 1; transform: translateY(-1px) scale(1.06); }
+.tabbar-btn.is-active .tabbar-label { color: #A5741F; }
+
+/* ===================== 독서 보상 (+10분) ===================== */
+.reward-math {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.reward-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  background: #F4EEE3;
+  border: 1px solid #EDE2D0;
+  color: #A2937F;
+}
+
+.reward-chip.is-on {
+  background: #E9F8EC;
+  border-color: #CDEBD5;
+  color: #3E8A57;
+}
+
+.reward-chip-book.is-on {
+  background: #EAF3FC;
+  border-color: #D3E4F7;
+  color: #41719F;
+}
+
+.reward-plus { font-size: 10px; font-weight: 700; color: #B7A78F; }
+
+.reward-total {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: #9C8B78;
+  letter-spacing: -0.2px;
+}
+
+.reward-total.is-on { color: #2F7B4C; }
+
+.reward-row.is-unlocked .reward-state.is-bonus {
+  background: #E4F0FC;
+  color: #41719F;
+}
+
+.reward-book-note {
+  margin-top: 9px;
+  padding: 9px 11px;
+  border-radius: 14px;
+  background: #F8F3E8;
+  border: 1.2px dashed #E6D9C0;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #9A8368;
+  text-align: center;
+  letter-spacing: -0.2px;
+}
+
+.reward-book-note.is-on {
+  background: linear-gradient(120deg, #EFFAF1, #F7FDF6);
+  border-style: solid;
+  border-color: #C6E7CF;
+  color: #3E8A57;
+}
+
+.book-bonus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 11px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #F2F7FE, #F7FBF2);
+  border: 1.3px dashed #D8E4F2;
+}
+
+.book-bonus.is-on {
+  background: linear-gradient(120deg, #EAF8EE, #F5FCF3);
+  border: 1.3px solid #C3E5CC;
+}
+
+.book-bonus-emoji { flex: none; font-size: 20px; }
+.book-bonus-info { flex: 1; min-width: 0; }
+.book-bonus-title { font-size: 12.5px; font-weight: 700; color: #4B3B31; letter-spacing: -0.2px; }
+.book-bonus-sub { margin-top: 1px; font-size: 11px; color: #A08C7A; }
+.book-bonus.is-on .book-bonus-title { color: #3E8A57; }
+
+/* ===================== 오늘 엄마 강의 (오늘 것만) ===================== */
+.lecture-mini-section {
+  background:
+    radial-gradient(120% 90% at 0% 0%, #F6F2FF 0%, rgba(246, 242, 255, 0) 58%),
+    linear-gradient(168deg, #FDFBFF 0%, #FFFDF7 62%);
+  border-color: #E9E2F3;
+}
+
+.lecture-mini { margin-top: 2px; }
+
+.lecture-mini-empty {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: #A2907F;
+  letter-spacing: -0.2px;
+}
+
+.lecture-week .lecture-head { margin-top: 14px; }
+
 /* ===================== 시트(모달) ===================== */
 .sheet-backdrop {
   position: fixed;
@@ -1859,7 +2051,7 @@ input[type="date"]:focus, textarea:focus {
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(24px + env(safe-area-inset-bottom));
+  bottom: calc(100px + env(safe-area-inset-bottom));
   transform: translateX(-50%) translateY(10px);
   background: rgba(74, 58, 46, .92);
   color: #FFF9EC;

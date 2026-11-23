@@ -12,7 +12,11 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 5;
+  var SCHEMA = 6;
+
+  /* 매일 독서 루틴 — 기존 기기에도 빠짐없이 들어가도록 마이그레이션에서 확인합니다. */
+  var READ_ROUTINE_ID = 'r_jj_read';
+  var READ_ROUTINE = { id: READ_ROUTINE_ID, text: '독서 30분', repeat: 'daily', group: 'read' };
 
   /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
      불러올 때 깔끔히 지워서 찌니 한 명 구성만 남깁니다. */
@@ -90,7 +94,7 @@
           { id: 'r_jj_math', text: '재능학습지 수학 2장 풀기', repeat: 'daily', group: 'jaeneung' },
           { id: 'r_jj_hanja', text: '한자어휘문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
           { id: 'r_jj_history', text: '역사문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
-          { id: 'r_jj_read', text: '책 30분 읽기', repeat: 'daily' }
+          { id: 'r_jj_read', text: '독서 30분', repeat: 'daily', group: 'read' }
         ]
       },
       days: {},
@@ -162,6 +166,27 @@
       stamps: Object.assign({}, base.stamps, stamps)
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });
+
+    // SCHEMA 6 — '독서 30분' 매일 루틴이 빠진 기기에도 넣고,
+    // 이미 만들어진 날짜의 할 일 문구도 같은 이름으로 맞춥니다.
+    out.members.forEach(function (m) {
+      if (!Array.isArray(out.routines[m.id])) out.routines[m.id] = [];
+      var has = out.routines[m.id].some(function (r) { return r && r.id === READ_ROUTINE_ID; });
+      if (!has) out.routines[m.id].push(Object.assign({}, READ_ROUTINE));
+    });
+    Object.keys(out.days).forEach(function (d) {
+      var tasks = out.days[d] && out.days[d].tasks;
+      if (!tasks) return;
+      out.members.forEach(function (m) {
+        (tasks[m.id] || []).forEach(function (t) {
+          if (t && t.id === READ_ROUTINE_ID) {
+            t.text = READ_ROUTINE.text;
+            t.group = 'read';
+            t.repeat = 'daily';
+          }
+        });
+      });
+    });
     return out;
   }
 

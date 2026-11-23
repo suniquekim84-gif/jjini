@@ -43,6 +43,12 @@
       return null;
     },
 
+    /** 그념 날짜로 남긴 기록 수 — 오늘 읽었는지 확인할 때 씁니다. */
+    countOn: function (dateISO) {
+      var date = String(dateISO || '').slice(0, 10);
+      return read().filter(function (it) { return String(it.date || '').slice(0, 10) === date; }).length;
+    },
+
     add: function (o) {
       var list = read();
       var title = String(o.title || '').trim().slice(0, 60);

@@ -75,127 +75,184 @@
     </div>
   </header>
 
-  <!-- ================= WEATHER ================= -->
-  <section class="weather-card" id="weather-card" aria-label="오늘 날씨와 미세먼지">
-    <div class="weather-main">
-      <span class="weather-icon" id="wx-icon" aria-hidden="true">🌤️</span>
-      <div class="weather-place">
-        <span class="wx-city" id="wx-city">동탄2신도시</span>
-        <span class="wx-temp" id="wx-temp">–°</span>
-        <span class="wx-cond" id="wx-cond">불러오는 중</span>
-      </div>
-      <span class="wx-range" id="wx-range">최저 –° · 최고 –°</span>
-    </div>
-    <div class="weather-foot">
-      <span class="badge badge-air" id="wx-pm10">미세먼지 –</span>
-      <span class="badge badge-air" id="wx-pm25">초미세먼지 –</span>
-      <span class="pill pill-tip" id="wx-tip">🌿 오늘 공기 확인 중</span>
-    </div>
-  </section>
+  <!-- ================= PAGE 1 · 오늘 ================= -->
+  <div class="page" id="page-today" data-page="today">
 
-  <!-- ================= TODAY'S SCHOOL & ACADEMY ================= -->
-  <section class="card schedule-section" id="schedule-section" aria-label="오늘의 학교·학원 일정">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🏫 오늘의 학교·학원 일정</h2>
-        <p class="section-sub" id="schedule-sub">오늘 찌니의 하루 시간표예요</p>
+    <!-- ================= WEATHER ================= -->
+    <section class="weather-card" id="weather-card" aria-label="오늘 날씨와 미세먼지">
+      <div class="weather-main">
+        <span class="weather-icon" id="wx-icon" aria-hidden="true">🌤️</span>
+        <div class="weather-place">
+          <span class="wx-city" id="wx-city">동탄2신도시</span>
+          <span class="wx-temp" id="wx-temp">–°</span>
+          <span class="wx-cond" id="wx-cond">불러오는 중</span>
+        </div>
+        <span class="wx-range" id="wx-range">최저 –° · 최고 –°</span>
       </div>
-      <span class="pill pill-day" id="schedule-day">일요일</span>
-    </header>
-    <div class="schedule-body" id="schedule-body"><!-- rendered --></div>
-    <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
-  </section>
-
-  <!-- ================= 등교·학원 준비 ================= -->
-  <section class="card prep-section" id="prep-section" aria-label="등교·학원 준비">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🎒 등교·학원 준비</h2>
-        <p class="section-sub" id="prep-sub">나가기 전에 챙길 것만 확인해요</p>
+      <div class="weather-foot">
+        <span class="badge badge-air" id="wx-pm10">미세먼지 –</span>
+        <span class="badge badge-air" id="wx-pm25">초미세먼지 –</span>
+        <span class="pill pill-tip" id="wx-tip">🌿 오늘 공기 확인 중</span>
       </div>
-      <span class="pill pill-day" id="prep-day">월요일</span>
-    </header>
-    <div class="prep-body" id="prep-body"><!-- rendered --></div>
-  </section>
+    </section>
 
-  <!-- ================= 엄마 강의 일정 ================= -->
-  <section class="card lecture-section" id="lecture-section" aria-label="엄마 강의 일정">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🎤 엄마 강의 일정</h2>
-        <p class="section-sub" id="lecture-sub">오늘과 다가오는 강의를 모아 봐요</p>
+    <!-- ================= TODAY'S SCHOOL & ACADEMY ================= -->
+    <section class="card schedule-section" id="schedule-section" aria-label="오늘의 학교·학원 일정">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🏫 오늘의 학교·학원 일정</h2>
+          <p class="section-sub" id="schedule-sub">오늘 찌니의 하루 시간표예요</p>
+        </div>
+        <span class="pill pill-day" id="schedule-day">일요일</span>
+      </header>
+      <div class="schedule-body" id="schedule-body"><!-- rendered --></div>
+      <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
+    </section>
+
+    <!-- ================= 찌니 카드 ================= -->
+    <section class="card family-section" aria-label="찌니">
+      <div class="member-list" id="member-list"><!-- rendered --></div>
+    </section>
+
+    <!-- ================= 오늘 엄마 강의 (오늘 것만) ================= -->
+    <section class="card lecture-mini-section" id="lecture-mini-section" aria-label="오늘 엄마 강의">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🎤 오늘 엄마 강의</h2>
+          <p class="section-sub" id="lecture-mini-sub">오늘 일정만 모아 봐요</p>
+        </div>
+        <button class="btn btn-ghost" data-action="switch-tab" data-tab="lecture" id="btn-lecture-more">이번 주 일정 →</button>
+      </header>
+      <div class="lecture-mini" id="lecture-mini"><!-- rendered --></div>
+    </section>
+
+  </div><!-- /page-today -->
+
+  <!-- ================= PAGE 2 · 준비 ================= -->
+  <div class="page" id="page-prep" data-page="prep" hidden>
+
+    <!-- ================= 등교·학원 준비 ================= -->
+    <section class="card prep-section" id="prep-section" aria-label="등교·학원 준비">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🎒 등교·학원 준비</h2>
+          <p class="section-sub" id="prep-sub">나가기 전에 챙길 것만 확인해요</p>
+        </div>
+        <span class="pill pill-day" id="prep-day">월요일</span>
+      </header>
+      <div class="prep-body" id="prep-body"><!-- rendered --></div>
+    </section>
+
+  </div><!-- /page-prep -->
+
+  <!-- ================= PAGE 3 · 할일 ================= -->
+  <div class="page" id="page-todo" data-page="todo" hidden>
+
+    <!-- ================= TODAY'S TO-DO ================= -->
+    <section class="card todo-section" id="todo-section" aria-label="오늘 할 일">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">✅ 오늘 할 일</h2>
+          <p class="section-sub" id="todo-sub">오늘 할 일을 하나씩 체크해요</p>
+        </div>
+        <button class="btn btn-ghost" data-action="add-task" id="btn-add-task">+ 할 일 추가</button>
+      </header>
+      <div class="todo-list" id="todo-list"><!-- rendered --></div>
+    </section>
+
+    <!-- ================= 독서 기록 (오늘 할 일 바로 아래) ================= -->
+    <section class="card book-section" id="book-section" aria-label="독서 기록">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">📚 독서 기록</h2>
+          <p class="section-sub" id="book-sub">읽은 책과 짧은 감상평을 남겨요</p>
+        </div>
+        <button class="btn btn-ghost" data-action="add-book" id="btn-add-book">+ 기록 추가</button>
+      </header>
+      <div class="book-bonus" id="book-bonus">
+        <span class="book-bonus-emoji" aria-hidden="true">💻</span>
+        <div class="book-bonus-info">
+          <p class="book-bonus-title" id="book-bonus-title">오늘 기록 남기면 엔트리코딩 +10분!</p>
+          <p class="book-bonus-sub" id="book-bonus-sub">오늘 날짜로 책을 남기면 보상이 10분 늘어나요</p>
+        </div>
       </div>
-      <button class="btn btn-ghost" data-action="add-lecture" id="btn-add-lecture">+ 일정 추가</button>
-    </header>
-    <div class="lecture-today" id="lecture-today"><!-- rendered --></div>
-    <div class="lecture-upcoming" id="lecture-upcoming"><!-- rendered --></div>
-  </section>
+      <div class="book-list" id="book-list"><!-- rendered --></div>
+    </section>
 
-  <!-- ================= 찌니 카드 ================= -->
-  <section class="card family-section" aria-label="찌니">
-    <div class="member-list" id="member-list"><!-- rendered --></div>
-  </section>
+    <!-- ================= 찌니 보상 트래커 ================= -->
+    <section class="card reward-section" id="reward-section" aria-label="찌니 보상 트래커">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🎁 <span id="reward-name">찌니</span> 보상 트래커</h2>
+          <p class="section-sub">문제집·재능을 끝내면 보상이 열려요</p>
+        </div>
+        <span class="pill pill-soft" id="reward-today">오늘</span>
+      </header>
+      <div class="reward-list" id="reward-list"><!-- rendered --></div>
+      <p class="reward-book-note" id="reward-book-note"><!-- rendered --></p>
+      <div class="reward-week" id="reward-week"><!-- rendered --></div>
+      <p class="reward-note" id="reward-note">평일 문제집 5일 완주 → 주말 닌텐도 +30분</p>
+    </section>
 
-  <!-- ================= TODAY'S TO-DO ================= -->
-  <section class="card todo-section" id="todo-section" aria-label="오늘 할 일">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">✅ 오늘 할 일</h2>
-        <p class="section-sub" id="todo-sub">오늘 할 일을 하나씩 체크해요</p>
+    <!-- ================= STAMP BOARD ================= -->
+    <section class="card stamp-section" id="stamp-section" aria-label="도장판">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🐹 <span id="stamp-title">찌니</span> 도장판</h2>
+        </div>
+        <span class="badge badge-fire" id="stamp-streak">🔥 0일 연속</span>
+      </header>
+      <div class="stamp-tabs" id="stamp-tabs" role="tablist" aria-label="도장판 아이 선택"></div>
+      <p class="section-sub stamp-desc" id="stamp-desc">찌니가 그날 공부나 루틴을 하나라도 마치면 도장이 찍혀요</p>
+      <div class="stamp-week" id="stamp-week"><!-- rendered --></div>
+      <div class="stamp-foot">
+        <span class="pill pill-soft" id="stamp-summary">이번 달 도장 0개</span>
+        <button class="btn btn-light" data-action="open-calendar" id="btn-calendar">🗓️ 도장판 달력 보기</button>
       </div>
-      <button class="btn btn-ghost" data-action="add-task" id="btn-add-task">+ 할 일 추가</button>
-    </header>
-    <div class="todo-list" id="todo-list"><!-- rendered --></div>
-  </section>
+    </section>
 
-  <!-- ================= 찌니 보상 트래커 ================= -->
-  <section class="card reward-section" id="reward-section" aria-label="찌니 보상 트래커">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🎁 <span id="reward-name">찌니</span> 보상 트래커</h2>
-        <p class="section-sub">문제집·재능을 끝내면 보상이 열려요</p>
-      </div>
-      <span class="pill pill-soft" id="reward-today">오늘</span>
-    </header>
-    <div class="reward-list" id="reward-list"><!-- rendered --></div>
-    <div class="reward-week" id="reward-week"><!-- rendered --></div>
-    <p class="reward-note" id="reward-note">평일 문제집 5일 완주 → 주말 닌텐도 +30분</p>
-  </section>
+  </div><!-- /page-todo -->
 
-  <!-- ================= STAMP BOARD ================= -->
-  <section class="card stamp-section" id="stamp-section" aria-label="도장판">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🐹 <span id="stamp-title">찌니</span> 도장판</h2>
-      </div>
-      <span class="badge badge-fire" id="stamp-streak">🔥 0일 연속</span>
-    </header>
-    <div class="stamp-tabs" id="stamp-tabs" role="tablist" aria-label="도장판 아이 선택"></div>
-    <p class="section-sub stamp-desc" id="stamp-desc">찌니가 그날 공부나 루틴을 하나라도 마치면 도장이 찍혀요</p>
-    <div class="stamp-week" id="stamp-week"><!-- rendered --></div>
-    <div class="stamp-foot">
-      <span class="pill pill-soft" id="stamp-summary">이번 달 도장 0개</span>
-      <button class="btn btn-light" data-action="open-calendar" id="btn-calendar">🗓️ 도장판 달력 보기</button>
-    </div>
-  </section>
+  <!-- ================= PAGE 4 · 강의 ================= -->
+  <div class="page" id="page-lecture" data-page="lecture" hidden>
 
-  <!-- ================= 독서 기록 ================= -->
-  <section class="card book-section" id="book-section" aria-label="독서 기록">
-    <header class="section-head">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📚 독서 기록</h2>
-        <p class="section-sub" id="book-sub">읽은 책과 짧은 감상평을 남겨요</p>
-      </div>
-      <button class="btn btn-ghost" data-action="add-book" id="btn-add-book">+ 기록 추가</button>
-    </header>
-    <div class="book-list" id="book-list"><!-- rendered --></div>
-  </section>
+    <!-- ================= 엄마 강의 일정 (이번 주 + 다가오는) ================= -->
+    <section class="card lecture-section" id="lecture-section" aria-label="엄마 강의 일정">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🎤 엄마 강의 일정</h2>
+          <p class="section-sub" id="lecture-sub">이번 주와 다가오는 강의를 모아 봐요</p>
+        </div>
+        <button class="btn btn-ghost" data-action="add-lecture" id="btn-add-lecture">+ 일정 추가</button>
+      </header>
+      <div class="lecture-today" id="lecture-today"><!-- rendered --></div>
+      <div class="lecture-week" id="lecture-week"><!-- rendered --></div>
+      <div class="lecture-upcoming" id="lecture-upcoming"><!-- rendered --></div>
+    </section>
+
+  </div><!-- /page-lecture -->
 
   <footer class="app-footer">
     <p>찌니 대시보드 · 기록은 이 기기에 저장돼요</p>
-    <p class="app-footer-small">홈 화면에 추가하면 앱처럼 열려요 · v1.0</p>
+    <p class="app-footer-small">홈 화면에 추가하면 앱처럼 열려요 · v1.1</p>
   </footer>
 </div>
+
+<!-- ================= 하단 탭 바 ================= -->
+<nav class="tabbar" id="tabbar" aria-label="페이지 이동">
+  <button class="tabbar-btn is-active" type="button" data-action="switch-tab" data-tab="today" aria-current="page">
+    <span class="tabbar-icon" aria-hidden="true">🏠</span><span class="tabbar-label">오늘</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-action="switch-tab" data-tab="prep">
+    <span class="tabbar-icon" aria-hidden="true">🎒</span><span class="tabbar-label">준비</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-action="switch-tab" data-tab="todo">
+    <span class="tabbar-icon" aria-hidden="true">✅</span><span class="tabbar-label">할일</span>
+  </button>
+  <button class="tabbar-btn" type="button" data-action="switch-tab" data-tab="lecture">
+    <span class="tabbar-icon" aria-hidden="true">🎤</span><span class="tabbar-label">강의</span>
+  </button>
+</nav>
 
 <!-- ================= SHEETS ================= -->
 <div class="sheet-backdrop" id="sheet-backdrop" hidden>
