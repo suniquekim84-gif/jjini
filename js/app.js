@@ -547,7 +547,7 @@
   }
 
   /* ---------------- 엄마 강의 일정 ---------------- */
-  function lectureRow(it, withDate) {
+  function lectureRow(it, withDate, noActions) {
     return '<div class="lecture-row">' +
       '<div class="lecture-top">' +
         '<span class="lecture-time' + (it.time ? '' : ' is-empty') + '">' +
@@ -557,12 +557,13 @@
       '<div class="lecture-meta">' +
         (withDate ? '<span class="lecture-date">' + esc(shortDate(it.date)) + '</span>' : '') +
         (it.note ? '<span class="lecture-note">' + esc(it.note) + '</span>' : '') +
-        '<span class="lecture-actions">' +
-          '<button class="mini-btn" data-action="edit-lecture" data-id="' + it.id + '" ' +
-            'aria-label="' + esc(it.title) + ' 고치기">✏️</button>' +
-          '<button class="mini-btn del" data-action="delete-lecture" data-id="' + it.id + '" ' +
-            'aria-label="' + esc(it.title) + ' 지우기">✕</button>' +
-        '</span>' +
+        (noActions ? '' :
+          '<span class="lecture-actions">' +
+            '<button class="mini-btn" data-action="edit-lecture" data-id="' + it.id + '" ' +
+              'aria-label="' + esc(it.title) + ' 고치기">✏️</button>' +
+            '<button class="mini-btn del" data-action="delete-lecture" data-id="' + it.id + '" ' +
+              'aria-label="' + esc(it.title) + ' 지우기">✕</button>' +
+          '</span>') +
       '</div>' +
     '</div>';
   }
@@ -583,7 +584,7 @@
       ? '오늘 ' + todayList.length + '개 일정이 있어요'
       : '오늘은 일정이 없어요';
     byId('lecture-mini').innerHTML = todayList.length
-      ? '<div class="lecture-list">' + todayList.map(function (it) { return lectureRow(it, false); }).join('') + '</div>'
+      ? '<div class="lecture-list">' + todayList.map(function (it) { return lectureRow(it, false, true); }).join('') + '</div>'
       : '<p class="lecture-mini-empty">오늘은 강의가 없어요 ☕</p>';
 
     /* 강의 탭 — 이번 주 + 다가오는 일정 */
