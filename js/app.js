@@ -1218,7 +1218,11 @@
     },
 
     'reset': function () {
-      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장 기록이 모두 사라지고 되돌릴 수 없어요.')) return;
+      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 강의 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.')) return;
+      if (Prep && Prep.clear) Prep.clear();
+      if (Books && Books.clear) Books.clear();
+      if (Lectures && Lectures.clear) Lectures.clear();
+      lectureExpanded = false;
       Store.reset();
       closeSheets();
       renderAll();

@@ -89,6 +89,10 @@
       var list = read();
       list.push(item);
       write(list);
+    },
+
+    clear: function () {
+      try { localStorage.removeItem(KEY); } catch (e) { /* noop */ }
     }
   };
 })();

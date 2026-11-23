@@ -134,6 +134,10 @@
       var list = read();
       list.push(item);
       write(list.sort(byDate));
+    },
+
+    clear: function () {
+      try { localStorage.removeItem(KEY); } catch (e) { /* noop */ }
     }
   };
 })();

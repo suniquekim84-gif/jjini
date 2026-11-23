@@ -155,6 +155,9 @@
     schoolList: schoolList,
     toggleSchool: toggleSchool,
     academyList: academyList,
-    toggleAcademy: toggleAcademy
+    toggleAcademy: toggleAcademy,
+    clear: function () {
+      try { localStorage.removeItem(KEY); } catch (e) { /* noop */ }
+    }
   };
 })();
