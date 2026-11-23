@@ -167,12 +167,19 @@
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });
 
-    // SCHEMA 6 — '독서 30분' 매일 루틴이 빠진 기기에도 넣고,
-    // 이미 만들어진 날짜의 할 일 문구도 같은 이름으로 맞춥니다.
+    // SCHEMA 6 — '독서 30분' 매일 루틴이 빠진 기기에도 넣고, 이미 있던 루틴·할 일 문구도
+    // 같은 이름으로 맞춥니다. (앞으로 생기는 날짜에도 같은 이름으로 채워져요)
     out.members.forEach(function (m) {
       if (!Array.isArray(out.routines[m.id])) out.routines[m.id] = [];
-      var has = out.routines[m.id].some(function (r) { return r && r.id === READ_ROUTINE_ID; });
-      if (!has) out.routines[m.id].push(Object.assign({}, READ_ROUTINE));
+      var found = null;
+      out.routines[m.id].forEach(function (r) { if (r && r.id === READ_ROUTINE_ID) found = r; });
+      if (!found) {
+        out.routines[m.id].push(Object.assign({}, READ_ROUTINE));
+      } else {
+        found.text = READ_ROUTINE.text;
+        found.group = 'read';
+        found.repeat = 'daily';
+      }
     });
     Object.keys(out.days).forEach(function (d) {
       var tasks = out.days[d] && out.days[d].tasks;

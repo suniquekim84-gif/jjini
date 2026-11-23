@@ -15,7 +15,6 @@
   var TINTS = { jjini: '' };
   var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star', 'sheet-lecture', 'sheet-book'];
   var TABS = ['today', 'prep', 'todo', 'lecture'];
-  var TAB_KEY = 'jjini.tab.v1';
   var currentTab = 'today';
 
   var state = null;
@@ -955,8 +954,6 @@
       else btn.removeAttribute('aria-current');
     });
 
-    try { localStorage.setItem(TAB_KEY, name); } catch (e) { /* 저장소를 못 쓰면 첫 화면으로 */ }
-
     /* 탭마다 필요한 부분만 새로 그려요 */
     if (name === 'prep') {
       renderPrep();
@@ -975,14 +972,6 @@
     }
 
     if (changed && !silent) window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function savedTab() {
-    try {
-      var v = localStorage.getItem(TAB_KEY);
-      if (v && TABS.indexOf(v) >= 0) return v;
-    } catch (e) { /* noop */ }
-    return 'today';
   }
 
   /* ---------------- 동작 ---------------- */
@@ -1491,7 +1480,7 @@
     Store.init().then(function () {
       state = Store.get();
       renderAll();
-      applyTab(savedTab(), true);
+      applyTab('today', true);
       loadWeather(false);
       Store.listenRemote();
       // 다른 기기에서 기록이 바뀌면 다시 그립니다 (시트가 열려 있을 땐 잠시 미룸)
