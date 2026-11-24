@@ -1493,6 +1493,18 @@ input { font: inherit; color: inherit; }
 /* 페이지 안의 열 묶음 — 폰에서는 지금처럼 한 줄로 이어지고,
    태블릿(720px 이상)에서만 두 열로 나뉩니다. */
 .page-col { display: contents; }
+
+/* 폰의 오늘 탭은 카드 순서를 그대로 둡니다(날씨 → 일정 → 찌니 → 강의).
+   HTML은 태블릿 2열에 맞춰 찌니 카드를 날씨 아래에 두었으니,
+   폰에서는 일정 카드를 찌니보다 위로 올려 예전과 같은 순서로 보여 줍니다. */
+@media (max-width: 719px) {
+  #page-today {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #page-today .schedule-section { grid-row: 2; }
+  #page-today .family-section { grid-row: 3; }
+}
 .page:not([hidden]) { animation: pageIn .24s ease-out; }
 
 @keyframes pageIn {
