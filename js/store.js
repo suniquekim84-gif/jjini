@@ -12,11 +12,15 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 6;
+  var SCHEMA = 7;
 
   /* 매일 독서 루틴 — 기존 기기에도 빠짐없이 들어가도록 마이그레이션에서 확인합니다. */
   var READ_ROUTINE_ID = 'r_jj_read';
   var READ_ROUTINE = { id: READ_ROUTINE_ID, text: '독서 30분', repeat: 'daily', group: 'read' };
+
+  /* 매일 아킬레스건 운동 — 보상 트래커(재능/문제집/독서)와 상관없는 건강 루틴입니다. */
+  var ACHILLES_ROUTINE_ID = 'r_jj_achilles';
+  var ACHILLES_ROUTINE = { id: ACHILLES_ROUTINE_ID, text: '아킬레스건 운동하기', repeat: 'daily', group: 'health' };
 
   /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
      불러올 때 깔끔히 지워서 찌니 한 명 구성만 남깁니다. */
@@ -94,7 +98,8 @@
           { id: 'r_jj_math', text: '재능학습지 수학 2장 풀기', repeat: 'daily', group: 'jaeneung' },
           { id: 'r_jj_hanja', text: '한자어휘문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
           { id: 'r_jj_history', text: '역사문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
-          { id: 'r_jj_read', text: '독서 30분', repeat: 'daily', group: 'read' }
+          { id: 'r_jj_read', text: '독서 30분', repeat: 'daily', group: 'read' },
+          { id: 'r_jj_achilles', text: '아킬레스건 운동하기', repeat: 'daily', group: 'health' }
         ]
       },
       days: {},
@@ -193,6 +198,20 @@
           }
         });
       });
+    });
+
+    // SCHEMA 7 — '아킬레스건 운동하기' 매일 루틴. 이미 쓰던 기기의 루틴과
+    // 오늘 할 일 목록에 한 번만 넣습니다. (내일부터는 루틴에서 자동으로 채워져요)
+    var today = todayISO();
+    out.members.forEach(function (m) {
+      if (!Array.isArray(out.routines[m.id])) out.routines[m.id] = [];
+      var hasRoutine = out.routines[m.id].some(function (r) { return r && r.id === ACHILLES_ROUTINE_ID; });
+      if (!hasRoutine) out.routines[m.id].push(Object.assign({}, ACHILLES_ROUTINE));
+
+      var day = out.days[today];
+      if (!day || !day.tasks || !Array.isArray(day.tasks[m.id])) return;
+      var hasTask = day.tasks[m.id].some(function (t) { return t && t.id === ACHILLES_ROUTINE_ID; });
+      if (!hasTask) day.tasks[m.id].push(Object.assign({ done: false }, ACHILLES_ROUTINE));
     });
     return out;
   }
