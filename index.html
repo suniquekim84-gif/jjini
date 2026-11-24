@@ -78,6 +78,9 @@
   <!-- ================= PAGE 1 · 오늘 ================= -->
   <div class="page" id="page-today" data-page="today">
 
+    <!-- 태블릿(2열)에서 왼쪽 열: 날씨 + 찌니 카드 -->
+    <div class="page-col">
+
     <!-- ================= WEATHER ================= -->
     <section class="weather-card" id="weather-card" aria-label="오늘 날씨와 미세먼지">
       <div class="weather-main">
@@ -95,6 +98,11 @@
         <span class="pill pill-tip" id="wx-tip">🌿 오늘 공기 확인 중</span>
       </div>
     </section>
+
+    </div><!-- /page-col 왼쪽 -->
+
+    <!-- 태블릿(2열)에서 오른쪽 열: 오늘 일정 + 오늘 엄마 강의 -->
+    <div class="page-col">
 
     <!-- ================= TODAY'S SCHOOL & ACADEMY ================= -->
     <section class="card schedule-section" id="schedule-section" aria-label="오늘의 학교·학원 일정">
@@ -126,6 +134,8 @@
       <div class="lecture-mini" id="lecture-mini"><!-- rendered --></div>
     </section>
 
+    </div><!-- /page-col 오른쪽 -->
+
   </div><!-- /page-today -->
 
   <!-- ================= PAGE 2 · 준비 ================= -->
@@ -147,6 +157,9 @@
 
   <!-- ================= PAGE 3 · 할일 ================= -->
   <div class="page" id="page-todo" data-page="todo" hidden>
+
+    <!-- 태블릿(2열)에서 왼쪽 열: 오늘 할 일 + 독서 기록 -->
+    <div class="page-col">
 
     <!-- ================= TODAY'S TO-DO ================= -->
     <section class="card todo-section" id="todo-section" aria-label="오늘 할 일">
@@ -179,6 +192,11 @@
       <div class="book-list" id="book-list"><!-- rendered --></div>
     </section>
 
+    </div><!-- /page-col 왼쪽 -->
+
+    <!-- 태블릿(2열)에서 오른쪽 열: 보상 트래커 + 도장판 -->
+    <div class="page-col">
+
     <!-- ================= 찌니 보상 트래커 ================= -->
     <section class="card reward-section" id="reward-section" aria-label="찌니 보상 트래커">
       <header class="section-head">
@@ -210,6 +228,8 @@
         <button class="btn btn-light" data-action="open-calendar" id="btn-calendar">🗓️ 도장판 달력 보기</button>
       </div>
     </section>
+
+    </div><!-- /page-col 오른쪽 -->
 
   </div><!-- /page-todo -->
 

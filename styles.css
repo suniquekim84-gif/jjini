@@ -1489,6 +1489,10 @@ input { font: inherit; color: inherit; }
 /* ===================== 페이지 전환 · 하단 탭 바 ===================== */
 .page { display: block; }
 .page[hidden] { display: none !important; }
+
+/* 페이지 안의 열 묶음 — 폰에서는 지금처럼 한 줄로 이어지고,
+   태블릿(720px 이상)에서만 두 열로 나뉩니다. */
+.page-col { display: contents; }
 .page:not([hidden]) { animation: pageIn .24s ease-out; }
 
 @keyframes pageIn {
@@ -2251,6 +2255,194 @@ html.is-locked .lock {
   .app { max-width: 440px; }
   .sheet-backdrop { align-items: center; padding: 20px; }
   .sheet { border-radius: 26px; max-height: 84dvh; }
+}
+
+/* =====================================================================
+   태블릿 · 넓은 화면 (720px 이상)
+   폰 레이아웃은 그대로 두고, 태블릿에서는 화면을 꽉 채우는 2열로 펼칩니다.
+   ===================================================================== */
+@media (min-width: 720px) {
+  body { padding: 0; }
+
+  .app {
+    max-width: min(1160px, 100%);
+    padding: 26px 30px calc(126px + env(safe-area-inset-bottom));
+  }
+
+  /* ---------- 헤더: 두 줄(제목 줄 + 날짜 줄)을 넓게 ---------- */
+  .app-header { padding: 2px 4px 2px; }
+
+  .brand-row { gap: 12px; }
+  .brand-mark { width: 44px; height: 44px; }
+  .brand-title { font-size: 34px; letter-spacing: -1.1px; }
+
+  .header-actions { gap: 9px; }
+  .icon-pill { width: 46px; height: 42px; }
+
+  .header-sub { margin-top: 12px; align-items: center; gap: 12px; }
+  .header-date { font-size: 17px; }
+  .header-line { font-size: 13.5px; }
+  .pill-glow { font-size: 12.5px; padding: 7px 13px; }
+
+  /* ---------- 페이지: 2열 그리드 ---------- */
+  .page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 20px;
+    align-items: start;
+  }
+  .page-col { display: flex; flex-direction: column; min-width: 0; }
+
+  /* 준비·강의 탭은 카드 하나가 폭을 다 쓰고, 카드 안에서 2열로 나눕니다 */
+  .page[data-page="prep"],
+  .page[data-page="lecture"] { display: block; }
+
+  /* ---------- 카드 ---------- */
+  .card {
+    margin-top: 18px;
+    padding: 20px 20px 18px;
+    border-radius: 30px;
+  }
+  .section-head { gap: 14px; }
+  .section-title { font-size: 20px; letter-spacing: -0.4px; }
+  .section-sub { font-size: 13.5px; margin-top: 4px; }
+  .btn { font-size: 14.5px; padding: 12px 17px; }
+  .btn-ghost { font-size: 13.5px; padding: 10px 14px; }
+  .pill { font-size: 13px; padding: 7px 12px; }
+  .badge { font-size: 12.5px; }
+
+  /* ---------- 날씨 ---------- */
+  .weather-card {
+    margin-top: 18px;
+    padding: 20px 20px 18px;
+    border-radius: 28px;
+  }
+  .weather-icon { font-size: 32px; }
+  .wx-city { font-size: 17px; }
+  .wx-temp { font-size: 34px; letter-spacing: -1.5px; }
+  .wx-cond { font-size: 15px; }
+  .wx-range { font-size: 13px; }
+  .weather-foot { margin-top: 12px; gap: 8px; }
+  .badge-air { font-size: 12.5px; padding: 6px 11px; }
+  .pill-tip { font-size: 12.5px; }
+
+  /* ---------- 오늘의 학교·학원 일정 ---------- */
+  .schedule-row { padding: 13px 0; gap: 9px; }
+  .schedule-avatar { width: 44px; height: 44px; }
+  .schedule-name { font-size: 15.5px; }
+  .schedule-status { font-size: 11.5px; }
+  .chip-subject { font-size: 12.5px; padding: 6px 10px; }
+  .schedule-section > .btn { margin-top: 14px; }
+
+  /* ---------- 찌니 카드 ---------- */
+  .family-section { padding: 14px 12px; }
+  .member-card { padding: 14px; gap: 14px; }
+  .member-avatar { width: 78px; height: 78px; }
+  .member-name { font-size: 24px; }
+  .member-sub { font-size: 13px; }
+  .star-big .star-emoji { font-size: 24px; }
+  .star-big b { font-size: 26px; }
+  .piggy { font-size: 12px; }
+
+  /* ---------- 준비: 등교 | 학원 2열 ---------- */
+  .prep-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    margin-top: 14px;
+  }
+  .prep-block { padding: 16px 16px 15px; }
+  .prep-title { font-size: 15px; }
+
+  /* ---------- 할 일 · 독서 ---------- */
+  .todo-section { padding: 20px 18px 18px; }
+  .todo-card { padding: 15px 15px 12px; }
+  .task { min-height: 48px; }
+  .task-text { font-size: 15px; }
+  .book-bonus { padding: 12px 14px; }
+  .book-bonus-title { font-size: 13.5px; }
+
+  /* ---------- 보상 트래커 · 도장판 ---------- */
+  .reward-row { padding: 12px 14px; }
+  .stamp-section > .btn { margin-top: 0; }
+
+  /* ---------- 강의: 헤더·오늘 위, 이번 주 | 다가오는 일정 2열 ---------- */
+  .lecture-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 26px;
+    align-content: start;
+  }
+  .lecture-section > .section-head,
+  .lecture-section > #lecture-today { grid-column: 1 / -1; }
+  .lecture-section > #lecture-week { grid-column: 1; }
+  .lecture-section > #lecture-upcoming { grid-column: 2; }
+  .lecture-head { margin-top: 14px; }
+  .lecture-head-title { font-size: 14px; }
+  .lecture-row { padding: 11px 13px; }
+  .lecture-title { font-size: 13.5px; }
+  .lecture-time { font-size: 13px; }
+  .lecture-mini-empty { font-size: 13px; }
+
+  /* ---------- 하단 탭 바: 폭에 맞춘 둥근 바 ---------- */
+  .tabbar {
+    max-width: min(1160px, calc(100% - 40px));
+    bottom: 16px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    border: 1px solid rgba(228, 208, 172, .8);
+    border-radius: 24px;
+    box-shadow: 0 10px 34px rgba(150, 120, 80, .20);
+  }
+  .tabbar-btn {
+    flex-direction: row;
+    justify-content: center;
+    gap: 9px;
+    padding: 11px 12px;
+    border-radius: 18px;
+  }
+  .tabbar-icon { font-size: 21px; }
+  .tabbar-label { font-size: 14px; letter-spacing: -0.2px; }
+
+  /* ---------- 모달(시트) ---------- */
+  .sheet-backdrop { padding: 24px; }
+  .sheet {
+    width: min(540px, 100%);
+    max-height: 86dvh;
+    border-radius: 28px;
+  }
+  .sheet-head { padding: 20px 22px 12px; }
+  .sheet-head h2 { font-size: 19px; }
+  .sheet-body { padding: 6px 22px 10px; }
+  .sheet-foot { padding: 14px 22px 18px; }
+  .field-title { font-size: 14px; }
+  .field-hint { font-size: 12.5px; }
+
+  /* ---------- 잠금 화면 ---------- */
+  .lock-inner { width: min(400px, 100%); }
+  .lock-avatar { width: 108px; height: 108px; }
+  .lock-title { font-size: 26px; }
+  .lock-sub { font-size: 13.5px; }
+  .lock-pad { width: min(292px, 100%); gap: 12px; }
+  .lock-key { font-size: 23px; }
+}
+
+/* 넓은 태블릿·데스크톱: 헤더를 한 줄로, 다가오는 강의 카드도 2열로 */
+@media (min-width: 1100px) {
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .brand-row { flex: 1 1 auto; }
+  .header-sub { margin-top: 0; flex: 0 0 auto; align-items: center; flex-wrap: nowrap; gap: 14px; }
+  .lecture-upcoming .lecture-list,
+  .lecture-today .lecture-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
 }
 
 /* 아주 좁은 화면 */
