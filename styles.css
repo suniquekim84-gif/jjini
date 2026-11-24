@@ -2279,7 +2279,13 @@ html.is-locked .lock {
   .app {
     max-width: min(1160px, 100%);
     padding: 26px 30px calc(126px + env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
+
+  /* 짧은 탭에서도 푸터가 화면 아래에 놓이도록 */
+  .app-footer { margin-top: auto; }
 
   /* ---------- 헤더: 두 줄(제목 줄 + 날짜 줄)을 넓게 ---------- */
   .app-header { padding: 2px 4px 2px; }
