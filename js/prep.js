@@ -1,6 +1,8 @@
-/* 찌니 대시보드 — 등교·학원 준비
+/* 찌니 대시보드 — 등교·학원·취침 준비
    · 등교: 평일 08:30 출발, 준비물 안경·외투·핸드폰
    · 학원: 수업 시작 10분 전 출발, 수업별 확인 항목
+   · 취침: 월·수·금 21:00 샤워 · 22:00 자기, 화·목 21:30 샤워 · 22:30 자기
+           (토·일은 정해진 취침 루틴이 없어 참고 시간만 보여 줍니다)
    체크 기록은 이 기기의 localStorage 에 날짜별로 저장합니다. */
 (function () {
   'use strict';
@@ -25,6 +27,26 @@
     '재능': { id: 'homework', label: '과제 끝냈는지 확인', emoji: '📝' }
   };
 
+  /* 취침 준비 — 요일별 샤워·취침 시간 (토·일은 없음) */
+  var BED_TABLE = {
+    1: { shower: '21:00', sleep: '22:00' },
+    2: { shower: '21:30', sleep: '22:30' },
+    3: { shower: '21:00', sleep: '22:00' },
+    4: { shower: '21:30', sleep: '22:30' },
+    5: { shower: '21:00', sleep: '22:00' }
+  };
+
+  var BED_ITEMS = [
+    { id: 'shower', label: '샤워하기', emoji: '🚿' },
+    { id: 'sleep', label: '자기', emoji: '😴' }
+  ];
+
+  /* 주말에 보여 줄 참고 시간 */
+  var BED_REF = [
+    { label: '월·수·금', shower: '21:00', sleep: '22:00' },
+    { label: '화·목', shower: '21:30', sleep: '22:30' }
+  ];
+
   function minutesOf(hhmm) {
     var p = String(hhmm).split(':');
     return Number(p[0]) * 60 + Number(p[1]);
@@ -40,6 +62,11 @@
   /* 수업 시작 10분 전 출발 시각 */
   function departOf(start) {
     return toHHMM(minutesOf(start) - LEAD_MIN);
+  }
+
+  function dowOf(dateISO) {
+    var p = String(dateISO).split('-');
+    return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 12, 0, 0).getDay();
   }
 
   /* 남은 시간 안내 문구 */
@@ -78,11 +105,12 @@
   function dayOf(all, dateISO, create) {
     if (!all[dateISO]) {
       if (!create) return null;
-      all[dateISO] = { school: {}, academy: {} };
+      all[dateISO] = { school: {}, academy: {}, bed: {} };
     }
     var day = all[dateISO];
     if (!day.school || typeof day.school !== 'object') day.school = {};
     if (!day.academy || typeof day.academy !== 'object') day.academy = {};
+    if (!day.bed || typeof day.bed !== 'object') day.bed = {};
     return day;
   }
 
@@ -145,6 +173,71 @@
     return { checked: !!slot[checkId] };
   }
 
+  /* ---------------- 취침 ---------------- */
+  /* 오늘 요일의 취침 계획 (주말이면 null) */
+  function bedPlan(dateISO) {
+    var dow = dowOf(dateISO);
+    var t = BED_TABLE[dow];
+    if (!t) return null;
+    return {
+      dow: dow,
+      shower: t.shower,
+      sleep: t.sleep,
+      showerMin: minutesOf(t.shower),
+      sleepMin: minutesOf(t.sleep),
+      tag: (dow === 2 || dow === 4) ? '화·목은 조금 늦게' : '월·수·금 시간'
+    };
+  }
+
+  function bedList(dateISO) {
+    var plan = bedPlan(dateISO);
+    if (!plan) return [];
+    var day = dayOf(read(), dateISO, false);
+    var saved = (day && day.bed) || {};
+    return BED_ITEMS.map(function (it) {
+      return {
+        id: it.id,
+        label: it.label,
+        emoji: it.emoji,
+        at: it.id === 'shower' ? plan.shower : plan.sleep,
+        atMin: it.id === 'shower' ? plan.showerMin : plan.sleepMin,
+        checked: !!saved[it.id]
+      };
+    });
+  }
+
+  function toggleBed(dateISO, itemId) {
+    var all = read();
+    var day = dayOf(all, dateISO, true);
+    if (day.bed[itemId]) delete day.bed[itemId];
+    else day.bed[itemId] = true;
+    write(all);
+    var list = bedList(dateISO);
+    var label = '';
+    list.forEach(function (it) { if (it.id === itemId) label = it.label; });
+    return {
+      item: itemId,
+      label: label,
+      checked: !!day.bed[itemId],
+      done: list.length > 0 && list.every(function (it) { return it.checked; }),
+      count: list.filter(function (it) { return it.checked; }).length,
+      total: list.length
+    };
+  }
+
+  /* 취침 준비 남은 시간 안내 */
+  function bedStatus(atMin, nowMin) {
+    var left = atMin - nowMin;
+    if (left > 60) {
+      var h = Math.floor(left / 60);
+      var m = left % 60;
+      return { state: 'wait', left: left, text: h + '시간' + (m ? ' ' + m + '분' : '') + ' 남음' };
+    }
+    if (left > 0) return { state: 'soon', left: left, text: left + '분 남음' };
+    if (left > -10) return { state: 'now', left: left, text: '지금이에요!' };
+    return { state: 'over', left: left, text: '시간 지났어요' };
+  }
+
   window.FamilyPrep = {
     KEY: KEY,
     SCHOOL_DEPART: SCHOOL_DEPART,
@@ -156,6 +249,12 @@
     toggleSchool: toggleSchool,
     academyList: academyList,
     toggleAcademy: toggleAcademy,
+    BED_ITEMS: BED_ITEMS,
+    BED_REF: BED_REF,
+    bedPlan: bedPlan,
+    bedList: bedList,
+    toggleBed: toggleBed,
+    bedStatus: bedStatus,
     clear: function () {
       try { localStorage.removeItem(KEY); } catch (e) { /* noop */ }
     }

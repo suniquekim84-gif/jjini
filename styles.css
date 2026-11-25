@@ -1296,6 +1296,155 @@ input { font: inherit; color: inherit; }
   color: #A2907F;
 }
 
+/* ---------- 취침 준비 (밤·라벤더 톤) ---------- */
+.prep-block-bed {
+  background:
+    radial-gradient(120% 100% at 100% 0%, #F2EAFF 0%, rgba(242, 234, 255, 0) 62%),
+    linear-gradient(168deg, #F8F5FF 0%, #F1F8FF 100%);
+  border-color: #E2DAF6;
+}
+.prep-block-bed .prep-title { color: #514379; }
+.prep-block-bed .prep-count-sub { color: #9A8FC4; }
+
+.bed-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.bed-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px 8px 8px;
+  border-radius: 15px;
+  border: 1px solid #E7E0F7;
+  background: #FFFFFF;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.bed-ic {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.bed-ic svg { display: block; width: 100%; height: 100%; }
+
+.bed-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.bed-time {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  color: #4A3D78;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bed-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9186BE;
+  letter-spacing: -0.2px;
+}
+
+.bed-left {
+  margin-left: auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #7C6FA8;
+  background: #F4F0FF;
+  border: 1px solid #E4DCF8;
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bed-row[data-state="soon"] .bed-left {
+  color: #8A5BC0;
+  background: #F1E7FF;
+  border-color: #E0CFF8;
+}
+.bed-row[data-state="now"] .bed-left {
+  color: #FFFFFF;
+  background: #8E7BE8;
+  border-color: #8E7BE8;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+.bed-row[data-state="over"] .bed-left {
+  color: #A2907F;
+  background: #F7F2E8;
+  border-color: #EDE4D4;
+}
+.bed-row[data-state="done"] .bed-left {
+  color: #3F8358;
+  background: #E4F5E8;
+  border-color: #CFEBD8;
+}
+
+.bed-check {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  border: 1.5px solid #D9CFF0;
+  background: #FBFAFF;
+  color: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: background .15s ease, border-color .15s ease, transform .12s ease;
+}
+.bed-check:active { transform: scale(.94); }
+
+.bed-row.is-on { background: #F6FBF7; border-color: #D6EBDC; }
+.bed-row.is-on .bed-check {
+  background: #4CB56C;
+  border-color: #4CB56C;
+  color: #FFFFFF;
+}
+.bed-row.is-on .bed-time { color: #4C6B57; }
+
+.bed-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.bed-ref-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  border: 1px solid #E7E0F7;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #7C6FA8;
+  font-variant-numeric: tabular-nums;
+}
+.bed-ref-row b {
+  flex: none;
+  width: 62px;
+  font-size: 12px;
+  color: #514379;
+  letter-spacing: -0.2px;
+}
+
 /* ===================== 엄마 강의 일정 ===================== */
 .lecture-section {
   background:
@@ -2362,7 +2511,7 @@ html.is-locked .lock {
   .star-big b { font-size: 26px; }
   .piggy { font-size: 12px; }
 
-  /* ---------- 준비: 등교 | 학원 2열 ---------- */
+  /* ---------- 준비: 등교 | 학원, 취침은 아랫줄 전체 폭 ---------- */
   .prep-body {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -2372,6 +2521,19 @@ html.is-locked .lock {
   }
   .prep-block { padding: 16px 16px 15px; }
   .prep-title { font-size: 15px; }
+  .prep-block-bed { grid-column: 1 / -1; }
+  .prep-block-bed .bed-rows {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+  }
+  .bed-row { padding: 10px 12px 10px 10px; }
+  .bed-ic { width: 42px; height: 42px; }
+  .bed-time { font-size: 21px; }
+  .bed-name { font-size: 12px; }
+  .bed-left { font-size: 12.5px; }
+  .bed-check { width: 36px; height: 36px; }
+  .bed-ref-row { font-size: 12.5px; padding: 9px 12px; }
 
   /* ---------- 할 일 · 독서 ---------- */
   .todo-section { padding: 20px 18px 18px; }

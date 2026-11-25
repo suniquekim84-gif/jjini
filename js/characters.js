@@ -380,6 +380,31 @@
       '<path d="M24 30 l-4 8" stroke="#FFB347" stroke-width="3" stroke-linecap="round"/>');
   }
 
+  /* 취침 — 샤워하기 (물방울이 떨어지는 샤워기) */
+  function icShower() {
+    return tile('shower', '#DCEEFF', '#E9E4FF',
+      '<path d="M26 20 v12 a10 10 0 0 0 10 10" stroke="#8FBFEA" stroke-width="4.4" fill="none" stroke-linecap="round"/>' +
+      '<rect x="30" y="40" width="40" height="14" rx="7" fill="#9CCBF5"/>' +
+      '<rect x="34" y="43" width="12" height="4.4" rx="2.2" fill="#FFFFFF" opacity=".6"/>' +
+      '<path d="M37 60 v6 M45 60 v11 M53 60 v6 M61 60 v11 M69 60 v6" stroke="#BFE0FF" stroke-width="5" stroke-linecap="round"/>' +
+      '<path d="M26 87 q12-9 24-3 q12 6 24-2" stroke="#D3E9FF" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="50" cy="93" r="3.2" fill="#FFFFFF" opacity=".9"/>' +
+      sparkle(78, 26, 4, '#FFFFFF'));
+  }
+
+  /* 취침 — 자기 (달·별, 이불 덮고 자는 피카츄) */
+  function icBed() {
+    return tile('bed', '#E7E1FF', '#D9ECFF',
+      '<path d="M79 16 a14 14 0 1 0 6 25 a11 11 0 1 1 -6 -25 z" fill="#FFDD73"/>' +
+      sparkle(24, 22, 4, '#FFE9A8') +
+      '<path d="M63 30 h9 l-9 9 h9" stroke="#B9AEE8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<rect x="16" y="55" width="70" height="21" rx="10" fill="#FFFFFF" stroke="#E0D9F6" stroke-width="2.4"/>' +
+      '<rect x="22" y="46" width="25" height="13" rx="6.5" fill="#EDF3FF" stroke="#D6E4FA" stroke-width="2"/>' +
+      pikaHead(50, 45, 0.6, true) +
+      '<path d="M44 57 h34 a10 10 0 0 1 10 10 v9 h-44 z" fill="#BFD6FF"/>' +
+      '<path d="M44 57 h34 a10 10 0 0 1 10 10 v9 h-44 z" fill="none" stroke="#A9C6F5" stroke-width="2"/>');
+  }
+
   /* 책 (독서 기록) */
   function icBook() {
     return tile('book', '#E6F7EE', '#DDEEFF',
@@ -426,6 +451,8 @@
     homework: icHomework,
     school: icSchool,
     academy: icAcademy,
+    shower: icShower,
+    bed: icBed,
     book: icBook,
     mic: icMic
   };
@@ -444,7 +471,9 @@
     '🎮': 'nintendo',
     '🎤': 'mic',
     '🏫': 'school',
-    '🎓': 'academy'
+    '🎓': 'academy',
+    '🚿': 'shower',
+    '😴': 'bed'
   };
 
   window.FamilyChars = {

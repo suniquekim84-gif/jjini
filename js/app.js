@@ -488,88 +488,140 @@
 
     var kid = Sched.kids.jjini;
     var day = kid && kid.days[dow];
+    var now = nowMinutes();
+    var html = '';
 
     if (!day) {
-      byId('prep-sub').textContent = '주말은 준비할 게 없어요';
-      byId('prep-body').innerHTML =
+      byId('prep-sub').textContent = '주말은 등교·학원 준비가 없어요';
+      html +=
         '<div class="prep-free">' +
           '<div class="prep-free-emoji">🌈</div>' +
           '<p class="prep-free-title">주말엔 등교·학원 준비가 없어요</p>' +
-          '<p class="prep-free-sub">내일 준비물은 위의 주간 시간표를 보고 미리 챙겨 둬요</p>' +
+          '<p class="prep-free-sub">내일 준비물은 주간 시간표를 보고 미리 챙겨 둬요</p>' +
         '</div>';
-      return;
-    }
+    } else {
+      byId('prep-sub').textContent = '오늘 준비물과 취침 시간을 확인해요';
 
-    byId('prep-sub').textContent = '나가기 전에 챙길 것만 확인해요';
+      var schoolDep = Prep.minutesOf(Prep.SCHOOL_DEPART);
+      var sState = Prep.status(schoolDep, null, now);
+      var items = Prep.schoolList(dateISO);
+      var doneCount = items.filter(function (it) { return it.checked; }).length;
+      var allDone = doneCount === items.length;
 
-    var now = nowMinutes();
-    var schoolDep = Prep.minutesOf(Prep.SCHOOL_DEPART);
-    var sState = Prep.status(schoolDep, null, now);
-    var items = Prep.schoolList(dateISO);
-    var doneCount = items.filter(function (it) { return it.checked; }).length;
-    var allDone = doneCount === items.length;
-
-    var html = '<div class="prep-block prep-block-school" data-prep-dep="' + schoolDep + '"' +
-        prepBlockState(sState.state) + '>' +
-      '<div class="prep-head">' +
-        '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('school') + '</span>등교 준비</span>' +
-        '<span class="prep-left" data-prep-left>' + esc(sState.text) + '</span>' +
-      '</div>' +
-      '<div class="prep-depart-row">' +
-        '<span class="prep-depart">' + Prep.SCHOOL_DEPART + '</span>' +
-        '<span class="prep-depart-label">출발</span>' +
-        '<span class="prep-check-count' + (allDone ? ' is-done' : '') + '">' + doneCount + '/' + items.length + '</span>' +
-      '</div>' +
-      '<div class="prep-checks">' + items.map(function (it) {
-        return prepCheckButton({
-          action: 'prep-school-toggle',
-          id: it.id,
-          label: it.label,
-          emoji: it.emoji,
-          checked: it.checked
-        });
-      }).join('') + '</div>' +
-      '<p class="prep-note' + (allDone ? ' is-done' : '') + '">' +
-        (allDone ? '다 챙겼어요! 등교 준비 완료 🎉' : '안경·외투·핸드폰을 하나씩 체크해요') +
-      '</p>' +
-    '</div>';
-
-    var list = Prep.academyList(dateISO, day.items);
-    html += '<div class="prep-block prep-block-academy">' +
-      '<div class="prep-head">' +
-        '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('academy') + '</span>학원 준비</span>' +
-        '<span class="prep-count-sub">' + (list.length ? '수업 ' + list.length + '개 · 10분 전 출발' : '오늘은 없음') + '</span>' +
+      html += '<div class="prep-block prep-block-school" data-prep-dep="' + schoolDep + '"' +
+          prepBlockState(sState.state) + '>' +
+        '<div class="prep-head">' +
+          '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('school') + '</span>등교 준비</span>' +
+          '<span class="prep-left" data-prep-left>' + esc(sState.text) + '</span>' +
+        '</div>' +
+        '<div class="prep-depart-row">' +
+          '<span class="prep-depart">' + Prep.SCHOOL_DEPART + '</span>' +
+          '<span class="prep-depart-label">출발</span>' +
+          '<span class="prep-check-count' + (allDone ? ' is-done' : '') + '">' + doneCount + '/' + items.length + '</span>' +
+        '</div>' +
+        '<div class="prep-checks">' + items.map(function (it) {
+          return prepCheckButton({
+            action: 'prep-school-toggle',
+            id: it.id,
+            label: it.label,
+            emoji: it.emoji,
+            checked: it.checked
+          });
+        }).join('') + '</div>' +
+        '<p class="prep-note' + (allDone ? ' is-done' : '') + '">' +
+          (allDone ? '다 챙겼어요! 등교 준비 완료 🎉' : '안경·외투·핸드폰을 하나씩 체크해요') +
+        '</p>' +
       '</div>';
 
-    if (!list.length) {
-      html += '<p class="prep-empty">오늘은 학원 일정이 없어요 😌</p>';
-    } else {
-      html += list.map(function (it) {
-        var st = Prep.status(it.departMin, it.endMin, now);
-        return '<div class="prep-academy-row" data-prep-dep="' + it.departMin + '" data-prep-end="' + it.endMin + '"' +
-            prepBlockState(st.state) + '>' +
-          '<div class="prep-head">' +
-            '<span class="chip-subject tone-' + tone(it.name) + '">' + esc(it.name) + ' <b>' + it.start + '~' + it.end + '</b></span>' +
-            '<span class="prep-left" data-prep-left>' + esc(st.text) + '</span>' +
-          '</div>' +
-          '<div class="prep-depart-row">' +
-            '<span class="prep-depart">' + it.depart + '</span>' +
-            '<span class="prep-depart-label">출발</span>' +
-          '</div>' +
-          '<div class="prep-checks">' + prepCheckButton({
-            action: 'prep-academy-toggle',
-            id: it.check.id,
-            start: it.start,
-            label: it.check.label,
-            emoji: it.check.emoji,
-            checked: it.check.checked
-          }) + '</div>' +
+      var list = Prep.academyList(dateISO, day.items);
+      html += '<div class="prep-block prep-block-academy">' +
+        '<div class="prep-head">' +
+          '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('academy') + '</span>학원 준비</span>' +
+          '<span class="prep-count-sub">' + (list.length ? '수업 ' + list.length + '개 · 10분 전 출발' : '오늘은 없음') + '</span>' +
         '</div>';
-      }).join('');
+
+      if (!list.length) {
+        html += '<p class="prep-empty">오늘은 학원 일정이 없어요 😌</p>';
+      } else {
+        html += list.map(function (it) {
+          var st = Prep.status(it.departMin, it.endMin, now);
+          return '<div class="prep-academy-row" data-prep-dep="' + it.departMin + '" data-prep-end="' + it.endMin + '"' +
+              prepBlockState(st.state) + '>' +
+            '<div class="prep-head">' +
+              '<span class="chip-subject tone-' + tone(it.name) + '">' + esc(it.name) + ' <b>' + it.start + '~' + it.end + '</b></span>' +
+              '<span class="prep-left" data-prep-left>' + esc(st.text) + '</span>' +
+            '</div>' +
+            '<div class="prep-depart-row">' +
+              '<span class="prep-depart">' + it.depart + '</span>' +
+              '<span class="prep-depart-label">출발</span>' +
+            '</div>' +
+            '<div class="prep-checks">' + prepCheckButton({
+              action: 'prep-academy-toggle',
+              id: it.check.id,
+              start: it.start,
+              label: it.check.label,
+              emoji: it.check.emoji,
+              checked: it.check.checked
+            }) + '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      html += '</div>';
     }
 
-    html += '</div>';
+    html += bedBlockHtml(dateISO, now);
     byId('prep-body').innerHTML = html;
+  }
+
+  /* ---------------- 취침 준비 ---------------- */
+  function bedRowHtml(it, now) {
+    var icon = (Chars && Chars.iconOf) ? Chars.iconOf(it.emoji) : '';
+    var st = Prep.bedStatus(it.atMin, now);
+    return '<div class="bed-row' + (it.checked ? ' is-on' : '') + '" data-bed-at="' + it.atMin + '"' +
+        ' data-state="' + (it.checked ? 'done' : st.state) + '">' +
+      (icon ? '<span class="bed-ic" aria-hidden="true">' + icon + '</span>' : '') +
+      '<div class="bed-main">' +
+        '<span class="bed-time">' + it.at + '</span>' +
+        '<span class="bed-name">' + esc(it.label) + '</span>' +
+      '</div>' +
+      '<span class="bed-left" data-bed-left>' + esc(it.checked ? '완료 ✓' : st.text) + '</span>' +
+      '<button class="bed-check" type="button" data-action="prep-bed-toggle" data-item="' + it.id + '" ' +
+        'aria-pressed="' + (it.checked ? 'true' : 'false') + '" ' +
+        'aria-label="' + esc(it.label) + (it.checked ? ' 체크 풀기' : ' 체크하기') + '">' +
+        '<span aria-hidden="true">✓</span>' +
+      '</button>' +
+    '</div>';
+  }
+
+  function bedBlockHtml(dateISO, now) {
+    var plan = Prep.bedPlan(dateISO);
+    var head = '<div class="prep-head">' +
+      '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('bed') + '</span>취침 준비</span>' +
+      '<span class="prep-count-sub">' + (plan ? plan.tag : '주말은 정해진 시간 없음') + '</span>' +
+    '</div>';
+
+    if (!plan) {
+      return '<div class="prep-block prep-block-bed prep-block-bed-rest">' + head +
+        '<p class="prep-empty">주말엔 정해진 취침 시간이 없어요 😴 평일 시간은 이래요</p>' +
+        '<div class="bed-ref">' + Prep.BED_REF.map(function (r) {
+          return '<div class="bed-ref-row"><b>' + r.label + '</b>' +
+            '<span>🚿 ' + r.shower + '</span>' +
+            '<span>😴 ' + r.sleep + '</span></div>';
+        }).join('') + '</div>' +
+      '</div>';
+    }
+
+    var list = Prep.bedList(dateISO);
+    var doneCount = list.filter(function (it) { return it.checked; }).length;
+    var allDone = doneCount > 0 && doneCount === list.length;
+
+    return '<div class="prep-block prep-block-bed">' + head +
+      '<div class="bed-rows">' + list.map(function (it) { return bedRowHtml(it, now); }).join('') + '</div>' +
+      '<p class="prep-note' + (allDone ? ' is-done' : '') + '">' +
+        (allDone ? '취침 준비 끝! 잘 자요 🌙' : '샤워하고 이를 닦은 뒤 눕기까지 하나씩 체크해요') +
+      '</p>' +
+    '</div>';
   }
 
   function refreshPrepTimers() {
@@ -583,6 +635,17 @@
       node.setAttribute('data-state', st.state);
       var label = node.querySelector('[data-prep-left]');
       if (label) label.textContent = st.text;
+    });
+
+    /* 취침 준비 남은 시간 */
+    var beds = document.querySelectorAll('[data-bed-at]');
+    Array.prototype.forEach.call(beds, function (node) {
+      var at = Number(node.getAttribute('data-bed-at'));
+      var on = node.classList.contains('is-on');
+      var st2 = Prep.bedStatus(at, now);
+      node.setAttribute('data-state', on ? 'done' : st2.state);
+      var label2 = node.querySelector('[data-bed-left]');
+      if (label2) label2.textContent = on ? '완료 ✓' : st2.text;
     });
   }
 
@@ -1256,6 +1319,20 @@
       if (res.checked) {
         confetti();
         toast('학원 준비 확인 완료 ✓');
+      } else {
+        toast('체크를 풀었어요');
+      }
+    },
+
+    'prep-bed-toggle': function (el) {
+      var res = Prep.toggleBed(Store.todayISO(), el.dataset.item);
+      renderPrep();
+      refreshPrepTimers();
+      if (res.done) {
+        confetti();
+        toast('취침 준비 완료! 잘 자요 🌙');
+      } else if (res.checked) {
+        toast(res.item === 'shower' ? '샤워 완료 ✓ 이제 잘 준비!' : '체크 완료 ✓');
       } else {
         toast('체크를 풀었어요');
       }
