@@ -2522,7 +2522,7 @@ html.is-locked .lock {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 14px;
-    align-items: start;
+    align-items: stretch;
     margin-top: 14px;
   }
   .prep-block { padding: 16px 16px 15px; }
