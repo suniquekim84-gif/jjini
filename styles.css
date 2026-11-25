@@ -2528,6 +2528,7 @@ html.is-locked .lock {
   .prep-block { padding: 16px 16px 15px; }
   .prep-title { font-size: 15px; }
   .prep-block-bed { grid-column: 1 / -1; }
+  .prep-body > .prep-free { grid-column: 1 / -1; }
   .bed-row { padding: 10px 12px 10px 10px; }
   .bed-ic { width: 42px; height: 42px; }
   .bed-time { font-size: 21px; }
