@@ -1080,6 +1080,13 @@ input { font: inherit; color: inherit; }
   margin-top: 10px;
 }
 
+.prep-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
 .prep-block {
   border: 1px solid #EDE3D1;
   border-radius: var(--r-lg);
@@ -2517,18 +2524,18 @@ html.is-locked .lock {
   .star-big b { font-size: 26px; }
   .piggy { font-size: 12px; }
 
-  /* ---------- 준비: 등교 | 학원, 취침은 아랫줄 전체 폭 ---------- */
+  /* ---------- 준비: 왼쪽 열(등교 + 취침) | 오른쪽 열(학원) ---------- */
   .prep-body {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 14px;
-    align-items: stretch;
+    align-items: start;
     margin-top: 14px;
   }
+  .prep-col { gap: 14px; }
+  .prep-col-wide { grid-column: 1 / -1; }
   .prep-block { padding: 16px 16px 15px; }
   .prep-title { font-size: 15px; }
-  .prep-block-bed { grid-column: 1 / -1; }
-  .prep-body > .prep-free { grid-column: 1 / -1; }
   .bed-row { padding: 10px 12px 10px 10px; }
   .bed-ic { width: 42px; height: 42px; }
   .bed-time { font-size: 21px; }
@@ -2619,12 +2626,6 @@ html.is-locked .lock {
   }
   .brand-row { flex: 1 1 auto; }
   .header-sub { margin-top: 0; flex: 0 0 auto; align-items: center; flex-wrap: nowrap; gap: 14px; }
-  /* 넓은 화면: 취침 준비 두 줄을 나란히 */
-  .prep-block-bed .bed-rows {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 14px;
-  }
   .lecture-upcoming .lecture-list,
   .lecture-today .lecture-list {
     display: grid;

@@ -489,11 +489,13 @@
     var kid = Sched.kids.jjini;
     var day = kid && kid.days[dow];
     var now = nowMinutes();
-    var html = '';
+    var schoolHtml = '';
+    var academyHtml = '';
+    var freeHtml = '';
 
     if (!day) {
       byId('prep-sub').textContent = '주말은 등교·학원 준비가 없어요';
-      html +=
+      freeHtml +=
         '<div class="prep-free">' +
           '<div class="prep-free-emoji">🌈</div>' +
           '<p class="prep-free-title">주말엔 등교·학원 준비가 없어요</p>' +
@@ -508,7 +510,7 @@
       var doneCount = items.filter(function (it) { return it.checked; }).length;
       var allDone = doneCount === items.length;
 
-      html += '<div class="prep-block prep-block-school" data-prep-dep="' + schoolDep + '"' +
+      schoolHtml += '<div class="prep-block prep-block-school" data-prep-dep="' + schoolDep + '"' +
           prepBlockState(sState.state) + '>' +
         '<div class="prep-head">' +
           '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('school') + '</span>등교 준비</span>' +
@@ -534,16 +536,16 @@
       '</div>';
 
       var list = Prep.academyList(dateISO, day.items);
-      html += '<div class="prep-block prep-block-academy">' +
+      academyHtml += '<div class="prep-block prep-block-academy">' +
         '<div class="prep-head">' +
           '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('academy') + '</span>학원 준비</span>' +
           '<span class="prep-count-sub">' + (list.length ? '수업 ' + list.length + '개 · 10분 전 출발' : '오늘은 없음') + '</span>' +
         '</div>';
 
       if (!list.length) {
-        html += '<p class="prep-empty">오늘은 학원 일정이 없어요 😌</p>';
+        academyHtml += '<p class="prep-empty">오늘은 학원 일정이 없어요 😌</p>';
       } else {
-        html += list.map(function (it) {
+        academyHtml += list.map(function (it) {
           var st = Prep.status(it.departMin, it.endMin, now);
           return '<div class="prep-academy-row" data-prep-dep="' + it.departMin + '" data-prep-end="' + it.endMin + '"' +
               prepBlockState(st.state) + '>' +
@@ -567,10 +569,16 @@
         }).join('');
       }
 
-      html += '</div>';
+      academyHtml += '</div>';
     }
 
-    html += bedBlockHtml(dateISO, now);
+    /* 등교·학원 준비를 왼쪽, 학원 준비를 오른쪽 열에 놓고
+       취침 준비는 왼쪽 열에서 등교 준비 아래에 붙입니다. */
+    var bedHtml = bedBlockHtml(dateISO, now);
+    var html = day
+      ? '<div class="prep-col">' + schoolHtml + bedHtml + '</div>' +
+        '<div class="prep-col">' + academyHtml + '</div>'
+      : '<div class="prep-col prep-col-wide">' + freeHtml + bedHtml + '</div>';
     byId('prep-body').innerHTML = html;
   }
 
