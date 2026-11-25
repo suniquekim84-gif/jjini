@@ -129,7 +129,7 @@
     <section class="card lecture-mini-section" id="lecture-mini-section" data-vibe="rose" aria-label="오늘 엄마 일정">
       <header class="section-head">
         <div class="section-title-wrap">
-          <h2 class="section-title">🎤 오늘 엄마 일정</h2>
+          <h2 class="section-title">👩 오늘 엄마 일정</h2>
           <p class="section-sub" id="lecture-mini-sub">오늘 일정만 모아 봐요</p>
         </div>
         <button class="btn btn-ghost" data-action="switch-tab" data-tab="lecture" id="btn-lecture-more">이번 주 일정 →</button>
@@ -243,7 +243,7 @@
     <section class="card lecture-section" id="lecture-section" data-vibe="lavpeach" aria-label="엄마 일정">
       <header class="section-head">
         <div class="section-title-wrap">
-          <h2 class="section-title">🎤 엄마 일정</h2>
+          <h2 class="section-title">👩 엄마 일정</h2>
           <p class="section-sub" id="lecture-sub">이번 주와 다가오는 일정을 모아 봐요</p>
         </div>
         <button class="btn btn-ghost" data-action="add-lecture" id="btn-add-lecture">+ 일정 추가</button>
@@ -277,7 +277,7 @@
     <span class="tabbar-icon" aria-hidden="true">✅</span><span class="tabbar-label">할일</span>
   </button>
   <button class="tabbar-btn" type="button" data-action="switch-tab" data-tab="lecture">
-    <span class="tabbar-icon" aria-hidden="true">🎤</span><span class="tabbar-label">일정</span>
+    <span class="tabbar-icon" aria-hidden="true">👩</span><span class="tabbar-label">일정</span>
   </button>
 </nav>
 
@@ -434,7 +434,7 @@
   <!-- 일정 추가 / 고치기 -->
   <section class="sheet" id="sheet-lecture" role="dialog" aria-modal="true" aria-labelledby="lecture-sheet-title" hidden>
     <header class="sheet-head">
-      <h2 id="lecture-sheet-title">🎤 엄마 일정</h2>
+      <h2 id="lecture-sheet-title">👩 엄마 일정</h2>
       <button class="sheet-close" data-close aria-label="닫기">✕</button>
     </header>
     <div class="sheet-body">
@@ -455,6 +455,11 @@
         <h3 class="field-title">메모 (선택)</h3>
         <p class="field-hint">비대면·서부·북부처럼 덧붙일 말이 있으면 적어 주세요</p>
         <input type="text" id="lecture-note" maxlength="20" placeholder="예: 비대면 / 서부" autocomplete="off" />
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">일정 종류</h3>
+        <p class="field-hint">강의·수업이면 🎤, 그 밖의 일정이면 📅로 목록에 보여요</p>
+        <button class="btn btn-light btn-wide lecture-kind" type="button" data-action="toggle-lecture-kind" id="lecture-kind-toggle" aria-pressed="false">📅 일반 일정</button>
       </div>
     </div>
     <footer class="sheet-foot">

@@ -27,7 +27,9 @@
 
   function clone(list) {
     return list.map(function (it) {
-      return { id: it.id, date: it.date, time: it.time, title: it.title, note: it.note || '' };
+      var copy = { id: it.id, date: it.date, time: it.time, title: it.title, note: it.note || '' };
+      if (typeof it.lecture === 'boolean') copy.lecture = it.lecture;
+      return copy;
     });
   }
 
@@ -103,12 +105,15 @@
   }
 
   function clean(o) {
-    return {
+    var it = {
       date: String(o.date || '').slice(0, 10),
       time: String(o.time || '').trim().slice(0, 20),
       title: String(o.title || '').trim().slice(0, 40),
       note: String(o.note || '').trim().slice(0, 20)
     };
+    /* 강의(🎤) 표시를 사용자가 정했으면 함께 저장합니다 — 없으면 제목·메모로 알아봅니다 */
+    if (typeof o.lecture === 'boolean') it.lecture = o.lecture;
+    return it;
   }
 
   window.FamilyLectures = {
@@ -157,6 +162,7 @@
         it.time = next.time;
         it.title = next.title || it.title;
         it.note = next.note;
+        if (typeof next.lecture === 'boolean') it.lecture = next.lecture;
         found = it;
       });
       write(list.sort(byDate));

@@ -26,7 +26,7 @@
   var calCursor = null;
   var starMember = 'jjini';
   var taskCtx = { mode: 'add', memberId: 'jjini', taskId: null, repeat: 'once' };
-  var lectureCtx = { mode: 'add', id: null };
+  var lectureCtx = { mode: 'add', id: null, manual: false, lecture: false };
   var lectureExpanded = false;
   var bookCtx = { mode: 'add', id: null };
   var lastToday = null;
@@ -679,10 +679,25 @@
   }
 
   /* ---------------- 엄마 일정 ---------------- */
+  /* 강의·수업 성격의 낱말 — 제목이나 메모에 있으면 🎤로 보여 줍니다 */
+  var LECTURE_WORDS = /(디지털안전지도사|지도사|강의|특강|교육|강사|수업|비대면|초등|중등|고등|학교|초\s|초$|중\s|중$|고\s|고$)/;
+  function looksLikeLecture(title, note) {
+    return LECTURE_WORDS.test(String(title || '') + ' ' + String(note || ''));
+  }
+  /* 저장된 표시(lecture)가 있으면 그걸 따르고, 없으면 낱말로 알아봅니다 */
+  function isLecture(it) {
+    if (!it) return false;
+    if (typeof it.lecture === 'boolean') return it.lecture;
+    return looksLikeLecture(it.title, it.note);
+  }
+  function lectureIcon(it) {
+    return isLecture(it) ? '🎤' : '📅';
+  }
+
   function lectureRow(it, withDate, noActions) {
     return '<div class="lecture-row">' +
       '<div class="lecture-top">' +
-        '<span class="lecture-ic" aria-hidden="true">' + ric('mic') + '</span>' +
+        '<span class="lecture-ic' + (isLecture(it) ? ' is-lecture' : '') + '" aria-hidden="true">' + lectureIcon(it) + '</span>' +
         '<span class="lecture-time' + (it.time ? '' : ' is-empty') + '">' +
           (it.time ? esc(it.time) : '시간 미정') + '</span>' +
         '<span class="lecture-title">' + esc(it.title) + '</span>' +
@@ -707,9 +722,11 @@
     var all = Lectures.list();
     var monday = Store.startOfWeek(today);
     var sunday = Store.addDays(monday, 6);
+    /* 다가오는 일정은 다음 주 일요일까지만 보여 줍니다(그 뒤 일정은 저장만 하고 화면에는 안 냅니다) */
+    var nextSunday = Store.addDays(monday, 13);
     var todayList = all.filter(function (it) { return it.date === today; });
     var weekList = all.filter(function (it) { return it.date > today && it.date <= sunday; });
-    var upcomingAll = all.filter(function (it) { return it.date > sunday; });
+    var upcomingAll = all.filter(function (it) { return it.date > sunday && it.date <= nextSunday; });
     var upcoming = lectureExpanded ? upcomingAll : upcomingAll.slice(0, 6);
 
     /* 오늘 탭 — 오늘 날짜의 일정만 짧게 */
@@ -744,7 +761,7 @@
     byId('lecture-week').innerHTML = wk;
 
     var up = '<div class="lecture-head">' +
-        '<span class="lecture-head-title">다가오는 일정</span>' +
+        '<span class="lecture-head-title">다가오는 일정 · 다음 주까지</span>' +
         (upcomingAll.length > 6
           ? '<button class="lecture-more" type="button" data-action="toggle-lecture-more">' +
               (lectureExpanded ? '접기 ▴' : '외 ' + (upcomingAll.length - upcoming.length) + '개 더 보기 ▾') +
@@ -975,19 +992,41 @@
   function openLectureSheet(opts) {
     lectureCtx = {
       mode: opts.mode || 'add',
-      id: (opts.item && opts.item.id) || null
+      id: (opts.item && opts.item.id) || null,
+      manual: false,
+      lecture: false
     };
     var it = opts.item || { date: Store.todayISO(), time: '', title: '', note: '' };
 
-    byId('lecture-sheet-title').textContent = lectureCtx.mode === 'edit' ? '✏️ 일정 고치기' : '+ 일정 추가';
+    byId('lecture-sheet-title').textContent = lectureCtx.mode === 'edit' ? '👩 일정 고치기' : '👩 일정 추가';
     byId('lecture-date').value = it.date || Store.todayISO();
     byId('lecture-time').value = it.time || '';
     byId('lecture-name').value = it.title || '';
     byId('lecture-note').value = it.note || '';
+    /* 이미 정해 둔 종류가 있으면 그대로, 없으면 낱말로 알아본 값을 보여 줍니다 */
+    lectureCtx.manual = typeof it.lecture === 'boolean';
+    lectureCtx.lecture = lectureCtx.manual ? it.lecture : looksLikeLecture(it.title, it.note);
+    renderLectureKind();
+    byId('lecture-name').oninput = renderLectureKind;
+    byId('lecture-note').oninput = renderLectureKind;
     byId('lecture-delete').hidden = lectureCtx.mode !== 'edit';
 
     openSheet('sheet-lecture');
     setTimeout(function () { byId('lecture-name').focus(); }, 120);
+  }
+
+  /* 시트의 '일정 종류' 버튼 — 직접 고른 뒤에는 낱말보다 그 선택을 따릅니다 */
+  function currentLectureKind() {
+    if (lectureCtx.manual) return !!lectureCtx.lecture;
+    return looksLikeLecture(byId('lecture-name').value, byId('lecture-note').value);
+  }
+  function renderLectureKind() {
+    var btn = byId('lecture-kind-toggle');
+    if (!btn) return;
+    var on = currentLectureKind();
+    btn.textContent = on ? '🎤 강의 일정' : '📅 일반 일정';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.className = 'btn btn-light btn-wide lecture-kind' + (on ? ' is-lecture' : '');
   }
 
   /* ---------------- 독서 기록 시트 ---------------- */
@@ -1420,6 +1459,13 @@
       openLectureSheet({ mode: 'edit', item: it });
     },
 
+    'toggle-lecture-kind': function () {
+      var on = currentLectureKind();
+      lectureCtx.manual = true;
+      lectureCtx.lecture = !on;
+      renderLectureKind();
+    },
+
     'delete-lecture': function (el) {
       var it = Lectures.remove(el.dataset.id);
       if (!it) return;
@@ -1450,7 +1496,8 @@
         date: date,
         time: byId('lecture-time').value.trim(),
         title: title,
-        note: byId('lecture-note').value.trim()
+        note: byId('lecture-note').value.trim(),
+        lecture: currentLectureKind()
       };
       if (lectureCtx.mode === 'edit') {
         Lectures.update(lectureCtx.id, payload);
