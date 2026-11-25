@@ -1337,6 +1337,7 @@ input { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: none;
   min-width: 0;
 }
 
@@ -1355,10 +1356,15 @@ input { font: inherit; color: inherit; }
   font-weight: 700;
   color: #9186BE;
   letter-spacing: -0.2px;
+  white-space: nowrap;
 }
 
 .bed-left {
   margin-left: auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 11.5px;
   font-weight: 700;
   color: #7C6FA8;
