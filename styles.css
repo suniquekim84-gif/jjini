@@ -2458,7 +2458,8 @@ html.is-locked .lock {
   .lecture-upcoming .lecture-list,
   .lecture-today .lecture-list {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* 카드가 하나뿐이면 폭을 다 쓰고, 둘 이상이면 2열로 나뉩니다 */
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 8px;
   }
 }
