@@ -2673,10 +2673,25 @@ html.is-locked .lock {
 /* 아주 좁은 화면 */
 @media (max-width: 355px) {
   .brand-title { font-size: 23px; }
+  .brand-row { gap: 7px; }
+  .header-actions { gap: 5px; }
+  .icon-pill { width: 34px; height: 34px; }
+  .icon-pill svg { width: 17px; height: 17px; }
   .member-avatar { width: 54px; height: 54px; }
   .member-name { font-size: 19px; }
   .task-text { font-size: 13.5px; }
   .stamp-circle { max-width: 38px; }
+}
+
+/* 폰에서는 헤더 버튼 세 개(효과음·설정·공유)가 제목과 한 줄에 들어가도록 조금 줄입니다 */
+@media (max-width: 430px) {
+  .brand-row { gap: 8px; }
+  .brand-mark { width: 34px; height: 34px; }
+  .brand-title { font-size: 24px; letter-spacing: -0.7px; }
+  .header-actions { gap: 6px; }
+  .icon-pill { width: 38px; height: 36px; }
+  .icon-pill svg { width: 18px; height: 18px; }
+  .sound-pill span { font-size: 15px; }
 }
 
 /* =====================================================================
