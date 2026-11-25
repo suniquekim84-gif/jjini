@@ -44,6 +44,8 @@
   var statusEl = null;
   var statusTextEl = null;
   var status = 'idle';
+  var lastRemoteFp = null;      /* 마지막으로 서버와 맞춘 내용(되돌림 방지) */
+  var suppressUntil = 0;        /* 다른 기기 기록을 받은 직후에는 올리지 않습니다 */
 
   /* ---------------- 작은 도우미 ---------------- */
   function readJSON(key, fallback) {
@@ -122,6 +124,22 @@
     };
   }
 
+  /* 기록 내용만 비교하는 지문 — 서버와 같으면 다시 올리지 않아요
+     (기기끼리 같은 내용을 서로 되돌려 올리는 핑퐁을 막습니다) */
+  function fingerprint(p) {
+    if (!p) return '';
+    try {
+      return JSON.stringify({
+        store: p.store || null,
+        prep: p.prep || null,
+        books: p.books || null,
+        lectures: p.lectures || null
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
   function fetchRemote() {
     var url = BASE + '/rest/v1/' + TABLE + '?id=eq.' + ROW_ID + '&select=payload';
     return fetch(url, { headers: headers(), cache: 'no-store' }).then(function (res) {
@@ -135,6 +153,12 @@
 
   function push() {
     var payload = snapshot();
+    var fp = fingerprint(payload);
+    /* 서버에 이미 같은 내용이 있으면 그대로 둡니다 */
+    if (lastRemoteFp && fp === lastRemoteFp) {
+      setStatus('ok');
+      return Promise.resolve(true);
+    }
     /* 올린 시각을 이 기기에도 적어 둡니다 (내 기록이 돌아올 때 무시하려고) */
     setMeta({ updatedAt: payload.updatedAt, deviceId: payload.deviceId });
     setStatus('syncing');
@@ -147,6 +171,7 @@
       body: JSON.stringify([{ id: ROW_ID, payload: payload }])
     }).then(function (res) {
       if (!res.ok) throw new Error('http ' + res.status);
+      lastRemoteFp = fp;
       setStatus('ok');
       return true;
     }).catch(function () {
@@ -175,6 +200,9 @@
       applying = false;
     }
     setMeta({ updatedAt: Number(payload.updatedAt) || Date.now(), deviceId: payload.deviceId || '' });
+    lastRemoteFp = fingerprint(payload);
+    /* 이 직후 화면을 다시 그리면서 생기는 저장은 서버로 되돌려 보내지 않습니다 */
+    suppressUntil = Date.now() + 3000;
     return true;
   }
 
@@ -192,6 +220,7 @@
       }
 
       var remoteAt = Number(remote.updatedAt) || 0;
+      lastRemoteFp = fingerprint(remote);
 
       /* 방금 내가 올린 기록이면 그대로 둡니다 */
       if (remote.deviceId && remote.deviceId === deviceId() && remoteAt <= localAt) {
@@ -316,6 +345,7 @@
   /* ---------------- 로컬 변경 알림 ---------------- */
   function touch() {
     if (applying) return;
+    if (Date.now() < suppressUntil) return;
     var m = meta();
     m.updatedAt = Date.now();
     m.deviceId = deviceId();
