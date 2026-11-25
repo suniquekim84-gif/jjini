@@ -2731,3 +2731,15 @@ body {
   .rw-ic { width: 34px; height: 34px; }
   .todo-card { border-radius: 22px; }
 }
+
+/* 폰: 할 일 줄이 좁아도 단어 중간에서 끊기지 않게 */
+@media (max-width: 719px) {
+  .todo-section { padding: 14px 11px 12px; }
+  .todo-card { padding: 12px 10px 10px; }
+  .task { flex-wrap: wrap; gap: 7px; padding: 7px 8px; }
+  .task-ic { width: 30px; height: 30px; border-radius: 9px; }
+  .task-text { font-size: 14px; word-break: keep-all; overflow-wrap: anywhere; }
+  .task-tag { font-size: 9.5px; padding: 2px 5px; }
+  .mini-btn { width: 28px; height: 28px; border-radius: 9px; font-size: 11px; }
+  .task-actions { gap: 4px; }
+}
