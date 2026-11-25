@@ -222,6 +222,15 @@
       var remoteAt = Number(remote.updatedAt) || 0;
       lastRemoteFp = fingerprint(remote);
 
+      /* 안전장치: 이 기기에서 동기화를 처음 켜는 경우(localAt === 0)에는
+         기기 기록이 비어 있거나 옛것이므로 서버 기록을 먼저 그대로 따릅니다 */
+      if (localAt === 0) {
+        applyRemote(remote);
+        ready = true;
+        setStatus('ok');
+        return true;
+      }
+
       /* 방금 내가 올린 기록이면 그대로 둡니다 */
       if (remote.deviceId && remote.deviceId === deviceId() && remoteAt <= localAt) {
         ready = true;
@@ -346,11 +355,12 @@
   function touch() {
     if (applying) return;
     if (Date.now() < suppressUntil) return;
+    if (!ready) return;                 /* 첫 동기화가 끝나기 전에는 이 기기 시각을 쓰지 않습니다
+                                           (초기화·마이그레이션 중의 저장이 서버 기록을 덮어쓰지 않도록) */
     var m = meta();
     m.updatedAt = Date.now();
     m.deviceId = deviceId();
     setMeta(m);
-    if (!ready) return;                 /* 첫 동기화 전에는 건너뜁니다 */
     setStatus('syncing');
     if (pushTimer) clearTimeout(pushTimer);
     pushTimer = setTimeout(function () {
