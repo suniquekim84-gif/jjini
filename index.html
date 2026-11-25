@@ -82,7 +82,7 @@
     <div class="page-col">
 
     <!-- ================= WEATHER ================= -->
-    <section class="weather-card" id="weather-card" aria-label="오늘 날씨와 미세먼지">
+    <section class="weather-card" id="weather-card" data-vibe="sky" aria-label="오늘 날씨와 미세먼지">
       <div class="weather-main">
         <span class="weather-icon" id="wx-icon" aria-hidden="true">🌤️</span>
         <div class="weather-place">
@@ -100,7 +100,7 @@
     </section>
 
     <!-- ================= 찌니 카드 ================= -->
-    <section class="card family-section" aria-label="찌니">
+    <section class="card family-section" data-vibe="peachmint" aria-label="찌니">
       <div class="member-list" id="member-list"><!-- rendered --></div>
     </section>
 
@@ -110,7 +110,7 @@
     <div class="page-col">
 
     <!-- ================= TODAY'S SCHOOL & ACADEMY ================= -->
-    <section class="card schedule-section" id="schedule-section" aria-label="오늘의 학교·학원 일정">
+    <section class="card schedule-section" id="schedule-section" data-vibe="lav" aria-label="오늘의 학교·학원 일정">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">🏫 오늘의 학교·학원 일정</h2>
@@ -123,7 +123,7 @@
     </section>
 
     <!-- ================= 오늘 엄마 강의 (오늘 것만) ================= -->
-    <section class="card lecture-mini-section" id="lecture-mini-section" aria-label="오늘 엄마 강의">
+    <section class="card lecture-mini-section" id="lecture-mini-section" data-vibe="rose" aria-label="오늘 엄마 강의">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">🎤 오늘 엄마 강의</h2>
@@ -142,7 +142,7 @@
   <div class="page" id="page-prep" data-page="prep" hidden>
 
     <!-- ================= 등교·학원 준비 ================= -->
-    <section class="card prep-section" id="prep-section" aria-label="등교·학원 준비">
+    <section class="card prep-section" id="prep-section" data-vibe="sky" aria-label="등교·학원 준비">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">🎒 등교·학원 준비</h2>
@@ -162,7 +162,7 @@
     <div class="page-col">
 
     <!-- ================= TODAY'S TO-DO ================= -->
-    <section class="card todo-section" id="todo-section" aria-label="오늘 할 일">
+    <section class="card todo-section" id="todo-section" data-vibe="lemon" aria-label="오늘 할 일">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">✅ 오늘 할 일</h2>
@@ -174,7 +174,7 @@
     </section>
 
     <!-- ================= 독서 기록 (오늘 할 일 바로 아래) ================= -->
-    <section class="card book-section" id="book-section" aria-label="독서 기록">
+    <section class="card book-section" id="book-section" data-vibe="mint" aria-label="독서 기록">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">📚 독서 기록</h2>
@@ -183,10 +183,10 @@
         <button class="btn btn-ghost" data-action="add-book" id="btn-add-book">+ 기록 추가</button>
       </header>
       <div class="book-bonus" id="book-bonus">
-        <span class="book-bonus-emoji" aria-hidden="true">💻</span>
+        <span class="book-bonus-emoji" id="book-bonus-icons" aria-hidden="true"></span>
         <div class="book-bonus-info">
-          <p class="book-bonus-title" id="book-bonus-title">오늘 기록 남기면 엔트리코딩 +10분!</p>
-          <p class="book-bonus-sub" id="book-bonus-sub">오늘 날짜로 책을 남기면 보상이 10분 늘어나요</p>
+          <p class="book-bonus-title" id="book-bonus-title">오늘 기록 남기면 엔트리코딩 +10분 · 냥코 20분!</p>
+          <p class="book-bonus-sub" id="book-bonus-sub">오늘 날짜로 책을 남기면 두 보상이 함께 열려요</p>
         </div>
       </div>
       <div class="book-list" id="book-list"><!-- rendered --></div>
@@ -198,7 +198,7 @@
     <div class="page-col">
 
     <!-- ================= 찌니 보상 트래커 ================= -->
-    <section class="card reward-section" id="reward-section" aria-label="찌니 보상 트래커">
+    <section class="card reward-section" id="reward-section" data-vibe="coral" aria-label="찌니 보상 트래커">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">🎁 <span id="reward-name">찌니</span> 보상 트래커</h2>
@@ -213,7 +213,7 @@
     </section>
 
     <!-- ================= STAMP BOARD ================= -->
-    <section class="card stamp-section" id="stamp-section" aria-label="도장판">
+    <section class="card stamp-section" id="stamp-section" data-vibe="lav" aria-label="도장판">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">🐹 <span id="stamp-title">찌니</span> 도장판</h2>
@@ -237,7 +237,7 @@
   <div class="page" id="page-lecture" data-page="lecture" hidden>
 
     <!-- ================= 엄마 강의 일정 (이번 주 + 다가오는) ================= -->
-    <section class="card lecture-section" id="lecture-section" aria-label="엄마 강의 일정">
+    <section class="card lecture-section" id="lecture-section" data-vibe="lavpeach" aria-label="엄마 강의 일정">
       <header class="section-head">
         <div class="section-title-wrap">
           <h2 class="section-title">🎤 엄마 강의 일정</h2>

@@ -49,6 +49,27 @@
     return d.getHours() * 60 + d.getMinutes();
   }
   function tone(name) { return (Sched.colors && Sched.colors[name]) || 'blue'; }
+
+  /* 알록달록 일러스트 아이콘 (js/characters.js) */
+  function ric(key) {
+    return (Chars && Chars.icon) ? Chars.icon(key) : '';
+  }
+
+  /* 할 일마다 어울리는 그림을 골라요 */
+  function taskIcon(t) {
+    var text = String((t && t.text) || '');
+    if (t && t.group === 'jaeneung') return /수학/.test(text) ? 'math' : 'korean';
+    if (t && t.group === 'workbook') return /역사/.test(text) ? 'history' : 'hanja';
+    if (t && t.group === 'read') return 'read';
+    if (t && t.group === 'health') return 'move';
+    if (/독서|책 읽|읽기/.test(text)) return 'read';
+    if (/운동|스트레칭|줄넘기/.test(text)) return 'move';
+    if (/수학/.test(text)) return 'math';
+    if (/한자/.test(text)) return 'hanja';
+    if (/역사/.test(text)) return 'history';
+    if (/코딩|엔트리/.test(text)) return 'coding';
+    return 'korean';
+  }
   function shortDate(dateISO, withWeekday) {
     var d = Store.parseDate(dateISO);
     var s = (d.getMonth() + 1) + '/' + d.getDate();
@@ -213,9 +234,10 @@
     if (t.repeat === 'daily') tag = '<span class="task-tag" data-repeat="daily">매일</span>';
     else if (t.repeat === 'weekday') tag = '<span class="task-tag" data-repeat="weekday">평일</span>';
 
-    return '<li class="task' + (t.done ? ' is-done' : '') + '">' +
+    return '<li class="task' + (t.done ? ' is-done' : '') + '" data-icon="' + taskIcon(t) + '">' +
       '<button class="task-check" data-action="toggle-task" data-member="' + m.id + '" data-task="' + t.id + '" ' +
         'role="checkbox" aria-checked="' + (t.done ? 'true' : 'false') + '" aria-label="' + esc(t.text) + '">✓</button>' +
+      '<span class="task-ic" aria-hidden="true">' + ric(taskIcon(t)) + '</span>' +
       '<span class="task-text">' + esc(t.text) + '</span>' + tag +
       '<span class="task-actions">' +
         (t.group === 'read'
@@ -295,8 +317,8 @@
       videoCond = '문제집 ' + wb.done + '/' + wb.total + ' 완료';
     }
 
-    var videoRow = '<div class="reward-row' + (wb.all ? ' is-unlocked' : '') + '">' +
-      '<span class="reward-icon">📺</span>' +
+    var videoRow = '<div class="reward-row' + (wb.all ? ' is-unlocked' : '') + '" data-reward="video">' +
+      '<span class="reward-icon">' + ric('video') + '</span>' +
       '<div class="reward-info">' +
         '<p class="reward-name">영상 30분 보기</p>' +
         '<p class="reward-cond">' + videoCond + pips(wb) + '</p>' +
@@ -322,8 +344,8 @@
       codingState = '잠금';
     }
 
-    var codingRow = '<div class="reward-row' + (codingMin > 0 ? ' is-unlocked' : '') + '">' +
-      '<span class="reward-icon">💻</span>' +
+    var codingRow = '<div class="reward-row' + (codingMin > 0 ? ' is-unlocked' : '') + '" data-reward="coding">' +
+      '<span class="reward-icon">' + ric('coding') + '</span>' +
       '<div class="reward-info">' +
         '<p class="reward-name">노트북(엔트리코딩)</p>' +
         '<p class="reward-cond">' + codingCond + pips(j) + '</p>' +
@@ -338,14 +360,28 @@
       '<span class="reward-state' + codingStateCls + '">' + codingState + '</span>' +
     '</div>';
 
-    byId('reward-list').innerHTML = videoRow + codingRow;
+    /* 3) 냥코 20분 — 오늘 독서 기록을 남기면 함께 해금 */
+    var catRow = '<div class="reward-row reward-row-cat' + (bookBonus ? ' is-unlocked' : '') + '" data-reward="cat">' +
+      '<span class="reward-icon">' + ric('cat') + '</span>' +
+      '<div class="reward-info">' +
+        '<p class="reward-name">🐱 냥코 20분 하기</p>' +
+        '<p class="reward-cond">' +
+          (bookBonus ? '오늘 책 ' + bookCount + '권 기록 완료! 🎉' : '오늘 독서 기록 남기면 해금!') +
+        '</p>' +
+      '</div>' +
+      '<span class="reward-state' + (bookBonus ? ' is-cat' : '') + '">' +
+        (bookBonus ? '20분 해금 🎉' : '잠금') +
+      '</span>' +
+    '</div>';
+
+    byId('reward-list').innerHTML = videoRow + codingRow + catRow;
 
     var noteEl = byId('reward-book-note');
     if (noteEl) {
       noteEl.className = 'reward-book-note' + (bookBonus ? ' is-on' : '');
       noteEl.textContent = bookBonus
-        ? '📚 오늘 책 ' + bookCount + '권 기록! 엔트리코딩 +10분이 더해졌어요'
-        : '📚 오늘 책을 기록하면 엔트리코딩 +10분!';
+        ? '📚 오늘 책 ' + bookCount + '권 기록! 엔트리코딩 +10분 · 냥코 20분이 열렸어요'
+        : '📚 오늘 책을 기록하면 엔트리코딩 +10분 · 냥코 20분!';
     }
 
     var wk = Store.weekWorkbookDays(kid.id, today);
@@ -358,7 +394,10 @@
     var week = byId('reward-week');
     week.className = 'reward-week' + (wk.full ? ' is-full' : '');
     week.innerHTML =
-      '<div class="reward-week-head"><span>주5일 문제집 완주</span><b>' + wk.count + '/' + wk.total + '일</b></div>' +
+      '<div class="reward-week-head"><span class="rw-head">' +
+        '<span class="rw-ic" aria-hidden="true">' + ric('nintendo') + '</span>' +
+        '<span>주5일 문제집 완주</span>' +
+      '</span><b>' + wk.count + '/' + wk.total + '일</b></div>' +
       '<div class="week-dots">' + dots + '</div>' +
       '<div class="reward-bar"><i style="width:' + pct + '%"></i></div>' +
       '<div class="reward-week-foot">' +
@@ -429,12 +468,14 @@
   }
 
   function prepCheckButton(opts) {
+    var icon = (Chars && Chars.iconOf) ? Chars.iconOf(opts.emoji) : '';
     return '<button class="prep-check' + (opts.checked ? ' is-on' : '') + '" type="button" ' +
       'data-action="' + opts.action + '" data-item="' + opts.id + '"' +
       (opts.start ? ' data-start="' + opts.start + '"' : '') +
       ' aria-pressed="' + (opts.checked ? 'true' : 'false') + '">' +
       '<span class="prep-box" aria-hidden="true">✓</span>' +
-      '<span class="prep-check-label">' + opts.emoji + ' ' + esc(opts.label) + '</span>' +
+      (icon ? '<span class="prep-ic" aria-hidden="true">' + icon + '</span>' : '') +
+      '<span class="prep-check-label">' + esc(opts.label) + '</span>' +
     '</button>';
   }
 
@@ -471,7 +512,7 @@
     var html = '<div class="prep-block prep-block-school" data-prep-dep="' + schoolDep + '"' +
         prepBlockState(sState.state) + '>' +
       '<div class="prep-head">' +
-        '<span class="prep-title">🏫 등교 준비</span>' +
+        '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('school') + '</span>등교 준비</span>' +
         '<span class="prep-left" data-prep-left>' + esc(sState.text) + '</span>' +
       '</div>' +
       '<div class="prep-depart-row">' +
@@ -496,7 +537,7 @@
     var list = Prep.academyList(dateISO, day.items);
     html += '<div class="prep-block prep-block-academy">' +
       '<div class="prep-head">' +
-        '<span class="prep-title">🎓 학원 준비</span>' +
+        '<span class="prep-title"><span class="prep-title-ic" aria-hidden="true">' + ric('academy') + '</span>학원 준비</span>' +
         '<span class="prep-count-sub">' + (list.length ? '수업 ' + list.length + '개 · 10분 전 출발' : '오늘은 없음') + '</span>' +
       '</div>';
 
@@ -549,6 +590,7 @@
   function lectureRow(it, withDate, noActions) {
     return '<div class="lecture-row">' +
       '<div class="lecture-top">' +
+        '<span class="lecture-ic" aria-hidden="true">' + ric('mic') + '</span>' +
         '<span class="lecture-time' + (it.time ? '' : ' is-empty') + '">' +
           (it.time ? esc(it.time) : '시간 미정') + '</span>' +
         '<span class="lecture-title">' + esc(it.title) + '</span>' +
@@ -636,25 +678,30 @@
     /* 오늘 기록을 남기면 엔트리코딩 +10분 — 지금 상태를 안내해요 */
     var bonus = byId('book-bonus');
     if (bonus) {
+      var bonusIcons = byId('book-bonus-icons');
+      if (bonusIcons && !bonusIcons.firstChild) {
+        bonusIcons.innerHTML = '<span class="bb-ic">' + ric('coding') + '</span>' +
+          '<span class="bb-ic">' + ric('cat') + '</span>';
+      }
       var kid = rewardKid();
       var jaeneungDone = kid ? !!Store.rewardProgress(kid.id, today).jaeneung.all : false;
       var codingMin = (jaeneungDone ? 30 : 0) + (todayCount > 0 ? 10 : 0);
       bonus.className = 'book-bonus' + (todayCount > 0 ? ' is-on' : '');
       byId('book-bonus-title').textContent = todayCount > 0
-        ? '오늘 책 기록 완료! 엔트리코딩 +10분 받았어요'
-        : '오늘 기록 남기면 엔트리코딩 +10분!';
+        ? '오늘 책 기록 완료! 엔트리코딩 +10분 · 냥코 20분 해금'
+        : '오늘 책 기록 남기면 엔트리코딩 +10분 · 냥코 20분!';
       byId('book-bonus-sub').textContent = todayCount > 0
         ? (jaeneungDone
-            ? '오늘 엔트리코딩 ' + codingMin + '분 (재능 30분 + 책 10분)'
-            : '지금 10분 · 재능학습지까지 끝내면 40분')
-        : '오늘 날짜로 책을 남기면 보상이 10분 늘어나요';
+            ? '지금 엔트리코딩 ' + codingMin + '분 + 냥코 20분 완료!'
+            : '지금 엔트리코딩 10분 + 냥코 20분 · 재능까지 끝내면 40분')
+        : '오늘 날짜로 책을 남기면 두 보상이 함께 열려요';
     }
 
     byId('book-list').innerHTML = list.length
       ? list.map(function (b) {
           return '<article class="book-row">' +
             '<div class="book-top">' +
-              '<span class="book-emoji" aria-hidden="true">📖</span>' +
+              '<span class="book-emoji" aria-hidden="true">' + ric('book') + '</span>' +
               '<div class="book-info">' +
                 '<p class="book-title">' + esc(b.title) + '</p>' +
                 '<p class="book-date">' + esc(shortDate(b.date, false)) + '</p>' +
@@ -1331,7 +1378,7 @@
       renderRewards();
       var after = Books.countOn(todayISO);
       if (payload.date === todayISO && after > before) {
-        toast('📚 오늘 기록 완료! 엔트리코딩 +10분이 열렸어요');
+        toast('📚 오늘 기록 완료! 엔트리코딩 +10분 & 냥코 20분이 열렸어요');
         confetti();
       } else if (wasEdit) {
         toast('독서 기록을 고쳤어요');

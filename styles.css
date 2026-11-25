@@ -2472,3 +2472,262 @@ html.is-locked .lock {
   .task-text { font-size: 13.5px; }
   .stamp-circle { max-width: 38px; }
 }
+
+/* =====================================================================
+   v20 · 알록달록 파스텔 & 캐릭터 일러스트
+   참고 사진의 포근하고 알록달록한 카드 타일 감성을 담았습니다.
+   폰 1열 / 태블릿 2열 구조는 그대로 두고 색과 그림만 입혔어요.
+   ===================================================================== */
+
+/* ---------- 배경: 크림 위에 파스텔 방울 ---------- */
+body {
+  background:
+    radial-gradient(760px 440px at 6% -8%, #FFF4D6 0%, rgba(255, 244, 214, 0) 62%),
+    radial-gradient(680px 420px at 98% 4%, #FFE7F1 0%, rgba(255, 231, 241, 0) 58%),
+    radial-gradient(640px 480px at 50% 110%, #E2F8EE 0%, rgba(226, 248, 238, 0) 60%),
+    linear-gradient(178deg, #FDF7E2 0%, #FCF2D5 55%, #FBEFCB 100%);
+  background-attachment: fixed;
+}
+
+/* ---------- 카드마다 다른 파스텔 ---------- */
+.card[data-vibe="sky"] {
+  background: linear-gradient(162deg, #E8F4FF 0%, #F5FBFF 58%, #FFFEFA 100%);
+  border-color: #CFE5F9;
+}
+.card[data-vibe="lav"] {
+  background: linear-gradient(162deg, #EDE8FF 0%, #F8F5FF 58%, #FFFDFA 100%);
+  border-color: #DED3F7;
+}
+.card[data-vibe="peachmint"] {
+  background:
+    radial-gradient(120% 90% at 100% 0%, #FFEFD8 0%, rgba(255, 239, 216, 0) 60%),
+    linear-gradient(150deg, #FFE7D6 0%, #FFF7E9 46%, #E7F9F0 100%);
+  border-color: #F7DCC6;
+}
+.card[data-vibe="rose"] {
+  background: linear-gradient(160deg, #FFE7EF 0%, #FFF4F8 60%, #FFFEFA 100%);
+  border-color: #F8D5E1;
+}
+.card[data-vibe="lemon"] {
+  background: linear-gradient(160deg, #FFF5C9 0%, #FFFBEA 58%, #FFFEF8 100%);
+  border-color: #F6E5B4;
+}
+.card[data-vibe="mint"] {
+  background: linear-gradient(160deg, #E1F8E9 0%, #F5FCF7 58%, #FFFEFA 100%);
+  border-color: #CCEAD6;
+}
+.card[data-vibe="coral"] {
+  background: linear-gradient(160deg, #FFE3DA 0%, #FFF2E3 52%, #FFFDF6 100%);
+  border-color: #F8D5C2;
+}
+.card[data-vibe="lavpeach"] {
+  background: linear-gradient(158deg, #EFE8FF 0%, #FFF3E4 64%, #FFFDF8 100%);
+  border-color: #E5D8F3;
+}
+
+.weather-card[data-vibe="sky"] {
+  background:
+    radial-gradient(120% 140% at 92% 0%, #FFF8DF 0%, rgba(255, 248, 223, 0) 56%),
+    linear-gradient(120deg, #E6F3FF 0%, #EFFAFF 58%, #F4FFF9 100%);
+  border-color: #CBE4F9;
+}
+
+/* ---------- 공통: 아이콘 ---------- */
+.ic { display: block; width: 100%; height: 100%; }
+
+/* ---------- 오늘 할 일: 알록달록 카드 타일 ---------- */
+.task {
+  background: rgba(255, 255, 255, .88);
+  border: 1px solid rgba(255, 255, 255, .95);
+  border-radius: 15px;
+  padding: 7px 9px;
+  margin-bottom: 6px;
+  gap: 8px;
+  box-shadow: 0 2px 7px rgba(170, 140, 100, .09);
+}
+.task:last-of-type { border: 1px solid rgba(255, 255, 255, .95); }
+.task.is-done { background: rgba(255, 255, 255, .58); box-shadow: none; }
+
+.task-ic {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(160, 130, 95, .16);
+}
+.task.is-done .task-ic { filter: saturate(.55) opacity(.8); }
+
+/* ---------- 보상 트래커: 보상별 파스텔 + 큰 아이콘 ---------- */
+.reward-row { border-radius: 18px; }
+.reward-row[data-reward="video"] {
+  background: linear-gradient(120deg, #FFF8E8, #FFF0F5);
+  border-color: #F7E2CA;
+}
+.reward-row[data-reward="coding"] {
+  background: linear-gradient(120deg, #EFF5FF, #F1FBF5);
+  border-color: #DAE7F8;
+}
+.reward-row[data-reward="cat"] {
+  background: linear-gradient(120deg, #FFF9E5, #FFF1EA);
+  border-color: #F6E5C6;
+}
+.reward-row.reward-row-cat.is-unlocked {
+  background: linear-gradient(120deg, #FFF5D2, #E3F9EF);
+  border-color: #F2C96E;
+  box-shadow: 0 4px 16px rgba(240, 190, 85, .28);
+}
+
+.reward-row .reward-icon,
+.reward-row.is-unlocked .reward-icon {
+  background: transparent;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 13px;
+  box-shadow: 0 2px 7px rgba(160, 130, 95, .18);
+}
+.reward-row-cat .reward-icon { box-shadow: 0 3px 10px rgba(240, 190, 85, .38); }
+
+.reward-state.is-cat {
+  background: #FFE8A3;
+  color: #8A6212;
+  box-shadow: 0 2px 8px rgba(240, 190, 80, .35);
+}
+
+.reward-week-head { gap: 8px; }
+.rw-head { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.rw-ic {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(160, 130, 95, .16);
+}
+
+/* ---------- 독서 기록 ---------- */
+.book-row {
+  background: #FFFFFF;
+  border-color: #E4EFE8;
+  border-radius: 16px;
+  box-shadow: 0 2px 7px rgba(150, 180, 160, .10);
+}
+.book-emoji {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(160, 130, 95, .14);
+}
+
+.book-bonus {
+  background: linear-gradient(115deg, #FFF8E9, #EAF9F1);
+  border: 1.4px dashed #CFE6DA;
+}
+.book-bonus.is-on {
+  background: linear-gradient(115deg, #FFF3CA, #E2F8EE);
+  border: 1.4px solid #F0CB79;
+  box-shadow: 0 4px 14px rgba(240, 195, 90, .22);
+}
+.book-bonus-emoji { display: flex; align-items: center; gap: 5px; }
+.bb-ic {
+  width: 27px;
+  height: 27px;
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(160, 130, 95, .16);
+}
+.book-bonus.is-on .book-bonus-title { color: #7A5A12; }
+.book-bonus.is-on .book-bonus-sub { color: #9A7B33; }
+
+/* ---------- 준비 탭: 등교(스카이) · 학원(민트/라벤더) ---------- */
+.prep-block { border-radius: 20px; background: rgba(255, 255, 255, .9); }
+.prep-block-school {
+  background: linear-gradient(160deg, #E7F3FF 0%, #F7FCFF 70%, #FFFDFA 100%);
+  border-color: #CEE4F8;
+}
+.prep-block-academy {
+  background: linear-gradient(160deg, #E6F9EF 0%, #F3F2FF 78%, #FFFDFA 100%);
+  border-color: #D3EDE0;
+}
+.prep-title { display: inline-flex; align-items: center; gap: 7px; }
+.prep-title-ic {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(160, 130, 95, .16);
+}
+.prep-check { background: #FFFFFF; }
+.prep-check.is-on { background: #E7F7EC; }
+.prep-ic {
+  width: 21px;
+  height: 21px;
+  flex: none;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.prep-academy-row { background: rgba(255, 255, 255, .95); border-color: #DDE8F4; }
+.prep-free-emoji { font-size: 34px; }
+
+/* ---------- 강의: 마이크 일러스트 ---------- */
+.lecture-ic {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(160, 130, 95, .14);
+}
+.lecture-top { align-items: center; gap: 8px; }
+.lecture-row { background: rgba(255, 255, 255, .9); border-radius: 15px; }
+.lecture-time { flex: none; }
+
+/* ---------- 찌니 프로필 카드 ---------- */
+.member-card {
+  background: rgba(255, 255, 255, .78);
+  border: 1.4px solid rgba(255, 255, 255, .95);
+  box-shadow: 0 4px 14px rgba(180, 140, 110, .12);
+}
+.member-avatar { box-shadow: 0 4px 12px rgba(180, 145, 100, .22), 0 0 0 3px rgba(255, 255, 255, .95); }
+.member-stars { background: rgba(255, 255, 255, .85); }
+
+/* ---------- 하단 탭: 탭마다 다른 파스텔 ---------- */
+.tabbar-btn.is-active .tabbar-label { color: inherit; }
+.tabbar-btn:nth-of-type(1).is-active {
+  background: linear-gradient(180deg, #FFF8DC, #FFEFC2);
+  box-shadow: inset 0 0 0 1px #F5DFA8;
+  color: #A5741F;
+}
+.tabbar-btn:nth-of-type(2).is-active {
+  background: linear-gradient(180deg, #EAF5FF, #D8EBFF);
+  box-shadow: inset 0 0 0 1px #C4DFF8;
+  color: #3D6E9E;
+}
+.tabbar-btn:nth-of-type(3).is-active {
+  background: linear-gradient(180deg, #EBFAE7, #DBF3D4);
+  box-shadow: inset 0 0 0 1px #C7E7BC;
+  color: #4A8A46;
+}
+.tabbar-btn:nth-of-type(4).is-active {
+  background: linear-gradient(180deg, #F4EDFF, #E7DDFF);
+  box-shadow: inset 0 0 0 1px #DBCCF7;
+  color: #6A50A8;
+}
+
+/* ---------- 태블릿: 타일을 더 시원하게 ---------- */
+@media (min-width: 720px) {
+  .task { padding: 9px 12px; border-radius: 18px; min-height: 54px; }
+  .task-ic { width: 40px; height: 40px; border-radius: 12px; }
+  .task-check { width: 25px; height: 25px; }
+  .reward-icon { width: 46px; height: 46px; border-radius: 15px; }
+  .book-emoji { width: 38px; height: 38px; border-radius: 12px; }
+  .book-row { padding: 12px 13px; }
+  .bb-ic { width: 32px; height: 32px; border-radius: 10px; }
+  .prep-ic { width: 24px; height: 24px; }
+  .prep-title-ic { width: 30px; height: 30px; border-radius: 10px; }
+  .lecture-ic { width: 34px; height: 34px; border-radius: 11px; }
+  .rw-ic { width: 34px; height: 34px; }
+  .todo-card { border-radius: 22px; }
+}
