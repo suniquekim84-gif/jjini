@@ -12,7 +12,7 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 8;
+  var SCHEMA = 9;
 
   /* 매일 독서 루틴 — 기존 기기에도 빠짐없이 들어가도록 마이그레이션에서 확인합니다. */
   var READ_ROUTINE_ID = 'r_jj_read';
@@ -21,6 +21,23 @@
   /* 매일 아킬레스건 운동 — 보상 트래커(재능/문제집/독서)와 상관없는 건강 루틴입니다. */
   var ACHILLES_ROUTINE_ID = 'r_jj_achilles';
   var ACHILLES_ROUTINE = { id: ACHILLES_ROUTINE_ID, text: '아킬레스건 운동하기', repeat: 'daily', group: 'health' };
+
+  /* 2026-11-23(월)·2026-11-24(화) 완료 기록 채우기 (사용자 요청 "월화 모든거 다 채워줘")
+     그 두 날에 하던 루틴(재능 국어·수학, 한자어휘, 역사, 독서 30분)을 모두 완료로 채웁니다.
+     아킬레스건 운동은 그 뒤(11/25)에 생긴 루틴이라 그 두 날에는 넣지 않습니다.
+     새 기기 기본값에도 들어가고, 이미 쓰던 기기는 SCHEMA 9 에서 한 번만 채웁니다.
+     (seeds 플래그 + 이미 완료된 항목은 건너뛰는 검사로 별이 두 번 더해지지 않아요) */
+  var SEED_MON_TUE = {
+    key: 'monTue-2026-11-23',
+    dates: ['2026-11-23', '2026-11-24'],
+    tasks: [
+      { id: 'r_jj_korean', text: '재능학습지 국어 2장 풀기', repeat: 'daily', group: 'jaeneung' },
+      { id: 'r_jj_math', text: '재능학습지 수학 2장 풀기', repeat: 'daily', group: 'jaeneung' },
+      { id: 'r_jj_hanja', text: '한자어휘문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
+      { id: 'r_jj_history', text: '역사문제집 2장씩 풀기', repeat: 'weekday', group: 'workbook' },
+      { id: READ_ROUTINE_ID, text: READ_ROUTINE.text, repeat: 'daily', group: 'read' }
+    ]
+  };
 
   /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
      불러올 때 깔끔히 지워서 찌니 한 명 구성만 남깁니다. */
@@ -81,7 +98,7 @@
   }
 
   /* ---------------- 기본값 ---------------- */
-  function defaultState() {
+  function blankState() {
     return {
       version: SCHEMA,
       createdAt: Date.now(),
@@ -103,8 +120,58 @@
         ]
       },
       days: {},
-      stamps: { jjini: {} }
+      stamps: { jjini: {} },
+      seeds: {}
     };
+  }
+
+  /* 월·화 완료 기록을 한 번만 채웁니다. 이미 체크된 항목은 그대로 두고, 새로 완료로
+     바뀐 개수만큼 별을 더합니다. (새 기기 기본값에서도 같은 규칙으로 채워져요) */
+  function seedMonTueFill(out) {
+    if (!out.seeds) out.seeds = {};
+    if (out.seeds[SEED_MON_TUE.key]) return 0;
+    var filled = 0;
+    (out.members || []).forEach(function (m) {
+      if (m.role !== 'kid') return;
+      var changed = 0;
+      SEED_MON_TUE.dates.forEach(function (d) {
+        if (!out.days[d]) out.days[d] = { tasks: {} };
+        var day = out.days[d];
+        if (!day.tasks) day.tasks = {};
+        if (!Array.isArray(day.tasks[m.id])) day.tasks[m.id] = [];
+        var list = day.tasks[m.id];
+
+        SEED_MON_TUE.tasks.forEach(function (seed) {
+          var found = null;
+          for (var i = 0; i < list.length; i++) {
+            if (list[i] && list[i].id === seed.id) { found = list[i]; break; }
+          }
+          if (!found) {
+            list.push({ id: seed.id, text: seed.text, repeat: seed.repeat, group: seed.group, done: true });
+            changed++;
+          } else if (!found.done) {
+            found.done = true;
+            if (!found.group) found.group = seed.group;
+            if (!found.repeat) found.repeat = seed.repeat;
+            changed++;
+          }
+        });
+
+        /* 하나라도 마쳤으니 그날 도장도 찍힙니다. 이미 찍힌 도장은 손대지 않아요. */
+        if (!out.stamps[m.id]) out.stamps[m.id] = {};
+        if (!out.stamps[m.id][d]) out.stamps[m.id][d] = 'auto';
+      });
+      if (changed) m.stars = Math.max(0, (m.stars || 0) + changed);
+      filled += changed;
+    });
+    out.seeds[SEED_MON_TUE.key] = true;
+    return filled;
+  }
+
+  function defaultState() {
+    var base = blankState();
+    seedMonTueFill(base);
+    return base;
   }
 
   /* ---------------- 상태 로드 ---------------- */
@@ -131,15 +198,15 @@
   }
 
   function migrate(data) {
-    var base = defaultState();
-    if (!data || !Array.isArray(data.members) || !data.members.length) return base;
+    var base = blankState();
+    if (!data || !Array.isArray(data.members) || !data.members.length) return defaultState();
     // 빠진 항목은 기본값으로 채워요 (이전 버전 기록도 살아남도록)
     var members = data.members.filter(function (m) {
       return m && m.id && !REMOVED_MEMBERS[m.id];
     }).map(function (m) {
       return Object.assign({ stars: 0, role: 'kid' }, m);
     });
-    if (!members.length) return base;
+    if (!members.length) return defaultState();
 
     var settings = Object.assign({}, base.settings, data.settings || {});
     if (!settings.place || !settings.place.name || isLegacyPlace(settings.place)) {
@@ -168,7 +235,8 @@
       members: members,
       routines: Object.assign({}, base.routines, routines),
       days: days,
-      stamps: Object.assign({}, base.stamps, stamps)
+      stamps: Object.assign({}, base.stamps, stamps),
+      seeds: Object.assign({}, data.seeds || {})
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });
 
@@ -219,6 +287,10 @@
       if (!m.sub || m.sub === '햄찌와 함께') m.sub = '오늘도 피카피카 ⚡';
       m.char = 'pikachu';
     });
+
+    // SCHEMA 9 — 2026-11-23(월)·11-24(화) 완료 기록을 한 번만 채웁니다.
+    // 이미 쓰던 기기에서 그날 체크해 둔 기록·도장·별은 그대로 두고 빈 곳만 채워요.
+    seedMonTueFill(out);
     return out;
   }
 
