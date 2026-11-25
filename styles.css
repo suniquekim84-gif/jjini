@@ -2743,3 +2743,22 @@ body {
   .mini-btn { width: 28px; height: 28px; border-radius: 9px; font-size: 11px; }
   .task-actions { gap: 4px; }
 }
+
+/* 한글 문구가 단어 중간에서 끊기지 않도록 (줄바꿈은 띄어쓰기 기준) */
+.reward-book-note,
+.reward-name,
+.reward-cond,
+.book-bonus-title,
+.book-bonus-sub,
+.book-review,
+.book-title,
+.lecture-title,
+.lecture-note,
+.prep-note,
+.prep-check-label,
+.reward-week-foot,
+.section-sub,
+.task-empty {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
