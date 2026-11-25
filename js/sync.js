@@ -19,7 +19,8 @@
   var META_KEY = 'jjini.sync.v1';        /* { updatedAt, deviceId } */
   var DEVICE_KEY = 'jjini.sync.device';
 
-  /* 함께 맞추는 기록들 */
+  /* 함께 맞추는 기록들 — store 안에 💌 엄마·아빠 한마디(parentNotes)도 들어 있어
+     한마디를 남기면 다른 기기에도 같은 payload 로 함께 갑니다. */
   var KEYS = {
     store: 'uri-family-dashboard.v3',
     prep: 'jjini.prep.v1',

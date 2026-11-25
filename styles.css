@@ -3001,3 +3001,112 @@ body {
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
+
+/* =====================================================================
+   v36 · 💌 엄마·아빠 한마디
+   오늘 탭의 포근한 편지 카드와 한마디 작성 시트
+   ===================================================================== */
+.note-section { padding-bottom: 13px; }
+
+.note-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+
+.note-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 18px;
+  background: #FFFDFA;
+  border: 1px solid #F8DCE5;
+  box-shadow: 0 2px 8px rgba(190, 145, 160, .10), inset 0 1px 0 #fff;
+}
+.note-row[data-who="dad"] { border-color: #D9E5F7; }
+.note-row.is-empty {
+  border-style: dashed;
+  background: rgba(255, 255, 255, .6);
+  box-shadow: none;
+}
+
+.note-face {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #FDE9F0;
+  border: 1px solid #F7D2DF;
+  font-size: 18px;
+  line-height: 1;
+}
+.note-row[data-who="dad"] .note-face { background: #E9F2FD; border-color: #D3E3F8; }
+
+.note-main { flex: 1; min-width: 0; }
+
+.note-who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #B56F87;
+  letter-spacing: -0.1px;
+}
+.note-row[data-who="dad"] .note-who { color: #6C8FB8; }
+
+.note-when {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #C9AEBA;
+  font-variant-numeric: tabular-nums;
+}
+.note-row[data-who="dad"] .note-when { color: #A9BCD3; }
+
+.note-text {
+  margin-top: 3px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #4B3B31;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.note-row.is-empty .note-text { color: #C3B0B6; font-size: 12.5px; }
+
+.note-empty {
+  padding: 16px 14px 14px;
+  border-radius: 18px;
+  border: 1.5px dashed #F5D3DE;
+  background: rgba(255, 253, 250, .72);
+  text-align: center;
+}
+.note-empty-emoji { display: block; font-size: 24px; line-height: 1; }
+.note-empty-text {
+  margin-top: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #A98691;
+  word-break: keep-all;
+}
+.note-empty-btn {
+  margin-top: 11px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1.4px solid #F2C7D4;
+  background: linear-gradient(180deg, #FFEFF4, #FBDDE7);
+  color: #A75C74;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.note-empty-btn:active { transform: scale(.98); }
+
+#note-text { min-height: 88px; }
+#note-count { text-align: right; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 719px) {
+  .note-row { padding: 10px 11px; gap: 9px; }
+  .note-face { width: 32px; height: 32px; font-size: 16px; }
+  .note-text { font-size: 13px; }
+  .note-empty { padding: 14px 12px 12px; }
+}

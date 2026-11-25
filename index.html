@@ -107,6 +107,18 @@
       <div class="member-list" id="member-list"><!-- rendered --></div>
     </section>
 
+    <!-- ================= 💌 엄마·아빠 한마디 ================= -->
+    <section class="card note-section" id="note-section" data-vibe="rose" aria-label="엄마·아빠 한마디">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">💌 엄마·아빠 한마디</h2>
+          <p class="section-sub" id="note-sub">오늘의 응원을 짧게 남겨요</p>
+        </div>
+        <button class="btn btn-ghost" data-action="edit-note" id="btn-note-add">✏️ 한마디 남기기</button>
+      </header>
+      <div class="note-list" id="note-list"><!-- rendered --></div>
+    </section>
+
     </div><!-- /page-col 왼쪽 -->
 
     <!-- 태블릿(2열)에서 오른쪽 열: 오늘 일정 + 오늘 엄마 일정 -->
@@ -333,7 +345,7 @@
 
       <div class="field-group field-danger">
         <h3 class="field-title">기록 지우기</h3>
-        <p class="field-hint">할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 엄마 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.</p>
+        <p class="field-hint">할 일, 별, 도장, 준비 체크, 독서 기록, 엄마·아빠 한마디가 모두 사라지고 엄마 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.</p>
         <button class="btn btn-danger btn-wide" data-action="reset" id="btn-reset">모든 기록 지우기</button>
       </div>
     </div>
@@ -494,6 +506,33 @@
       <button class="btn btn-primary btn-wide" data-action="book-save" id="book-save">저장</button>
     </footer>
   </section>
+  <!-- 엄마·아빠 한마디 작성 / 고치기 -->
+  <section class="sheet" id="sheet-note" role="dialog" aria-modal="true" aria-labelledby="note-sheet-title" hidden>
+    <header class="sheet-head">
+      <h2 id="note-sheet-title">💌 엄마 한마디</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="field-group">
+        <h3 class="field-title">누가 남기나요?</h3>
+        <div class="chip-wrap" id="note-who-chips">
+          <button class="chip chip-choice" type="button" data-action="note-who" data-who="mom" aria-pressed="true">👩 엄마</button>
+          <button class="chip chip-choice" type="button" data-action="note-who" data-who="dad" aria-pressed="false">👨 아빠</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <h3 class="field-title">한마디</h3>
+        <p class="field-hint">찌니에게 짧은 응원을 남겨 주세요 (최대 120자)</p>
+        <textarea id="note-text" rows="3" maxlength="120" placeholder="예) 오늘도 잘하고 있어, 엄마가 응원해! 💛"></textarea>
+        <p class="field-hint" id="note-count">0/120</p>
+      </div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-ghost btn-wide" data-action="note-delete" id="note-delete" hidden>지우기</button>
+      <button class="btn btn-primary btn-wide" data-action="note-save" id="note-save">저장</button>
+    </footer>
+  </section>
+
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

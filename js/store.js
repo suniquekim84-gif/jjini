@@ -12,7 +12,7 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 9;
+  var SCHEMA = 10;
 
   /* 매일 독서 루틴 — 기존 기기에도 빠짐없이 들어가도록 마이그레이션에서 확인합니다. */
   var READ_ROUTINE_ID = 'r_jj_read';
@@ -38,6 +38,24 @@
       { id: READ_ROUTINE_ID, text: READ_ROUTINE.text, repeat: 'daily', group: 'read' }
     ]
   };
+
+  /* 💌 엄마·아빠 한마디 — 작성자별 가장 최근 한 줄. 날짜별로 쌓지 않고
+     덮어쓰기 때문에 어느 기기에서 적어도 같은 한마디가 보입니다. */
+  var NOTE_TEXT_MAX = 120;
+  var NOTE_AUTHORS = ['mom', 'dad'];
+  function blankNote() { return { text: '', updatedAt: 0 }; }
+  function blankNotes() { return { mom: blankNote(), dad: blankNote() }; }
+  function normalizeNotes(src) {
+    var out = blankNotes();
+    NOTE_AUTHORS.forEach(function (who) {
+      var n = src && src[who];
+      if (!n || typeof n !== 'object') return;
+      var text = typeof n.text === 'string' ? n.text.trim().slice(0, NOTE_TEXT_MAX) : '';
+      if (!text) return; // 지운 한마디는 빈 값으로 둡니다
+      out[who] = { text: text, updatedAt: Number(n.updatedAt) || 0 };
+    });
+    return out;
+  }
 
   /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
      불러올 때 깔끔히 지워서 찌니 한 명 구성만 남깁니다. */
@@ -121,6 +139,8 @@
       },
       days: {},
       stamps: { jjini: {} },
+      /* 💌 엄마·아빠 한마디 (없으면 빈 값) */
+      parentNotes: blankNotes(),
       seeds: {}
     };
   }
@@ -236,6 +256,9 @@
       routines: Object.assign({}, base.routines, routines),
       days: days,
       stamps: Object.assign({}, base.stamps, stamps),
+      /* SCHEMA 10 — 💌 엄마·아빠 한마디. 예전 기록에는 없으니 빈 값으로 시작합니다.
+         (다른 기기가 올린 한마디가 있으면 그대로 살려 둡니다) */
+      parentNotes: normalizeNotes(data.parentNotes),
       seeds: Object.assign({}, data.seeds || {})
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });
@@ -549,6 +572,31 @@
         group: task.group || null
       });
       persist(false);
+    },
+
+    /** 💌 엄마·아빠 한마디 — { mom: { text, updatedAt }, dad: { text, updatedAt } } */
+    parentNotes: function () {
+      if (!state.parentNotes) state.parentNotes = blankNotes();
+      return state.parentNotes;
+    },
+
+    /** 한마디 저장(고치기). 빈 값이면 지우기와 같습니다. */
+    setParentNote: function (who, text) {
+      if (NOTE_AUTHORS.indexOf(who) < 0) return null;
+      if (!state.parentNotes) state.parentNotes = blankNotes();
+      var clean = String(text || '').replace(/\s+/g, ' ').trim().slice(0, NOTE_TEXT_MAX);
+      if (!clean) return api.clearParentNote(who);
+      state.parentNotes[who] = { text: clean, updatedAt: Date.now() };
+      persist(false);
+      return state.parentNotes[who];
+    },
+
+    clearParentNote: function (who) {
+      if (NOTE_AUTHORS.indexOf(who) < 0) return null;
+      if (!state.parentNotes) state.parentNotes = blankNotes();
+      state.parentNotes[who] = blankNote();
+      persist(false);
+      return state.parentNotes[who];
     },
 
     addStar: function (memberId, delta) {

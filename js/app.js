@@ -14,9 +14,16 @@
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var TINTS = { jjini: '' };
-  var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star', 'sheet-lecture', 'sheet-book'];
+  var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star', 'sheet-lecture', 'sheet-book', 'sheet-note'];
   var TABS = ['today', 'prep', 'todo', 'lecture'];
   var currentTab = 'today';
+
+  /* 💌 엄마·아빠 한마디 — 보여 주는 순서와 이름 */
+  var NOTE_AUTHORS = [
+    { who: 'mom', emoji: '👩', name: '엄마' },
+    { who: 'dad', emoji: '👨', name: '아빠' }
+  ];
+  var noteCtx = { who: 'mom', saved: '' };
 
   var state = null;
   var weather = null;
@@ -828,6 +835,98 @@
       : '<p class="book-empty">아직 독서 기록이 없어요.<br />읽은 책을 첫 권으로 남겨 볼까요? 📚</p>';
   }
 
+  /* ---------------- 💌 엄마·아빠 한마디 ---------------- */
+  function noteAuthor(who) {
+    for (var i = 0; i < NOTE_AUTHORS.length; i++) {
+      if (NOTE_AUTHORS[i].who === who) return NOTE_AUTHORS[i];
+    }
+    return NOTE_AUTHORS[0];
+  }
+
+  function noteWhen(n) {
+    if (!n || !n.updatedAt) return '';
+    var d = new Date(n.updatedAt);
+    return (d.getMonth() + 1) + '/' + d.getDate();
+  }
+
+  function notesNow() {
+    return (Store.parentNotes && Store.parentNotes()) || { mom: { text: '' }, dad: { text: '' } };
+  }
+
+  function renderNotes() {
+    var list = byId('note-list');
+    if (!list) return;
+    var notes = notesNow();
+    var filled = NOTE_AUTHORS.filter(function (a) { return notes[a.who] && notes[a.who].text; });
+    var sub = byId('note-sub');
+
+    /* 둘 다 비어 있으면 포근한 안내만 보여 줍니다 */
+    if (!filled.length) {
+      if (sub) sub.textContent = '오늘의 응원을 짧게 남겨요';
+      list.innerHTML =
+        '<div class="note-empty">' +
+          '<span class="note-empty-emoji" aria-hidden="true">💌</span>' +
+          '<p class="note-empty-text">오늘 남겨진 한마디가 아직 없어요 ✨</p>' +
+          '<button class="note-empty-btn" type="button" data-action="edit-note">✏️ 첫 한마디 남기기</button>' +
+        '</div>';
+      return;
+    }
+
+    if (sub) sub.textContent = filled.length + '개의 한마디가 찌니를 응원해요';
+    list.innerHTML = NOTE_AUTHORS.map(function (a) {
+      var n = notes[a.who] || { text: '', updatedAt: 0 };
+      var has = !!n.text;
+      return '<article class="note-row' + (has ? ' is-filled' : ' is-empty') + '" data-who="' + a.who + '">' +
+        '<span class="note-face" aria-hidden="true">' + a.emoji + '</span>' +
+        '<div class="note-main">' +
+          '<p class="note-who">' + a.name + ' 한마디' +
+            (has ? '<span class="note-when">' + noteWhen(n) + '</span>' : '') +
+          '</p>' +
+          '<p class="note-text">' + (has ? esc(n.text) : '아직 한마디가 없어요') + '</p>' +
+        '</div>' +
+        '<button class="mini-btn" type="button" data-action="edit-note" data-who="' + a.who + '" ' +
+          'aria-label="' + a.name + ' 한마디 ' + (has ? '고치기' : '남기기') + '">✏️</button>' +
+      '</article>';
+    }).join('');
+  }
+
+  /* 한마디 시트 — 작성자를 고르고 한 줄을 적습니다 */
+  function noteSheetPick(who, keepTyped) {
+    noteCtx.who = who;
+    var n = notesNow()[who] || { text: '', updatedAt: 0 };
+    var ta = byId('note-text');
+    var sameAsSaved = !keepTyped || ta.value.trim() === String(noteCtx.saved || '').trim();
+    if (sameAsSaved) ta.value = n.text || '';
+    noteCtx.saved = n.text || '';
+
+    Array.prototype.forEach.call(byId('note-who-chips').children, function (b) {
+      b.setAttribute('aria-pressed', b.dataset.who === who ? 'true' : 'false');
+    });
+    byId('note-sheet-title').textContent = '💌 ' + noteAuthor(who).name + ' 한마디';
+    byId('note-delete').hidden = !n.text;
+    renderNoteCount();
+  }
+
+  function renderNoteCount() {
+    var el = byId('note-count');
+    var ta = byId('note-text');
+    if (el && ta) el.textContent = ta.value.length + '/120';
+  }
+
+  function openNoteSheet(who) {
+    var notes = notesNow();
+    var target = who;
+    if (!target) {
+      /* 아직 비어 있는 사람을 먼저 고릅니다 (둘 다 비었으면 엄마) */
+      var empty = NOTE_AUTHORS.filter(function (a) { return !(notes[a.who] && notes[a.who].text); });
+      target = empty.length ? empty[0].who : 'mom';
+    }
+    noteCtx.saved = '';
+    noteSheetPick(target, false);
+    openSheet('sheet-note');
+    setTimeout(function () { byId('note-text').focus(); }, 120);
+  }
+
   /* ---------------- 설정 ---------------- */
   function renderSettings() {
     byId('city-current').textContent = state.settings.place.name;
@@ -1105,6 +1204,7 @@
     renderPrep();
     renderLectures();
     renderBooks();
+    renderNotes();
   }
 
   function renderAfterTaskChange() {
@@ -1148,6 +1248,7 @@
       renderSchedule();
       renderMembers();
       renderLectures();
+      renderNotes();
     }
 
     if (changed && !silent) window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1518,10 +1619,55 @@
       toast('일정을 지웠어요');
     },
 
+    /* 💌 엄마·아빠 한마디 */
+    'edit-note': function (el) {
+      openNoteSheet(el.dataset.who || null);
+    },
+
+    'note-who': function (el) {
+      var who = el.dataset.who;
+      if (!who || who === noteCtx.who) return;
+      noteSheetPick(who, true);
+      byId('note-text').focus();
+    },
+
+    'note-save': function () {
+      var who = noteCtx.who;
+      var whoName = noteAuthor(who).name;
+      var text = byId('note-text').value.trim();
+      if (!text) {
+        toast('한마디를 적어 주세요 ✏️');
+        byId('note-text').focus();
+        return;
+      }
+      Store.setParentNote(who, text);
+      closeSheets();
+      renderNotes();
+      if (Sound) Sound.playCheck();
+      toast('💌 ' + whoName + ' 한마디를 남겼어요');
+    },
+
+    'note-delete': function () {
+      var who = noteCtx.who;
+      var whoName = noteAuthor(who).name;
+      var before = (notesNow()[who] || {}).text || '';
+      if (!before) return;
+      Store.clearParentNote(who);
+      closeSheets();
+      renderNotes();
+      toast(whoName + ' 한마디를 지웠어요', {
+        label: '되돌리기',
+        onAction: function () {
+          Store.setParentNote(who, before);
+          renderNotes();
+          toast('한마디를 되돌렸어요');
+        }
+      });
+    },
+
     'add-book': function () {
       openBookSheet({ mode: 'add' });
     },
-
     'edit-book': function (el) {
       var b = Books.get(el.dataset.id);
       if (!b) return;
@@ -1610,7 +1756,7 @@
     },
 
     'reset': function () {
-      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 엄마 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.')) return;
+      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장, 준비 체크, 독서 기록, 엄마·아빠 한마디가 모두 사라지고 엄마 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.')) return;
       if (Prep && Prep.clear) Prep.clear();
       if (Books && Books.clear) Books.clear();
       if (Lectures && Lectures.clear) Lectures.clear();
@@ -1702,6 +1848,10 @@
     loadWeather(true);
     toast('날씨를 새로 확인했어요');
   });
+
+  /* 한마디 글자 수 */
+  var noteTextInput = byId('note-text');
+  if (noteTextInput) noteTextInput.addEventListener('input', renderNoteCount);
 
   /* ---------------- 시작 ---------------- */
   function tick() {
