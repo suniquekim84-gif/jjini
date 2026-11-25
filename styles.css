@@ -2528,11 +2528,6 @@ html.is-locked .lock {
   .prep-block { padding: 16px 16px 15px; }
   .prep-title { font-size: 15px; }
   .prep-block-bed { grid-column: 1 / -1; }
-  .prep-block-bed .bed-rows {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 12px;
-  }
   .bed-row { padding: 10px 12px 10px 10px; }
   .bed-ic { width: 42px; height: 42px; }
   .bed-time { font-size: 21px; }
@@ -2623,6 +2618,12 @@ html.is-locked .lock {
   }
   .brand-row { flex: 1 1 auto; }
   .header-sub { margin-top: 0; flex: 0 0 auto; align-items: center; flex-wrap: nowrap; gap: 14px; }
+  /* 넓은 화면: 취침 준비 두 줄을 나란히 */
+  .prep-block-bed .bed-rows {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+  }
   .lecture-upcoming .lecture-list,
   .lecture-today .lecture-list {
     display: grid;
