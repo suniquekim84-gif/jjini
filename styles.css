@@ -246,6 +246,19 @@ input { font: inherit; color: inherit; }
 }
 .icon-pill:active { transform: scale(.96); }
 
+/* 효과음 켜기/끄기 — 아이콘 하나로 바로 끌 수 있게 */
+.sound-pill span { font-size: 17px; line-height: 1; }
+.sound-pill[aria-pressed="false"] {
+  background: #FBF5EA;
+  border-color: #EBDFCB;
+  color: #B7A695;
+  box-shadow: none;
+}
+.sound-toggle[aria-pressed="false"] {
+  background: #FBF5EA;
+  color: #A08C7A;
+}
+
 .icon-round {
   width: 34px;
   height: 34px;

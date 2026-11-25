@@ -10,6 +10,7 @@
   var Lectures = window.FamilyLectures;
   var Books = window.FamilyBooks;
   var Weather = window.FamilyWeather;
+  var Sound = window.FamilySound;
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var TINTS = { jjini: '' };
@@ -81,6 +82,26 @@
     var d = Store.now();
     byId('brand-mark').innerHTML = Chars.svg('pikachu');
     byId('header-date').textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + DAYS[d.getDay()] + '요일';
+    renderSoundUI();
+  }
+
+  /* ---------------- 효과음 켜기/끄기 ---------------- */
+  function renderSoundUI() {
+    if (!Sound) return;
+    var on = Sound.isOn();
+    var btn = byId('btn-sound');
+    if (btn) {
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? '효과음 끄기' : '효과음 켜기');
+      btn.title = on ? '효과음 켜짐 · 눌러서 끄기' : '효과음 꺼짐 · 눌러서 켜기';
+    }
+    var icon = byId('btn-sound-icon');
+    if (icon) icon.textContent = on ? '🔊' : '🔇';
+    var setting = byId('btn-sound-setting');
+    if (setting) {
+      setting.setAttribute('aria-pressed', on ? 'true' : 'false');
+      setting.textContent = on ? '🔊 효과음 켜짐' : '🔇 효과음 꺼짐';
+    }
   }
 
   /* ---------------- 날씨 ---------------- */
@@ -793,6 +814,7 @@
   /* ---------------- 설정 ---------------- */
   function renderSettings() {
     byId('city-current').textContent = state.settings.place.name;
+    renderSoundUI();
 
     byId('city-presets').innerHTML = Weather.PRESETS.map(function (p) {
       var active = p.name === state.settings.place.name;
@@ -1104,6 +1126,13 @@
       openSheet('sheet-settings');
     },
 
+    'toggle-sound': function () {
+      if (!Sound) return;
+      var on = Sound.toggle();
+      renderSoundUI();
+      toast(on ? '효과음을 켰어요 🔊' : '효과음을 껐어요 🔇');
+    },
+
     'share': function () {
       var payload = {
         title: '찌니 대시보드',
@@ -1129,7 +1158,10 @@
       var res = Store.toggleTask(memberId, el.dataset.task);
       if (!res) return;
       renderAfterTaskChange();
-      if (!res.done) return;
+      if (!res.done) {
+        if (Sound) Sound.playUncheck();
+        return;
+      }
 
       confetti();
       var after = Store.rewardProgress(memberId);
@@ -1138,15 +1170,26 @@
       var codingText = codingTotal > 30 ? '노트북(엔트리코딩) 40분(책 +10분 포함)' : '노트북(엔트리코딩) 30분';
       var unlockedVideo = !before.workbook.all && after.workbook.all;
       var unlockedLaptop = !before.jaeneung.all && after.jaeneung.all;
+      var todayList = Store.tasks(memberId, Store.todayISO());
+      var allDoneToday = todayList.length > 0 && todayList.every(function (t) { return t.done; });
       if (unlockedVideo && unlockedLaptop) {
         toast('🎉 문제집·재능 모두 완료! 영상 30분 + ' + codingText + ' 해금!');
       } else if (unlockedVideo) {
         toast('🎉 문제집 완료! 영상 30분 보기 해금!');
       } else if (unlockedLaptop) {
         toast('🎉 재능 완료! ' + codingText + ' 해금!');
+      } else if (allDoneToday) {
+        toast('🎉 오늘 할 일 모두 완료! 정말 잘했어요');
       } else {
         toast('할 일 완료! 별 1개를 모았어요 ⭐️');
       }
+
+      /* 보상 해금·올클리어·도장은 축하 소리, 그냥 체크는 짧은 소리 */
+      if (Sound) {
+        if (unlockedVideo || unlockedLaptop || allDoneToday || res.stamped) Sound.playSuccess();
+        else Sound.playCheck();
+      }
+
       var wk = Store.weekWorkbookDays(memberId);
       if (wk.full) setTimeout(function () { toast('🎮 5일 완주! 주말 닌텐도 4시간 30분!'); }, 3200);
     },
@@ -1240,6 +1283,7 @@
       Store.addStar(starMember, 1);
       openStarSheet(starMember);
       renderMembers();
+      if (Sound) Sound.playCheck();
       toast('⭐️ 별을 하나 더 모았어요');
       confetti();
     },
@@ -1265,9 +1309,11 @@
       var on = Store.toggleStamp(stampKid, el.dataset.date);
       renderStamps();
       if (on) {
+        if (Sound) Sound.playSuccess();
         confetti();
         toast('도장을 찍었어요! 🎉');
       } else {
+        if (Sound) Sound.playUncheck();
         toast('도장을 지웠어요');
       }
     },
@@ -1292,8 +1338,13 @@
       var on = Store.toggleStamp(stampKid, el.dataset.date);
       renderCalendar();
       renderStamps();
-      if (on) toast('도장을 찍었어요! 🎉');
-      else toast('도장을 지웠어요');
+      if (on) {
+        if (Sound) Sound.playSuccess();
+        toast('도장을 찍었어요! 🎉');
+      } else {
+        if (Sound) Sound.playUncheck();
+        toast('도장을 지웠어요');
+      }
     },
 
     'open-timetable': function () {
@@ -1311,11 +1362,14 @@
       renderPrep();
       refreshPrepTimers();
       if (res.done) {
+        if (Sound) Sound.playSuccess();
         confetti();
         toast('등교 준비 완료! 잘 다녀와요 🎒');
       } else if (res.checked) {
+        if (Sound) Sound.playCheck();
         toast('챙겼어요 ' + res.count + '/' + res.total + ' ✓');
       } else {
+        if (Sound) Sound.playUncheck();
         toast('체크를 풀었어요');
       }
     },
@@ -1325,9 +1379,11 @@
       renderPrep();
       refreshPrepTimers();
       if (res.checked) {
+        if (Sound) Sound.playCheck();
         confetti();
         toast('학원 준비 확인 완료 ✓');
       } else {
+        if (Sound) Sound.playUncheck();
         toast('체크를 풀었어요');
       }
     },
@@ -1337,11 +1393,14 @@
       renderPrep();
       refreshPrepTimers();
       if (res.done) {
+        if (Sound) Sound.playSuccess();
         confetti();
         toast('취침 준비 완료! 잘 자요 🌙');
       } else if (res.checked) {
+        if (Sound) Sound.playCheck();
         toast(res.item === 'shower' ? '샤워 완료 ✓ 이제 잘 준비!' : '체크 완료 ✓');
       } else {
+        if (Sound) Sound.playUncheck();
         toast('체크를 풀었어요');
       }
     },
@@ -1463,11 +1522,13 @@
       renderRewards();
       var after = Books.countOn(todayISO);
       if (payload.date === todayISO && after > before) {
+        if (Sound) Sound.playSuccess();
         toast('📚 오늘 기록 완료! 엔트리코딩 +10분 & 냥코 20분이 열렸어요');
         confetti();
       } else if (wasEdit) {
         toast('독서 기록을 고쳤어요');
       } else {
+        if (Sound) Sound.playCheck();
         toast('독서 기록을 남겼어요 📚');
         confetti();
       }
