@@ -304,6 +304,9 @@
       if (adapter && typeof adapter.save === 'function') {
         try { adapter.save(state); } catch (e) { /* 오프라인 */ }
       }
+      if (window.FamilySync && typeof window.FamilySync.touch === 'function') {
+        try { window.FamilySync.touch(); } catch (e) { /* noop */ }
+      }
       if (!silent) notify();
     }, 120);
   }
@@ -612,6 +615,15 @@
       if (typeof changes.name === 'string' && changes.name.trim()) m.name = changes.name.trim().slice(0, 12);
       if (typeof changes.sub === 'string') m.sub = changes.sub.trim().slice(0, 20);
       persist(false);
+    },
+
+    /** 다른 기기에서 온 기록을 그대로 반영합니다 (실시간 동기화). */
+    applyRemote: function (data) {
+      if (!data || typeof data !== 'object') return state;
+      state = migrate(data);
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 용량 초과 등 */ }
+      notify();
+      return state;
     },
 
     reset: function () {

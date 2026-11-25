@@ -100,6 +100,9 @@
       keys.slice(0, keys.length - KEEP_DAYS).forEach(function (k) { delete all[k]; });
     }
     try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) { /* 용량 초과 등 */ }
+    if (window.FamilySync && typeof window.FamilySync.touch === 'function') {
+      try { window.FamilySync.touch(); } catch (e) { /* noop */ }
+    }
   }
 
   function dayOf(all, dateISO, create) {

@@ -1,7 +1,7 @@
 /* 찌니 대시보드 — 오프라인 캐시 (서비스 워커)
    홈 화면에 추가한 뒤 인터넷이 잠깐 끊겨도 열리도록 정적 파일만 저장합니다.
    날씨 API 응답은 캐시하지 않습니다. */
-var CACHE = 'family-dashboard-v28';
+var CACHE = 'family-dashboard-v29';
 
 var ASSETS = [
   './',
@@ -17,6 +17,7 @@ var ASSETS = [
   './js/lock.js',
   './js/weather.js',
   './js/app.js',
+  './js/sync.js',
   './assets/fonts/NanumSquareRound.woff2',
   './assets/fonts/NanumSquareRoundB.woff',
   './assets/fonts/NanumSquareRoundEB.woff',

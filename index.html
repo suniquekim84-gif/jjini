@@ -253,8 +253,12 @@
   </div><!-- /page-lecture -->
 
   <footer class="app-footer">
-    <p>찌니 대시보드 · 기록은 이 기기에 저장돼요</p>
-    <p class="app-footer-small">홈 화면에 추가하면 앱처럼 열려요 · v1.1</p>
+    <p>찌니 대시보드 · 기록은 가족 기기와 함께 저장돼요</p>
+    <p class="sync-status" id="sync-status" data-status="idle" hidden>
+      <span class="sync-cloud" aria-hidden="true">☁️</span>
+      <span id="sync-status-text">동기화 준비 중</span>
+    </p>
+    <p class="app-footer-small">홈 화면에 추가하면 앱처럼 열려요 · v1.2</p>
   </footer>
 </div>
 
@@ -495,5 +499,6 @@
 <script src="js/lock.js"></script>
 <script src="js/weather.js"></script>
 <script src="js/app.js"></script>
+<script src="js/sync.js"></script>
 </body>
 </html>

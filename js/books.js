@@ -7,6 +7,9 @@
 
   function write(list) {
     try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) { /* 용량 초과 등 */ }
+    if (window.FamilySync && typeof window.FamilySync.touch === 'function') {
+      try { window.FamilySync.touch(); } catch (e) { /* noop */ }
+    }
   }
 
   function read() {
