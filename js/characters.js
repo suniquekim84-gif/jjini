@@ -415,7 +415,7 @@
       '<path d="M64 22 v20 l-6-4.6 -6 4.6 V22z" fill="#FFD34D"/>');
   }
 
-  /* 마이크 (강의) */
+  /* 마이크 (일정) */
   function icMic() {
     return tile('mic', '#FFE4EE', '#EDE7FF',
       '<rect x="41" y="16" width="18" height="36" rx="9" fill="#8E86E8"/>' +

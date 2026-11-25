@@ -109,7 +109,7 @@
 
     </div><!-- /page-col 왼쪽 -->
 
-    <!-- 태블릿(2열)에서 오른쪽 열: 오늘 일정 + 오늘 엄마 강의 -->
+    <!-- 태블릿(2열)에서 오른쪽 열: 오늘 일정 + 오늘 엄마 일정 -->
     <div class="page-col">
 
     <!-- ================= TODAY'S SCHOOL & ACADEMY ================= -->
@@ -125,11 +125,11 @@
       <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
     </section>
 
-    <!-- ================= 오늘 엄마 강의 (오늘 것만) ================= -->
-    <section class="card lecture-mini-section" id="lecture-mini-section" data-vibe="rose" aria-label="오늘 엄마 강의">
+    <!-- ================= 오늘 엄마 일정 (오늘 것만) ================= -->
+    <section class="card lecture-mini-section" id="lecture-mini-section" data-vibe="rose" aria-label="오늘 엄마 일정">
       <header class="section-head">
         <div class="section-title-wrap">
-          <h2 class="section-title">🎤 오늘 엄마 강의</h2>
+          <h2 class="section-title">🎤 오늘 엄마 일정</h2>
           <p class="section-sub" id="lecture-mini-sub">오늘 일정만 모아 봐요</p>
         </div>
         <button class="btn btn-ghost" data-action="switch-tab" data-tab="lecture" id="btn-lecture-more">이번 주 일정 →</button>
@@ -236,15 +236,15 @@
 
   </div><!-- /page-todo -->
 
-  <!-- ================= PAGE 4 · 강의 ================= -->
+  <!-- ================= PAGE 4 · 일정 ================= -->
   <div class="page" id="page-lecture" data-page="lecture" hidden>
 
-    <!-- ================= 엄마 강의 일정 (이번 주 + 다가오는) ================= -->
-    <section class="card lecture-section" id="lecture-section" data-vibe="lavpeach" aria-label="엄마 강의 일정">
+    <!-- ================= 엄마 일정 (이번 주 + 다가오는) ================= -->
+    <section class="card lecture-section" id="lecture-section" data-vibe="lavpeach" aria-label="엄마 일정">
       <header class="section-head">
         <div class="section-title-wrap">
-          <h2 class="section-title">🎤 엄마 강의 일정</h2>
-          <p class="section-sub" id="lecture-sub">이번 주와 다가오는 강의를 모아 봐요</p>
+          <h2 class="section-title">🎤 엄마 일정</h2>
+          <p class="section-sub" id="lecture-sub">이번 주와 다가오는 일정을 모아 봐요</p>
         </div>
         <button class="btn btn-ghost" data-action="add-lecture" id="btn-add-lecture">+ 일정 추가</button>
       </header>
@@ -277,7 +277,7 @@
     <span class="tabbar-icon" aria-hidden="true">✅</span><span class="tabbar-label">할일</span>
   </button>
   <button class="tabbar-btn" type="button" data-action="switch-tab" data-tab="lecture">
-    <span class="tabbar-icon" aria-hidden="true">🎤</span><span class="tabbar-label">강의</span>
+    <span class="tabbar-icon" aria-hidden="true">🎤</span><span class="tabbar-label">일정</span>
   </button>
 </nav>
 
@@ -333,7 +333,7 @@
 
       <div class="field-group field-danger">
         <h3 class="field-title">기록 지우기</h3>
-        <p class="field-hint">할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 강의 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.</p>
+        <p class="field-hint">할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 엄마 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.</p>
         <button class="btn btn-danger btn-wide" data-action="reset" id="btn-reset">모든 기록 지우기</button>
       </div>
     </div>
@@ -431,10 +431,10 @@
       </div>
     </div>
   </section>
-  <!-- 강의 일정 추가 / 고치기 -->
+  <!-- 일정 추가 / 고치기 -->
   <section class="sheet" id="sheet-lecture" role="dialog" aria-modal="true" aria-labelledby="lecture-sheet-title" hidden>
     <header class="sheet-head">
-      <h2 id="lecture-sheet-title">🎤 강의 일정</h2>
+      <h2 id="lecture-sheet-title">🎤 엄마 일정</h2>
       <button class="sheet-close" data-close aria-label="닫기">✕</button>
     </header>
     <div class="sheet-body">

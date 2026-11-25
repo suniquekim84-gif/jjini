@@ -678,7 +678,7 @@
     });
   }
 
-  /* ---------------- 엄마 강의 일정 ---------------- */
+  /* ---------------- 엄마 일정 ---------------- */
   function lectureRow(it, withDate, noActions) {
     return '<div class="lecture-row">' +
       '<div class="lecture-top">' +
@@ -712,18 +712,18 @@
     var upcomingAll = all.filter(function (it) { return it.date > sunday; });
     var upcoming = lectureExpanded ? upcomingAll : upcomingAll.slice(0, 6);
 
-    /* 오늘 탭 — 오늘 날짜의 강의만 짧게 */
+    /* 오늘 탭 — 오늘 날짜의 일정만 짧게 */
     byId('lecture-mini-sub').textContent = todayList.length
       ? '오늘 ' + todayList.length + '개 일정이 있어요'
       : '오늘은 일정이 없어요';
     byId('lecture-mini').innerHTML = todayList.length
       ? '<div class="lecture-list">' + todayList.map(function (it) { return lectureRow(it, false, true); }).join('') + '</div>'
-      : '<p class="lecture-mini-empty">오늘은 강의가 없어요 ☕</p>';
+      : '<p class="lecture-mini-empty">오늘은 일정이 없어요 ☕</p>';
 
-    /* 강의 탭 — 이번 주 + 다가오는 일정 */
+    /* 일정 탭 — 이번 주 + 다가오는 일정 */
     byId('lecture-sub').textContent = (weekList.length + upcomingAll.length)
       ? '이번 주 ' + weekList.length + '개 · 다가오는 일정 ' + upcomingAll.length + '개'
-      : '이번 주와 다가오는 강의를 모아 봐요';
+      : '이번 주와 다가오는 일정을 모아 봐요';
 
     var html = '<div class="lecture-head">' +
         '<span class="lecture-head-title">오늘 · ' + esc(shortDate(today)) + '</span>' +
@@ -731,7 +731,7 @@
       '</div>';
     html += todayList.length
       ? '<div class="lecture-list">' + todayList.map(function (it) { return lectureRow(it, false); }).join('') + '</div>'
-      : '<p class="lecture-empty">오늘은 강의가 없어요 ☕</p>';
+      : '<p class="lecture-empty">오늘은 일정이 없어요 ☕</p>';
     byId('lecture-today').innerHTML = html;
 
     var wk = '<div class="lecture-head">' +
@@ -740,7 +740,7 @@
       '</div>';
     wk += weekList.length
       ? '<div class="lecture-list">' + weekList.map(function (it) { return lectureRow(it, true); }).join('') + '</div>'
-      : '<p class="lecture-empty">이번 주에는 남은 강의가 없어요</p>';
+      : '<p class="lecture-empty">이번 주에는 남은 일정이 없어요</p>';
     byId('lecture-week').innerHTML = wk;
 
     var up = '<div class="lecture-head">' +
@@ -753,7 +753,7 @@
       '</div>';
     up += upcoming.length
       ? '<div class="lecture-list">' + upcoming.map(function (it) { return lectureRow(it, true); }).join('') + '</div>'
-      : '<p class="lecture-empty">다가오는 강의는 아직 없어요</p>';
+      : '<p class="lecture-empty">다가오는 일정은 아직 없어요</p>';
     byId('lecture-upcoming').innerHTML = up;
   }
 
@@ -971,7 +971,7 @@
     openSheet('sheet-star');
   }
 
-  /* ---------------- 강의 일정 시트 ---------------- */
+  /* ---------------- 일정 시트 ---------------- */
   function openLectureSheet(opts) {
     lectureCtx = {
       mode: opts.mode || 'add',
@@ -979,7 +979,7 @@
     };
     var it = opts.item || { date: Store.todayISO(), time: '', title: '', note: '' };
 
-    byId('lecture-sheet-title').textContent = lectureCtx.mode === 'edit' ? '✏️ 강의 일정 고치기' : '+ 강의 일정 추가';
+    byId('lecture-sheet-title').textContent = lectureCtx.mode === 'edit' ? '✏️ 일정 고치기' : '+ 일정 추가';
     byId('lecture-date').value = it.date || Store.todayISO();
     byId('lecture-time').value = it.time || '';
     byId('lecture-name').value = it.title || '';
@@ -1424,7 +1424,7 @@
       var it = Lectures.remove(el.dataset.id);
       if (!it) return;
       renderLectures();
-      toast('강의 일정을 지웠어요', {
+      toast('일정을 지웠어요', {
         label: '되돌리기',
         onAction: function () {
           Lectures.restore(it);
@@ -1454,10 +1454,10 @@
       };
       if (lectureCtx.mode === 'edit') {
         Lectures.update(lectureCtx.id, payload);
-        toast('강의 일정을 고쳤어요');
+        toast('일정을 고쳤어요');
       } else {
         Lectures.add(payload);
-        toast('강의 일정을 추가했어요');
+        toast('일정을 추가했어요');
       }
       closeSheets();
       renderLectures();
@@ -1468,7 +1468,7 @@
       Lectures.remove(lectureCtx.id);
       closeSheets();
       renderLectures();
-      toast('강의 일정을 지웠어요');
+      toast('일정을 지웠어요');
     },
 
     'add-book': function () {
@@ -1563,7 +1563,7 @@
     },
 
     'reset': function () {
-      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 강의 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.')) return;
+      if (!window.confirm('모든 기록을 지울까요?\n할 일, 별, 도장, 준비 체크, 독서 기록이 모두 사라지고 엄마 일정은 처음 기본 일정으로 들어가요. 되돌릴 수 없어요.')) return;
       if (Prep && Prep.clear) Prep.clear();
       if (Books && Books.clear) Books.clear();
       if (Lectures && Lectures.clear) Lectures.clear();

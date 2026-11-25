@@ -1471,7 +1471,7 @@ input { font: inherit; color: inherit; }
   letter-spacing: -0.2px;
 }
 
-/* ===================== 엄마 강의 일정 ===================== */
+/* ===================== 엄마 일정 일정 ===================== */
 .lecture-section {
   background:
     radial-gradient(120% 90% at 0% 0%, #F2EEFF 0%, rgba(242, 238, 255, 0) 58%),
@@ -1691,7 +1691,7 @@ input { font: inherit; color: inherit; }
    태블릿(720px 이상)에서만 두 열로 나뉩니다. */
 .page-col { display: contents; }
 
-/* 폰의 오늘 탭은 카드 순서를 그대로 둡니다(날씨 → 일정 → 찌니 → 강의).
+/* 폰의 오늘 탭은 카드 순서를 그대로 둡니다(날씨 → 일정 → 찌니 → 일정).
    HTML은 태블릿 2열에 맞춰 찌니 카드를 날씨 아래에 두었으니,
    폰에서는 일정 카드를 찌니보다 위로 올려 예전과 같은 순서로 보여 줍니다. */
 @media (max-width: 719px) {
@@ -1857,7 +1857,7 @@ html.is-locked .tabbar { display: none; }
 .book-bonus-sub { margin-top: 1px; font-size: 11px; color: #A08C7A; }
 .book-bonus.is-on .book-bonus-title { color: #3E8A57; }
 
-/* ===================== 오늘 엄마 강의 (오늘 것만) ===================== */
+/* ===================== 오늘 엄마 일정 (오늘 것만) ===================== */
 .lecture-mini-section {
   background:
     radial-gradient(120% 90% at 0% 0%, #F6F2FF 0%, rgba(246, 242, 255, 0) 58%),
@@ -2508,7 +2508,7 @@ html.is-locked .lock {
   }
   .page-col { display: flex; flex-direction: column; min-width: 0; }
 
-  /* 준비·강의 탭은 카드 하나가 폭을 다 쓰고, 카드 안에서 2열로 나눕니다 */
+  /* 준비·일정 탭은 카드 하나가 폭을 다 쓰고, 카드 안에서 2열로 나눕니다 */
   .page[data-page="prep"],
   .page[data-page="lecture"] { display: block; }
 
@@ -2591,7 +2591,7 @@ html.is-locked .lock {
   .reward-row { padding: 12px 14px; }
   .stamp-section > .btn { margin-top: 0; }
 
-  /* ---------- 강의: 헤더·오늘 위, 이번 주 | 다가오는 일정 2열 ---------- */
+  /* ---------- 일정: 헤더·오늘 위, 이번 주 | 다가오는 일정 2열 ---------- */
   .lecture-section {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -2651,7 +2651,7 @@ html.is-locked .lock {
   .lock-key { font-size: 23px; }
 }
 
-/* 넓은 태블릿·데스크톱: 헤더를 한 줄로, 다가오는 강의 카드도 2열로 */
+/* 넓은 태블릿·데스크톱: 헤더를 한 줄로, 다가오는 일정 카드도 2열로 */
 @media (min-width: 1100px) {
   .app-header {
     display: flex;
@@ -2892,7 +2892,7 @@ body {
 .prep-academy-row { background: rgba(255, 255, 255, .95); border-color: #DDE8F4; }
 .prep-free-emoji { font-size: 34px; }
 
-/* ---------- 강의: 마이크 일러스트 ---------- */
+/* ---------- 일정: 마이크 일러스트 ---------- */
 .lecture-ic {
   width: 30px;
   height: 30px;
