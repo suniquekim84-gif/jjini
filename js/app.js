@@ -79,7 +79,7 @@
   /* ---------------- 헤더 ---------------- */
   function renderHeader() {
     var d = Store.now();
-    byId('brand-mark').innerHTML = Chars.svg('hamster');
+    byId('brand-mark').innerHTML = Chars.svg('pikachu');
     byId('header-date').textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + DAYS[d.getDay()] + '요일';
   }
 

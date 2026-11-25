@@ -66,7 +66,7 @@ family-dashboard/
 ├── manifest.json              PWA 매니페스트
 ├── sw.js                      오프라인 캐시 (서비스 워커)
 ├── js/
-│   ├── characters.js          캐릭터 SVG (햄스터 = 찌니)
+│   ├── characters.js          캐릭터 SVG (피카츄 = 찌니 · 할 일 그림 타일)
 │   ├── schedule.js            2학기 주간 시간표 데이터 ← 여기만 고치면 됨
 │   ├── store.js               데이터 저장소 (localStorage + 동기화 어댑터)
 │   ├── lock.js                잠금 화면 (4자리 비밀번호, SHA-256 해시 비교)

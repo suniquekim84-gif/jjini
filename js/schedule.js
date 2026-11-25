@@ -10,7 +10,7 @@
       jjini: {
         id: 'jjini',
         name: '찌니',
-        char: 'hamster',
+        char: 'pikachu',
         days: {
           1: { school: '13:40', items: [{ name: '영어', start: '16:20', end: '17:30' }] },
           2: { school: '13:40', items: [{ name: '검도', start: '16:30', end: '17:30' }, { name: '줄넘기', start: '18:20', end: '19:20' }] },

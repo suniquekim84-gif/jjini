@@ -154,7 +154,7 @@
     });
 
     var avatar = el('lock-avatar');
-    if (avatar && window.FamilyChars) avatar.innerHTML = window.FamilyChars.svg('hamster');
+    if (avatar && window.FamilyChars) avatar.innerHTML = window.FamilyChars.svg('pikachu');
 
     // 이미 열어 둔 기기면 잠금 화면 없이 바로
     if (unlocked()) hideLock();

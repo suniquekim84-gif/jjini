@@ -77,69 +77,90 @@
   }
 
   /* ==================================================================
-     찌니 — 귀여운 꼬마 + 햄찌 펫
+     찌니 — 귀여운 피카츄 친구 (노란 몸 · 빨간 볼 · 번개 꼬리)
      ================================================================== */
+  var EAR_TIP = '#2E2A26';                                          /* 귀 끝 검정 */
+  var BOLT = 'M9 0 L0 12.5 L5.4 12.5 L4.2 21 L14 8.4 L8.2 8.4 Z';   /* 번개 꼬리 모양 */
+
+  /* 끝이 까만 뾰족한 두 귀 (몸·머리 뒤에 먼저 그림) */
+  function pikaEars() {
+    return '' +
+      '<path d="M35 50 C33 40 31 26 30.5 17 C30.2 12.6 33.8 11.6 36.4 15 C41 22 47 32 50 38 Z" fill="#FFD93B"/>' +
+      '<path d="M30.5 17 C30.2 12.6 33.8 11.6 36.4 15 C37.6 17 38.6 19.4 39.4 21.8 C36 20.6 33 19 30.5 17 Z" fill="' + EAR_TIP + '"/>' +
+      '<path d="M85 50 C87 40 89 26 89.5 17 C89.8 12.6 86.2 11.6 83.6 15 C79 22 73 32 70 38 Z" fill="#FFD93B"/>' +
+      '<path d="M89.5 17 C89.8 12.6 86.2 11.6 83.6 15 C82.4 17 81.4 19.4 80.6 21.8 C84 20.6 87 19 89.5 17 Z" fill="' + EAR_TIP + '"/>';
+  }
+
+  /* 작은 피카츄 얼굴 — 중심 (0,0), 반지름 14 기준 (할 일 타일에서 씀) */
+  function pikaHead(cx, cy, scale, happy) {
+    var eyes = happy
+      ? '<path d="M-7.4 -1.6 q2.5 -3.6 5 0" stroke="#2E2A26" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
+        '<path d="M2.4 -1.6 q2.5 -3.6 5 0" stroke="#2E2A26" stroke-width="1.9" fill="none" stroke-linecap="round"/>'
+      : '<circle cx="-4.6" cy="-1" r="2.7" fill="#2E2A26"/>' +
+        '<circle cx="4.6" cy="-1" r="2.7" fill="#2E2A26"/>';
+    return '<g transform="translate(' + cx + ' ' + cy + ') scale(' + scale + ')">' +
+      '<path d="M-9.5 9 C-11.5 2 -13.6 -8 -14.2 -15 C-14.5 -19.4 -11.2 -20.6 -8.8 -17 C-4.4 -9.4 -1.8 -2 -0.6 4 Z" fill="#FFD93B"/>' +
+      '<path d="M-14.2 -15 C-14.5 -19.4 -11.2 -20.6 -8.8 -17 C-7.9 -14.8 -7 -12.2 -6.3 -9.8 C-9.4 -10.8 -12 -12.8 -14.2 -15 Z" fill="' + EAR_TIP + '"/>' +
+      '<path d="M9.5 9 C11.5 2 13.6 -8 14.2 -15 C14.5 -19.4 11.2 -20.6 8.8 -17 C4.4 -9.4 1.8 -2 0.6 4 Z" fill="#FFD93B"/>' +
+      '<path d="M14.2 -15 C14.5 -19.4 11.2 -20.6 8.8 -17 C7.9 -14.8 7 -12.2 6.3 -9.8 C9.4 -10.8 12 -12.8 14.2 -15 Z" fill="' + EAR_TIP + '"/>' +
+      '<circle cx="0" cy="0" r="14" fill="#FFD93B"/>' +
+      '<circle cx="-9.6" cy="5.4" r="3.6" fill="#F4574B" opacity=".92"/>' +
+      '<circle cx="9.6" cy="5.4" r="3.6" fill="#F4574B" opacity=".92"/>' +
+      eyes +
+      '<ellipse cx="0" cy="2.2" rx="1" ry=".8" fill="#5B3A2A"/>' +
+      '<path d="M-3.2 4 q1.6 2 3.2 0 q1.6 2 3.2 0" stroke="#C0704A" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
+      '</g>';
+  }
+
   function jjini() {
     var b = '';
 
     /* 반짝이 */
-    b += sparkle(101, 32, 6, '#FFD37E');
-    b += sparkle(18, 64, 4.2, '#F9A8C0');
-    b += '<circle cx="24" cy="30" r="3.6" fill="#FFE08A"/>';
+    b += sparkle(104, 30, 6, '#FFD37E');
+    b += sparkle(15, 62, 4.4, '#FFE9A8');
+    b += '<circle cx="22" cy="32" r="3.2" fill="#FFE08A"/>';
 
-    /* 몸통(민트 셔츠) */
-    b += '<path d="M29 119 c0-21 13-33 30-33 s30 12 30 33 z" fill="#8AD9C6"/>';
-    b += '<path d="M29 119 c0-21 13-33 30-33 s30 12 30 33 z" fill="#5FC6AE" opacity=".35"/>';
-    b += '<path d="M48 89 q11 9 23 0" stroke="#FFFFFF" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
-
-    /* 목 */
-    b += '<rect x="53" y="69" width="12" height="13" rx="5.4" fill="#F6C9A6"/>';
-
-    /* 귀 */
-    b += '<circle cx="30" cy="53" r="7" fill="#FFE2C6"/>';
-    b += '<circle cx="83" cy="53" r="7" fill="#FFE2C6"/>';
-
-    /* 얼굴 */
-    b += '<circle cx="56" cy="50" r="27" fill="#FFE7CE"/>';
-
-    /* 머리카락 */
-    b += '<path d="M29 50 c0-18 12-30 28-30 c17 0 27 12 27 29 c-3-8-9-10-14-7 c-6 4-10 7-17 6 c-7-1-9-6-14-5 c-5 1-8 3-10 7z" fill="#5C4033"/>';
-    b += '<path d="M35 40 q10-13 23-9 q9 2 13 9 q-8-5-16-2 q-9 3-20 2z" fill="#6E4A37"/>';
-
-    /* 볼 */
-    b += blush(37, 76, 61);
-
-    /* 눈 */
-    b += eyesOpen(45, 51, 22, 5.1);
-
-    /* 눈썹 */
-    b += '<path d="M40 40 q5-3 10 0" stroke="#6E4A37" stroke-width="2.3" fill="none" stroke-linecap="round"/>';
-    b += '<path d="M64 40 q5-3 10 0" stroke="#6E4A37" stroke-width="2.3" fill="none" stroke-linecap="round"/>';
-
-    /* 입 */
-    b += '<path d="M51 64 q5.6 6 11 0" stroke="#C4746A" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
-
-    /* 햄찌 펫 (오른쪽 아래) */
-    b += '<g>' +
-      '<ellipse cx="93" cy="96" rx="15" ry="12.6" fill="#FFF4E2" stroke="#EBD0B0" stroke-width="2"/>' +
-      '<circle cx="83" cy="85" r="5.4" fill="#FFF4E2" stroke="#EBD0B0" stroke-width="2"/>' +
-      '<circle cx="83" cy="85" r="2.4" fill="#F9C2C9"/>' +
-      '<circle cx="103" cy="85" r="5.4" fill="#FFF4E2" stroke="#EBD0B0" stroke-width="2"/>' +
-      '<circle cx="103" cy="85" r="2.4" fill="#F9C2C9"/>' +
-      '<ellipse cx="93" cy="99" rx="9" ry="6.6" fill="#FFFDF9"/>' +
-      '<circle cx="88" cy="94" r="1.9" fill="#5B4033"/>' +
-      '<circle cx="98" cy="94" r="1.9" fill="#5B4033"/>' +
-      '<ellipse cx="93" cy="98" rx="1.9" ry="1.5" fill="#E4939C"/>' +
-      '<path d="M93 100 q-3 3.6 -5.6 1 M93 100 q3 3.6 5.6 1" stroke="#B98A82" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
-      '<ellipse cx="82" cy="99" rx="3.4" ry="2.4" fill="#F8AEBE" opacity=".75"/>' +
-      '<ellipse cx="104" cy="99" rx="3.4" ry="2.4" fill="#F8AEBE" opacity=".75"/>' +
+    /* 번개 꼬리 (몸 뒤) */
+    b += '<g transform="translate(70 40) scale(2.4)">' +
+      '<path d="' + BOLT + '" fill="#FFD93B" stroke="#EFC02A" stroke-width="1.5" stroke-linejoin="round"/>' +
       '</g>';
 
-    /* 햄찌를 감싼 손 */
-    b += '<ellipse cx="79" cy="100" rx="6.6" ry="5.6" fill="#FFE7CE" stroke="#F4CDA8" stroke-width="1.6"/>';
-    b += heart(66, 84, 4.4, '#F28F9C');
+    /* 귀 */
+    b += pikaEars();
 
-    return wrap('char-jjini', b, '#FFFDF6', '#FFEFD8');
+    /* 몸통 */
+    b += '<path d="M60 68 C44 68 38 80 38 90 C38 99 47 105 60 105 C73 105 82 99 82 90 C82 80 76 68 60 68 Z" fill="#FFD93B"/>';
+    /* 배 */
+    b += '<path d="M60 78 C51 78 46 85 46 92 C46 99 52 104 60 104 C68 104 74 99 74 92 C74 85 69 78 60 78 Z" fill="#FFE98A" opacity=".65"/>';
+
+    /* 발 */
+    b += '<ellipse cx="48" cy="102" rx="8" ry="4.4" fill="#FFD93B" stroke="#EFC02A" stroke-width="1.4"/>';
+    b += '<ellipse cx="72" cy="102" rx="8" ry="4.4" fill="#FFD93B" stroke="#EFC02A" stroke-width="1.4"/>';
+
+    /* 팔 */
+    b += '<path d="M42 82 C35 84 34 93 41 95 C47 96 50 89 47 85 Z" fill="#FFD93B" stroke="#EFC02A" stroke-width="1.5" stroke-linejoin="round"/>';
+    b += '<path d="M78 82 C85 84 86 93 79 95 C73 96 70 89 73 85 Z" fill="#FFD93B" stroke="#EFC02A" stroke-width="1.5" stroke-linejoin="round"/>';
+
+    /* 얼굴 */
+    b += '<ellipse cx="60" cy="54" rx="27" ry="24" fill="#FFD93B"/>';
+
+    /* 빨간 볼 */
+    b += '<circle cx="39" cy="63.5" r="5.8" fill="#F4574B" opacity=".92"/>';
+    b += '<circle cx="81" cy="63.5" r="5.8" fill="#F4574B" opacity=".92"/>';
+
+    /* 동그랗고 반짝이는 눈 */
+    b += '<circle cx="48" cy="52" r="5.6" fill="#2E2A26"/>';
+    b += '<circle cx="72" cy="52" r="5.6" fill="#2E2A26"/>';
+    b += '<circle cx="50" cy="49.8" r="2" fill="#FFFFFF"/>';
+    b += '<circle cx="74" cy="49.8" r="2" fill="#FFFFFF"/>';
+
+    /* 코 */
+    b += '<ellipse cx="60" cy="57.4" rx="1.7" ry="1.3" fill="#5B3A2A"/>';
+
+    /* 입 (ω) */
+    b += '<path d="M54.6 61.8 q2.7 3.4 5.4 0 M60 61.8 q2.7 3.4 5.4 0" stroke="#C0704A" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+
+    return wrap('char-jjini', b, '#FFFDF0', '#FFF0BF');
   }
 
   /* ==================================================================
@@ -194,36 +215,38 @@
       '<ellipse cx="50" cy="79" rx="14" ry="5" fill="#D9BE97"/>');
   }
 
-  /* 독서 30분 — 책 읽는 캐릭터 */
+  /* 독서 30분 — 책 읽는 피카츄 */
   function icRead() {
     return tile('read', '#DFF6E7', '#DDEEFF',
-      '<circle cx="50" cy="33" r="15" fill="#FFE7CE"/>' +
-      '<path d="M35 32 q2-15 15-15 q13 0 15 15 q-8-7-15-5 q-7 1-15 5z" fill="#5C4033"/>' +
-      eyesHappy(41, 52, 34, 7) +
-      blush(39, 62, 41) +
-      '<path d="M47 43 q3.4 3.6 7 0" stroke="#C4746A" stroke-width="2.2" fill="none" stroke-linecap="round"/>' +
-      '<path d="M13 59 q18-9 37-3 v25 q-19-6-37 3z" fill="#FFFFFF" stroke="#DCE7F1" stroke-width="2.2" stroke-linejoin="round"/>' +
-      '<path d="M87 59 q-18-9-37-3 v25 q19-6 37 3z" fill="#FFFDF7" stroke="#DCE7F1" stroke-width="2.2" stroke-linejoin="round"/>' +
-      '<path d="M50 57 v25" stroke="#DCE7F1" stroke-width="2.2"/>' +
-      '<circle cx="20" cy="66" r="4.8" fill="#FFE7CE"/>' +
-      '<circle cx="80" cy="66" r="4.8" fill="#FFE7CE"/>' +
-      '<path d="M27 70 q8-3 16-1 M57 69 q8-2 16 1" stroke="#EDF3F9" stroke-width="2" stroke-linecap="round"/>');
+      pikaHead(50, 40, 0.86, true) +
+      '<path d="M11 57 q19-9 39-3 v27 q-20-6-39 3 z" fill="#FFFFFF" stroke="#DCE7F1" stroke-width="2.2" stroke-linejoin="round"/>' +
+      '<path d="M89 57 q-19-9-39-3 v27 q20-6 39 3 z" fill="#FFFDF7" stroke="#DCE7F1" stroke-width="2.2" stroke-linejoin="round"/>' +
+      '<path d="M50 54 v27" stroke="#DCE7F1" stroke-width="2.2"/>' +
+      '<path d="M18 65 q9-3 17-1 M18 73 q9-3 17-1 M18 81 q9-3 17-1" stroke="#EDF3F9" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M65 64 q9-2 17 1 M65 72 q9-2 17 1 M65 80 q9-2 17 1" stroke="#EDF3F9" stroke-width="2" stroke-linecap="round"/>' +
+      sparkle(84, 24, 4.2, '#FFD37E'));
   }
 
-  /* 아킬레스건 운동 — 스트레칭하는 캐릭터 */
+  /* 아킬레스건 운동 — 스트레칭하는 피카츄 */
   function icMove() {
     return tile('move', '#FFE6D6', '#FFF7CE',
-      '<circle cx="54" cy="26" r="11.5" fill="#FFE7CE"/>' +
-      '<path d="M42 25 q3-12 13-12 q10 0 12 12 q-6-6-12-4 q-6 1-13 4z" fill="#5C4033"/>' +
-      eyesHappy(46, 57, 27, 5.6) +
-      '<path d="M54 38 v24" stroke="#7FD9C4" stroke-width="11" stroke-linecap="round"/>' +
-      '<path d="M54 44 L36 30" stroke="#FFE7CE" stroke-width="7" stroke-linecap="round"/>' +
-      '<path d="M54 44 L70 55" stroke="#FFE7CE" stroke-width="7" stroke-linecap="round"/>' +
-      '<path d="M54 62 L40 82" stroke="#8FB6E8" stroke-width="9" stroke-linecap="round"/>' +
-      '<path d="M54 62 L67 82" stroke="#8FB6E8" stroke-width="9" stroke-linecap="round"/>' +
-      '<path d="M33 84 h12 M62 84 h12" stroke="#E8798F" stroke-width="6" stroke-linecap="round"/>' +
-      '<path d="M28 40 q-7-8-1-17" stroke="#FFB347" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>' +
-      sparkle(84, 32, 4.4, '#FFD37E'));
+      '<path d="M23 44 q-8-8-3-17" stroke="#FFB347" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>' +
+      '<path d="M17 52 q-6-4-6-10" stroke="#FFB347" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".55"/>' +
+      '<g transform="translate(62 58) rotate(4)">' +
+        '<path d="' + BOLT + '" fill="#FFD93B" stroke="#EFC02A" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '</g>' +
+      '<path d="M50 32 C42 35 39 46 40 56 C41 64 45 68 50 68 C55 68 59 64 60 56 C61 46 58 35 50 32 Z" fill="#FFD93B"/>' +
+      '<ellipse cx="50" cy="57" rx="7.4" ry="8.4" fill="#FFE98A" opacity=".7"/>' +
+      '<path d="M43 43 L31 31" stroke="#FFD93B" stroke-width="7.4" stroke-linecap="round"/>' +
+      '<path d="M57 43 L69 31" stroke="#FFD93B" stroke-width="7.4" stroke-linecap="round"/>' +
+      '<circle cx="30" cy="31" r="4.2" fill="#FFC93B"/>' +
+      '<circle cx="70" cy="31" r="4.2" fill="#FFC93B"/>' +
+      '<path d="M46 67 L38 82" stroke="#FFD93B" stroke-width="8" stroke-linecap="round"/>' +
+      '<path d="M54 67 L62 82" stroke="#FFD93B" stroke-width="8" stroke-linecap="round"/>' +
+      '<ellipse cx="35" cy="85" rx="5.6" ry="3.6" fill="#FFC93B"/>' +
+      '<ellipse cx="65" cy="85" rx="5.6" ry="3.6" fill="#FFC93B"/>' +
+      pikaHead(50, 27, 0.62, true) +
+      sparkle(84, 26, 4.4, '#FFD37E'));
   }
 
   /* 영상 30분 — 텔레비전 */
@@ -379,8 +402,9 @@
 
   /* ================================================================== */
   var CHARACTERS = {
+    pikachu: jjini,
     jjini: jjini,
-    hamster: jjini,
+    hamster: jjini,   /* 예전 기록과 이름이 남아 있어도 피카츄로 나와요 */
     char: jjini
   };
 

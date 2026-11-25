@@ -12,7 +12,7 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 7;
+  var SCHEMA = 8;
 
   /* 매일 독서 루틴 — 기존 기기에도 빠짐없이 들어가도록 마이그레이션에서 확인합니다. */
   var READ_ROUTINE_ID = 'r_jj_read';
@@ -89,7 +89,7 @@
         place: { name: '동탄2신도시', lat: 37.2001, lon: 127.0990 }
       },
       members: [
-        { id: 'jjini', name: '찌니', sub: '햄찌와 함께', char: 'hamster', role: 'kid', stars: 3 }
+        { id: 'jjini', name: '찌니', sub: '오늘도 피카피카 ⚡', char: 'pikachu', role: 'kid', stars: 3 }
       ],
       /* 반복 루틴 — 매일/평일 구분. group 은 찌니 보상 트래커에서 씁니다. */
       routines: {
@@ -212,6 +212,12 @@
       if (!day || !day.tasks || !Array.isArray(day.tasks[m.id])) return;
       var hasTask = day.tasks[m.id].some(function (t) { return t && t.id === ACHILLES_ROUTINE_ID; });
       if (!hasTask) day.tasks[m.id].push(Object.assign({ done: false }, ACHILLES_ROUTINE));
+    });
+
+    // SCHEMA 8 — 찌니 캐릭터를 피카츄로. 이미 쓰던 기기의 한 줄 소개도 함께 맞춥니다.
+    out.members.forEach(function (m) {
+      if (!m.sub || m.sub === '햄찌와 함께') m.sub = '오늘도 피카피카 ⚡';
+      m.char = 'pikachu';
     });
     return out;
   }
