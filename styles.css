@@ -3110,3 +3110,128 @@ body {
   .note-text { font-size: 13px; }
   .note-empty { padding: 14px 12px 12px; }
 }
+
+/* =====================================================================
+   v37 · 매일 새 화면 + 누적 보기
+   오늘 화면의 '누적 보기' 버튼, 지난 한마디·누적 독서 기록 시트
+   ===================================================================== */
+.archive-open {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1.4px dashed #EFC9D6;
+  background: rgba(255, 253, 250, .78);
+  color: #A75C74;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  transition: transform .12s ease, background .15s ease;
+}
+.archive-open:active { transform: scale(.99); }
+.archive-open[hidden] { display: none; }
+.archive-open-book {
+  border-color: #EBD9BC;
+  color: #98794F;
+  background: rgba(255, 253, 247, .82);
+}
+
+/* 오늘 읽은 책이 없을 때 */
+.book-empty-card {
+  padding: 16px 14px 14px;
+  border-radius: 18px;
+  border: 1.5px dashed #EFDCBF;
+  background: rgba(255, 253, 247, .72);
+  text-align: center;
+}
+.book-empty-emoji { display: block; font-size: 24px; line-height: 1; }
+.book-empty-text {
+  margin-top: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #A2907F;
+  word-break: keep-all;
+}
+.book-empty-btn {
+  margin-top: 11px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1.4px solid #EDD9B4;
+  background: linear-gradient(180deg, #FFF6E4, #FCEBCB);
+  color: #98794F;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.book-empty-btn:active { transform: scale(.98); }
+
+/* 누적 보기 시트 */
+.archive-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 2px 10px;
+  border-bottom: 1px dashed #EFE3CB;
+}
+.archive-total {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: #4A3A30;
+  letter-spacing: -0.3px;
+}
+.archive-hint { font-size: 11px; color: #B3A08D; }
+
+.archive-list { display: flex; flex-direction: column; gap: 14px; padding: 12px 0 6px; }
+
+.archive-day { display: flex; flex-direction: column; gap: 7px; }
+.archive-day-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8B7358;
+  letter-spacing: -0.1px;
+}
+.archive-today {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #FDE9F0;
+  border: 1px solid #F7D2DF;
+  color: #B56F87;
+  font-size: 10px;
+  font-weight: 700;
+}
+.archive-day-count {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #B3A08D;
+}
+.archive-note { box-shadow: 0 1px 5px rgba(190, 145, 160, .08), inset 0 1px 0 #fff; }
+.archive-actions { display: flex; flex-direction: column; gap: 2px; flex: none; }
+
+.archive-empty {
+  padding: 24px 14px 20px;
+  border-radius: 18px;
+  border: 1.5px dashed #EFE3CB;
+  background: rgba(255, 253, 247, .7);
+  text-align: center;
+}
+.archive-empty-emoji { display: block; font-size: 26px; line-height: 1; }
+.archive-empty-text {
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #A08C7A;
+  word-break: keep-all;
+}
+
+#note-date-hint { color: #B56F87; font-weight: 700; }
+#note-date-hint[hidden] { display: none; }

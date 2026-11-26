@@ -12,7 +12,7 @@
   'use strict';
 
   var KEY = 'uri-family-dashboard.v3';
-  var SCHEMA = 10;
+  var SCHEMA = 11;
 
   /* 매일 독서 루틴 — 기존 기기에도 빠짐없이 들어가도록 마이그레이션에서 확인합니다. */
   var READ_ROUTINE_ID = 'r_jj_read';
@@ -39,10 +39,12 @@
     ]
   };
 
-  /* 💌 엄마·아빠 한마디 — 작성자별 가장 최근 한 줄. 날짜별로 쌓지 않고
-     덮어쓰기 때문에 어느 기기에서 적어도 같은 한마디가 보입니다. */
+  /* 💌 엄마·아빠 한마디 — 날짜마다 작성자별 한 줄을 쌓아 둡니다.
+     오늘 화면에는 오늘 자로 남긴 한마디만 보이고, 지난 한마디는 누적 보기에서 모아 봅니다.
+     (SCHEMA 10 까지는 parentNotes 한 벌에 덮어쓰던 기록이라 SCHEMA 11 에서 날짜별로 옮겨 보존합니다) */
   var NOTE_TEXT_MAX = 120;
   var NOTE_AUTHORS = ['mom', 'dad'];
+  var NOTE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
   function blankNote() { return { text: '', updatedAt: 0 }; }
   function blankNotes() { return { mom: blankNote(), dad: blankNote() }; }
   function normalizeNotes(src) {
@@ -55,6 +57,79 @@
       out[who] = { text: text, updatedAt: Number(n.updatedAt) || 0 };
     });
     return out;
+  }
+
+  /* 한 사람·하루치 한마디. 지운 한마디는 빈 text 와 지운 시각(updatedAt)만 남겨,
+     다른 기기 기록과 합칠 때 "지웠다"는 사실이 옛 글에 밀리지 않게 합니다. */
+  function normalizeNoteEntry(n) {
+    if (!n || typeof n !== 'object') return null;
+    var text = typeof n.text === 'string' ? n.text.trim().slice(0, NOTE_TEXT_MAX) : '';
+    var at = Number(n.updatedAt) || 0;
+    if (!text && !at) return null;
+    return { text: text, updatedAt: at };
+  }
+
+  /** { 'YYYY-MM-DD': { mom: {...}, dad: {...} } } 모양을 깔끔하게 다듬습니다. */
+  function normalizeNotesByDate(src) {
+    var out = {};
+    if (!src || typeof src !== 'object') return out;
+    Object.keys(src).forEach(function (date) {
+      if (!NOTE_DATE_RE.test(date)) return;
+      var day = src[date];
+      if (!day || typeof day !== 'object') return;
+      var entry = {};
+      NOTE_AUTHORS.forEach(function (who) {
+        var n = normalizeNoteEntry(day[who]);
+        if (n) entry[who] = n;
+      });
+      if (NOTE_AUTHORS.some(function (who) { return entry[who]; })) out[date] = entry;
+    });
+    return out;
+  }
+
+  /** 두 누적 기록을 합칩니다 — 같은 날 같은 사람 글은 더 최근 것(updatedAt)이 이깁니다. */
+  function mergeNotesByDate(a, b) {
+    var out = {};
+    [a, b].forEach(function (src) {
+      if (!src) return;
+      Object.keys(src).forEach(function (date) {
+        var day = src[date] || {};
+        if (!out[date]) out[date] = {};
+        NOTE_AUTHORS.forEach(function (who) {
+          var n = day[who];
+          if (!n) return;
+          var cur = out[date][who];
+          if (!cur || (Number(n.updatedAt) || 0) >= (Number(cur.updatedAt) || 0)) {
+            out[date][who] = { text: n.text || '', updatedAt: Number(n.updatedAt) || 0 };
+          }
+        });
+      });
+    });
+    return out;
+  }
+
+  /** 그날의 한마디 한 벌 (없으면 빈 값) */
+  function notesOnDate(byDate, dateISO) {
+    var out = blankNotes();
+    var day = byDate && byDate[dateISO];
+    if (!day) return out;
+    NOTE_AUTHORS.forEach(function (who) {
+      var n = day[who];
+      if (n) out[who] = { text: n.text || '', updatedAt: Number(n.updatedAt) || 0 };
+    });
+    return out;
+  }
+
+  /** 날짜 키를 YYYY-MM-DD 로 다듬습니다 (이상한 값이면 오늘) */
+  function notesDateKey(dateISO) {
+    var s = String(dateISO || '').slice(0, 10);
+    return NOTE_DATE_RE.test(s) ? s : todayISO();
+  }
+
+  /* 예전 앱 버전도 같은 한마디를 보도록 오늘치를 parentNotes 에도 함께 적어 둡니다. */
+  function syncNotesMirror() {
+    if (!state.parentNotesByDate) state.parentNotesByDate = {};
+    state.parentNotes = notesOnDate(state.parentNotesByDate, todayISO());
   }
 
   /* 이제 쓰지 않는 구성원. 예전에 저장된 기록이 남아 있어도
@@ -139,7 +214,8 @@
       },
       days: {},
       stamps: { jjini: {} },
-      /* 💌 엄마·아빠 한마디 (없으면 빈 값) */
+      /* 💌 엄마·아빠 한마디 (없으면 빈 값) — 날짜별 누적 기록 + 오늘 화면용 사본 */
+      parentNotesByDate: {},
       parentNotes: blankNotes(),
       seeds: {}
     };
@@ -248,6 +324,27 @@
       days[d] = Object.assign({}, src, { tasks: tasks });
     });
 
+    /* SCHEMA 11 — 💌 한마디 누적 기록. 예전(parentNotes 한 벌)에 남아 있던 글은
+       updatedAt 이 가리키는 날짜의 기록으로 옮겨 보존합니다.
+       · 예전 버전 앱(날짜별 보관이 없는 기록)이 올린 것이면 이 기기의 누적 기록과 합칩니다.
+       · 새 버전 기록은 그대로 따라갑니다 (전체 지우기도 반영되도록). */
+    var hasByDate = !!data.parentNotesByDate && typeof data.parentNotesByDate === 'object';
+    var notesByDate = normalizeNotesByDate(data.parentNotesByDate);
+    if (!hasByDate && state && state.parentNotesByDate) {
+      notesByDate = mergeNotesByDate(notesByDate, normalizeNotesByDate(state.parentNotesByDate));
+    }
+    var legacyNotes = normalizeNotes(data.parentNotes);
+    NOTE_AUTHORS.forEach(function (who) {
+      var n = legacyNotes[who];
+      if (!n.text) return;
+      var day = n.updatedAt ? iso(new Date(n.updatedAt)) : todayISO();
+      if (!notesByDate[day]) notesByDate[day] = {};
+      var cur = notesByDate[day][who];
+      if (!cur || (Number(n.updatedAt) || 0) >= (Number(cur.updatedAt) || 0)) {
+        notesByDate[day][who] = { text: n.text, updatedAt: n.updatedAt };
+      }
+    });
+
     var out = {
       version: SCHEMA,
       createdAt: data.createdAt || Date.now(),
@@ -256,12 +353,14 @@
       routines: Object.assign({}, base.routines, routines),
       days: days,
       stamps: Object.assign({}, base.stamps, stamps),
-      /* SCHEMA 10 — 💌 엄마·아빠 한마디. 예전 기록에는 없으니 빈 값으로 시작합니다.
-         (다른 기기가 올린 한마디가 있으면 그대로 살려 둡니다) */
-      parentNotes: normalizeNotes(data.parentNotes),
+      /* SCHEMA 11 — 💌 엄마·아빠 한마디를 날짜별로 보관합니다 (아래에서 채웁니다) */
+      parentNotesByDate: {},
+      parentNotes: blankNotes(),
       seeds: Object.assign({}, data.seeds || {})
     };
     out.members.forEach(function (m) { if (!out.stamps[m.id]) out.stamps[m.id] = {}; });
+    out.parentNotesByDate = notesByDate;
+    out.parentNotes = notesOnDate(notesByDate, todayISO());
 
     // SCHEMA 6 — '독서 30분' 매일 루틴이 빠진 기기에도 넣고, 이미 있던 루틴·할 일 문구도
     // 같은 이름으로 맞춥니다. (앞으로 생기는 날짜에도 같은 이름으로 채워져요)
@@ -574,29 +673,66 @@
       persist(false);
     },
 
-    /** 💌 엄마·아빠 한마디 — { mom: { text, updatedAt }, dad: { text, updatedAt } } */
+    /** 💌 엄마·아빠 한마디 — 날짜별 누적 기록 전체 { 'YYYY-MM-DD': { mom, dad } } */
+    parentNotesByDate: function () {
+      if (!state.parentNotesByDate) state.parentNotesByDate = {};
+      return state.parentNotesByDate;
+    },
+
+    /** 그날(기본: 오늘)의 한마디 — { mom: { text, updatedAt }, dad: { ... } } */
+    parentNotesOn: function (dateISO) {
+      return notesOnDate(api.parentNotesByDate(), notesDateKey(dateISO));
+    },
+
+    /** 오늘의 한마디 (오늘 화면) */
     parentNotes: function () {
-      if (!state.parentNotes) state.parentNotes = blankNotes();
-      return state.parentNotes;
+      return api.parentNotesOn(todayISO());
     },
 
-    /** 한마디 저장(고치기). 빈 값이면 지우기와 같습니다. */
-    setParentNote: function (who, text) {
+    /** 글이 남아 있는 날짜 목록 — 최신순 */
+    noteDates: function () {
+      var byDate = api.parentNotesByDate();
+      return Object.keys(byDate).filter(function (date) {
+        var day = byDate[date] || {};
+        return NOTE_AUTHORS.some(function (who) { return day[who] && day[who].text; });
+      }).sort().reverse();
+    },
+
+    /** 지금까지 남긴 한마디 개수 (날짜·작성자별 한 줄씩) */
+    notesCount: function () {
+      var byDate = api.parentNotesByDate();
+      var count = 0;
+      Object.keys(byDate).forEach(function (date) {
+        var day = byDate[date] || {};
+        NOTE_AUTHORS.forEach(function (who) { if (day[who] && day[who].text) count++; });
+      });
+      return count;
+    },
+
+    /** 한마디 저장(고치기). dateISO 를 주면 그날 기록으로 남깁니다. 빈 값이면 지우기와 같습니다. */
+    setParentNote: function (who, text, dateISO) {
       if (NOTE_AUTHORS.indexOf(who) < 0) return null;
-      if (!state.parentNotes) state.parentNotes = blankNotes();
+      var date = notesDateKey(dateISO);
       var clean = String(text || '').replace(/\s+/g, ' ').trim().slice(0, NOTE_TEXT_MAX);
-      if (!clean) return api.clearParentNote(who);
-      state.parentNotes[who] = { text: clean, updatedAt: Date.now() };
+      if (!clean) return api.clearParentNote(who, date);
+      var byDate = api.parentNotesByDate();
+      if (!byDate[date]) byDate[date] = {};
+      byDate[date][who] = { text: clean, updatedAt: Date.now() };
+      syncNotesMirror();
       persist(false);
-      return state.parentNotes[who];
+      return byDate[date][who];
     },
 
-    clearParentNote: function (who) {
+    clearParentNote: function (who, dateISO) {
       if (NOTE_AUTHORS.indexOf(who) < 0) return null;
-      if (!state.parentNotes) state.parentNotes = blankNotes();
-      state.parentNotes[who] = blankNote();
+      var date = notesDateKey(dateISO);
+      var byDate = api.parentNotesByDate();
+      if (!byDate[date]) byDate[date] = {};
+      /* 지운 시각을 남겨 두면 다른 기기의 옛 글과 합칠 때 되살아나지 않습니다 */
+      byDate[date][who] = { text: '', updatedAt: Date.now() };
+      syncNotesMirror();
       persist(false);
-      return state.parentNotes[who];
+      return byDate[date][who];
     },
 
     addStar: function (memberId, delta) {

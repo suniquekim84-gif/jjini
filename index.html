@@ -117,6 +117,7 @@
         <button class="btn btn-ghost" data-action="edit-note" id="btn-note-add">✏️ 한마디 남기기</button>
       </header>
       <div class="note-list" id="note-list"><!-- rendered --></div>
+      <button class="archive-open" type="button" data-action="open-note-archive" id="btn-note-archive" hidden>💌 지난 한마디 보기</button>
     </section>
 
     </div><!-- /page-col 왼쪽 -->
@@ -205,6 +206,7 @@
         </div>
       </div>
       <div class="book-list" id="book-list"><!-- rendered --></div>
+      <button class="archive-open archive-open-book" type="button" data-action="open-book-archive" id="btn-book-archive" hidden>📚 누적 0권 보기</button>
     </section>
 
     </div><!-- /page-col 왼쪽 -->
@@ -522,6 +524,7 @@
       </div>
       <div class="field-group">
         <h3 class="field-title">한마디</h3>
+        <p class="field-hint" id="note-date-hint" hidden></p>
         <p class="field-hint">찌니에게 짧은 응원을 남겨 주세요 (최대 120자)</p>
         <textarea id="note-text" rows="3" maxlength="120" placeholder="예) 오늘도 잘하고 있어, 엄마가 응원해! 💛"></textarea>
         <p class="field-hint" id="note-count">0/120</p>
@@ -530,6 +533,42 @@
     <footer class="sheet-foot">
       <button class="btn btn-ghost btn-wide" data-action="note-delete" id="note-delete" hidden>지우기</button>
       <button class="btn btn-primary btn-wide" data-action="note-save" id="note-save">저장</button>
+    </footer>
+  </section>
+
+  <!-- 💌 지난 한마디 (누적 보기) -->
+  <section class="sheet" id="sheet-note-archive" role="dialog" aria-modal="true" aria-labelledby="note-archive-title" hidden>
+    <header class="sheet-head">
+      <h2 id="note-archive-title">💌 지난 한마디</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="archive-summary">
+        <p class="archive-total" id="note-archive-count">누적 0개</p>
+        <p class="archive-hint">날짜별로 모아 봐요 · 최신순</p>
+      </div>
+      <div class="archive-list" id="note-archive-list"><!-- rendered --></div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-primary btn-wide" type="button" data-action="edit-note">✏️ 오늘 한마디 남기기</button>
+    </footer>
+  </section>
+
+  <!-- 📚 누적 독서 기록 -->
+  <section class="sheet" id="sheet-book-archive" role="dialog" aria-modal="true" aria-labelledby="book-archive-title" hidden>
+    <header class="sheet-head">
+      <h2 id="book-archive-title">📚 누적 독서 기록</h2>
+      <button class="sheet-close" data-close aria-label="닫기">✕</button>
+    </header>
+    <div class="sheet-body">
+      <div class="archive-summary">
+        <p class="archive-total" id="book-archive-count">지금까지 0권</p>
+        <p class="archive-hint">날짜별로 모아 봐요 · 최신순</p>
+      </div>
+      <div class="archive-list" id="book-archive-list"><!-- rendered --></div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn btn-primary btn-wide" type="button" data-action="add-book">📚 오늘 읽은 책 남기기</button>
     </footer>
   </section>
 

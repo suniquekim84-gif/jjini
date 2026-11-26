@@ -14,7 +14,7 @@
 
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var TINTS = { jjini: '' };
-  var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star', 'sheet-lecture', 'sheet-book', 'sheet-note'];
+  var SHEETS = ['sheet-settings', 'sheet-calendar', 'sheet-timetable', 'sheet-task', 'sheet-star', 'sheet-lecture', 'sheet-book', 'sheet-note', 'sheet-book-archive', 'sheet-note-archive'];
   var TABS = ['today', 'prep', 'todo', 'lecture'];
   var currentTab = 'today';
 
@@ -23,7 +23,7 @@
     { who: 'mom', emoji: '👩', name: '엄마' },
     { who: 'dad', emoji: '👨', name: '아빠' }
   ];
-  var noteCtx = { who: 'mom', saved: '' };
+  var noteCtx = { who: 'mom', saved: '', date: null, fromArchive: false };
 
   var state = null;
   var weather = null;
@@ -35,7 +35,7 @@
   var taskCtx = { mode: 'add', memberId: 'jjini', taskId: null, repeat: 'once' };
   var lectureCtx = { mode: 'add', id: null, manual: false, lecture: false };
   var lectureExpanded = false;
-  var bookCtx = { mode: 'add', id: null };
+  var bookCtx = { mode: 'add', id: null, fromArchive: false };
   var lastToday = null;
   var toastTimer = null;
   var weatherTimer = null;
@@ -782,13 +782,40 @@
   }
 
   /* ---------------- 독서 기록 ---------------- */
+  /* 책 한 권 카드 — 오늘 목록과 누적 보기에서 같이 씁니다. arch=1 이면 누적 보기에서 연 것 */
+  function bookRow(b, arch) {
+    return '<article class="book-row">' +
+      '<div class="book-top">' +
+        '<span class="book-emoji" aria-hidden="true">' + ric('book') + '</span>' +
+        '<div class="book-info">' +
+          '<p class="book-title">' + esc(b.title) + '</p>' +
+          '<p class="book-date">' + esc(shortDate(b.date, false)) + '</p>' +
+        '</div>' +
+        '<span class="book-actions">' +
+          '<button class="mini-btn" data-action="edit-book" data-id="' + b.id + '"' + (arch ? ' data-arch="1"' : '') + ' ' +
+            'aria-label="' + esc(b.title) + ' 고치기">✏️</button>' +
+          '<button class="mini-btn del" data-action="delete-book" data-id="' + b.id + '" ' +
+            'aria-label="' + esc(b.title) + ' 지우기">✕</button>' +
+        '</span>' +
+      '</div>' +
+      (b.review ? '<p class="book-review">' + esc(b.review) + '</p>' : '') +
+    '</article>';
+  }
+
+  function todayBooks() {
+    if (!Books) return [];
+    var today = Store.todayISO();
+    return Books.list().filter(function (b) { return String(b.date || '').slice(0, 10) === today; });
+  }
+
   function renderBooks() {
     if (!Books) return;
     var today = Store.todayISO();
     var list = Books.list();
-    var todayCount = Books.countOn(today);
+    var todayList = list.filter(function (b) { return String(b.date || '').slice(0, 10) === today; });
+    var todayCount = todayList.length;
     byId('book-sub').textContent = list.length
-      ? '지금까지 ' + list.length + '권 남겼어요'
+      ? '오늘 ' + todayCount + '권 · 지금까지 ' + list.length + '권'
       : '읽은 책과 짧은 감상평을 남겨요';
 
     /* 오늘 기록을 남기면 엔트리코딩 +10분 — 지금 상태를 안내해요 */
@@ -813,26 +840,20 @@
         : '오늘 날짜로 책을 남기면 두 보상이 함께 열려요';
     }
 
-    byId('book-list').innerHTML = list.length
-      ? list.map(function (b) {
-          return '<article class="book-row">' +
-            '<div class="book-top">' +
-              '<span class="book-emoji" aria-hidden="true">' + ric('book') + '</span>' +
-              '<div class="book-info">' +
-                '<p class="book-title">' + esc(b.title) + '</p>' +
-                '<p class="book-date">' + esc(shortDate(b.date, false)) + '</p>' +
-              '</div>' +
-              '<span class="book-actions">' +
-                '<button class="mini-btn" data-action="edit-book" data-id="' + b.id + '" ' +
-                  'aria-label="' + esc(b.title) + ' 고치기">✏️</button>' +
-                '<button class="mini-btn del" data-action="delete-book" data-id="' + b.id + '" ' +
-                  'aria-label="' + esc(b.title) + ' 지우기">✕</button>' +
-              '</span>' +
-            '</div>' +
-            (b.review ? '<p class="book-review">' + esc(b.review) + '</p>' : '') +
-          '</article>';
-        }).join('')
-      : '<p class="book-empty">아직 독서 기록이 없어요.<br />읽은 책을 첫 권으로 남겨 볼까요? 📚</p>';
+    /* 오늘 남긴 책만 보여 주고, 지난 기록은 '누적 N권 보기'에서 모아 봐요 */
+    byId('book-list').innerHTML = todayList.length
+      ? todayList.map(function (b) { return bookRow(b, false); }).join('')
+      : '<div class="book-empty-card">' +
+          '<span class="book-empty-emoji" aria-hidden="true">📚</span>' +
+          '<p class="book-empty-text">오늘 읽은 책이 아직 없어요</p>' +
+          '<button class="book-empty-btn" type="button" data-action="add-book">오늘 읽은 책 남기기</button>' +
+        '</div>';
+
+    var archBtn = byId('btn-book-archive');
+    if (archBtn) {
+      archBtn.hidden = list.length <= 0;
+      archBtn.textContent = '📚 누적 ' + list.length + '권 보기';
+    }
   }
 
   /* ---------------- 💌 엄마·아빠 한마디 ---------------- */
@@ -849,8 +870,28 @@
     return (d.getMonth() + 1) + '/' + d.getDate();
   }
 
+  /* 누적 보기에서 쓰는 시각 표시 */
+  function noteClock(n) {
+    if (!n || !n.updatedAt) return '';
+    var d = new Date(n.updatedAt);
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
   function notesNow() {
-    return (Store.parentNotes && Store.parentNotes()) || { mom: { text: '' }, dad: { text: '' } };
+    if (Store.parentNotesOn) return Store.parentNotesOn(Store.todayISO());
+    return Store.parentNotes() || { mom: { text: '' }, dad: { text: '' } };
+  }
+
+  function notesOn(dateISO) {
+    return Store.parentNotesOn ? Store.parentNotesOn(dateISO) : notesNow();
+  }
+
+  /* '11월 26일 (수)' — 해가 다르면 연도도 붙입니다 */
+  function archiveDayLabel(dateISO) {
+    var d = Store.parseDate(dateISO);
+    var thisYear = Store.parseDate(Store.todayISO()).getFullYear();
+    var head = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + DAYS[d.getDay()] + ')';
+    return d.getFullYear() === thisYear ? head : d.getFullYear() + '년 ' + head;
   }
 
   function renderNotes() {
@@ -859,8 +900,9 @@
     var notes = notesNow();
     var filled = NOTE_AUTHORS.filter(function (a) { return notes[a.who] && notes[a.who].text; });
     var sub = byId('note-sub');
+    renderNoteArchiveBtn();
 
-    /* 둘 다 비어 있으면 포근한 안내만 보여 줍니다 */
+    /* 오늘 남긴 한마디가 하나도 없으면 어제 글이 남지 않고 새 화면으로 뜹니다 */
     if (!filled.length) {
       if (sub) sub.textContent = '오늘의 응원을 짧게 남겨요';
       list.innerHTML =
@@ -890,10 +932,101 @@
     }).join('');
   }
 
+  function renderNoteArchiveBtn() {
+    var btn = byId('btn-note-archive');
+    if (!btn) return;
+    var total = Store.notesCount ? Store.notesCount() : 0;
+    btn.hidden = total <= 0;
+    btn.textContent = '💌 지난 한마디 보기 · 누적 ' + total + '개';
+  }
+
+  /* 지난 한마디 — 날짜별(최신순) 누적 보기 */
+  function renderNoteArchive() {
+    var box = byId('note-archive-list');
+    if (!box) return;
+    var dates = Store.noteDates ? Store.noteDates() : [];
+    var total = Store.notesCount ? Store.notesCount() : 0;
+    byId('note-archive-count').textContent = total ? '누적 ' + total + '개' : '아직 한마디가 없어요';
+    var today = Store.todayISO();
+
+    if (!dates.length) {
+      box.innerHTML = '<div class="archive-empty">' +
+        '<span class="archive-empty-emoji" aria-hidden="true">💌</span>' +
+        '<p class="archive-empty-text">아직 쌓인 한마디가 없어요.<br />오늘 첫 한마디를 남겨 볼까요?</p>' +
+        '</div>';
+      return;
+    }
+
+    box.innerHTML = dates.map(function (date) {
+      var notes = notesOn(date);
+      var rows = NOTE_AUTHORS.filter(function (a) { return notes[a.who] && notes[a.who].text; })
+        .map(function (a) {
+          var n = notes[a.who];
+          return '<article class="note-row archive-note" data-who="' + a.who + '">' +
+            '<span class="note-face" aria-hidden="true">' + a.emoji + '</span>' +
+            '<div class="note-main">' +
+              '<p class="note-who">' + a.name + ' 한마디' +
+                (n.updatedAt ? '<span class="note-when">' + noteClock(n) + '</span>' : '') +
+              '</p>' +
+              '<p class="note-text">' + esc(n.text) + '</p>' +
+            '</div>' +
+            '<span class="archive-actions">' +
+              '<button class="mini-btn" type="button" data-action="edit-note-arch" data-who="' + a.who + '" ' +
+                'data-date="' + date + '" aria-label="' + a.name + ' ' + date + ' 한마디 고치기">✏️</button>' +
+              '<button class="mini-btn del" type="button" data-action="delete-note-arch" data-who="' + a.who + '" ' +
+                'data-date="' + date + '" aria-label="' + a.name + ' ' + date + ' 한마디 지우기">✕</button>' +
+            '</span>' +
+          '</article>';
+        }).join('');
+      return '<section class="archive-day">' +
+        '<h3 class="archive-day-title"><span>' + esc(archiveDayLabel(date)) + '</span>' +
+          (date === today ? '<span class="archive-today">오늘</span>' : '') +
+        '</h3>' +
+        rows +
+      '</section>';
+    }).join('');
+  }
+
+  /* 누적 독서 기록 — 날짜별(최신순) */
+  function renderBookArchive() {
+    var box = byId('book-archive-list');
+    if (!box) return;
+    var all = Books ? Books.list() : [];
+    byId('book-archive-count').textContent = all.length ? '지금까지 ' + all.length + '권' : '아직 기록이 없어요';
+    var today = Store.todayISO();
+
+    if (!all.length) {
+      box.innerHTML = '<div class="archive-empty">' +
+        '<span class="archive-empty-emoji" aria-hidden="true">📚</span>' +
+        '<p class="archive-empty-text">아직 읽은 책이 없어요.<br />오늘 읽은 책을 남겨 볼까요?</p>' +
+        '</div>';
+      return;
+    }
+
+    var order = [];
+    var byDate = {};
+    all.forEach(function (b) {
+      var date = String(b.date || '').slice(0, 10) || today;
+      if (!byDate[date]) { byDate[date] = []; order.push(date); }
+      byDate[date].push(b);
+    });
+
+    box.innerHTML = order.map(function (date) {
+      return '<section class="archive-day">' +
+        '<h3 class="archive-day-title"><span>' + esc(archiveDayLabel(date)) + '</span>' +
+          (date === today ? '<span class="archive-today">오늘</span>' : '') +
+          '<span class="archive-day-count">' + byDate[date].length + '권</span>' +
+        '</h3>' +
+        byDate[date].map(function (b) { return bookRow(b, true); }).join('') +
+      '</section>';
+    }).join('');
+  }
+
   /* 한마디 시트 — 작성자를 고르고 한 줄을 적습니다 */
   function noteSheetPick(who, keepTyped) {
     noteCtx.who = who;
-    var n = notesNow()[who] || { text: '', updatedAt: 0 };
+    var date = noteCtx.date || Store.todayISO();
+    var n = notesOn(date)[who] || { text: '', updatedAt: 0 };
     var ta = byId('note-text');
     var sameAsSaved = !keepTyped || ta.value.trim() === String(noteCtx.saved || '').trim();
     if (sameAsSaved) ta.value = n.text || '';
@@ -903,6 +1036,12 @@
       b.setAttribute('aria-pressed', b.dataset.who === who ? 'true' : 'false');
     });
     byId('note-sheet-title').textContent = '💌 ' + noteAuthor(who).name + ' 한마디';
+    var hint = byId('note-date-hint');
+    if (hint) {
+      var past = date !== Store.todayISO();
+      hint.hidden = !past;
+      hint.textContent = past ? archiveDayLabel(date) + '에 남긴 한마디를 고쳐요' : '';
+    }
     byId('note-delete').hidden = !n.text;
     renderNoteCount();
   }
@@ -913,8 +1052,11 @@
     if (el && ta) el.textContent = ta.value.length + '/120';
   }
 
-  function openNoteSheet(who) {
-    var notes = notesNow();
+  function openNoteSheet(who, dateISO, opts) {
+    var raw = String(dateISO || '').slice(0, 10);
+    noteCtx.date = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : Store.todayISO();
+    noteCtx.fromArchive = !!(opts && opts.fromArchive);
+    var notes = notesOn(noteCtx.date);
     var target = who;
     if (!target) {
       /* 아직 비어 있는 사람을 먼저 고릅니다 (둘 다 비었으면 엄마) */
@@ -1132,7 +1274,8 @@
   function openBookSheet(opts) {
     bookCtx = {
       mode: opts.mode || 'add',
-      id: (opts.item && opts.item.id) || null
+      id: (opts.item && opts.item.id) || null,
+      fromArchive: !!opts.fromArchive
     };
     var b = opts.item || { date: Store.todayISO(), title: '', review: '' };
 
@@ -1624,6 +1767,34 @@
       openNoteSheet(el.dataset.who || null);
     },
 
+    'open-note-archive': function () {
+      renderNoteArchive();
+      openSheet('sheet-note-archive');
+    },
+
+    'edit-note-arch': function (el) {
+      openNoteSheet(el.dataset.who || null, el.dataset.date, { fromArchive: true });
+    },
+
+    'delete-note-arch': function (el) {
+      var who = el.dataset.who;
+      var date = el.dataset.date;
+      var before = (notesOn(date)[who] || {}).text || '';
+      if (!before) return;
+      Store.clearParentNote(who, date);
+      renderNoteArchive();
+      renderNotes();
+      toast(noteAuthor(who).name + ' ' + archiveDayLabel(date) + ' 한마디를 지웠어요', {
+        label: '되돌리기',
+        onAction: function () {
+          Store.setParentNote(who, before, date);
+          renderNoteArchive();
+          renderNotes();
+          toast('한마디를 되돌렸어요');
+        }
+      });
+    },
+
     'note-who': function (el) {
       var who = el.dataset.who;
       if (!who || who === noteCtx.who) return;
@@ -1634,32 +1805,41 @@
     'note-save': function () {
       var who = noteCtx.who;
       var whoName = noteAuthor(who).name;
+      var date = noteCtx.date || Store.todayISO();
+      var backToArchive = noteCtx.fromArchive;
       var text = byId('note-text').value.trim();
       if (!text) {
         toast('한마디를 적어 주세요 ✏️');
         byId('note-text').focus();
         return;
       }
-      Store.setParentNote(who, text);
+      Store.setParentNote(who, text, date);
       closeSheets();
       renderNotes();
+      if (backToArchive) { renderNoteArchive(); openSheet('sheet-note-archive'); }
+      renderNoteArchiveBtn();
       if (Sound) Sound.playCheck();
-      toast('💌 ' + whoName + ' 한마디를 남겼어요');
+      toast(date === Store.todayISO()
+        ? '💌 ' + whoName + ' 한마디를 남겼어요'
+        : '💌 ' + archiveDayLabel(date) + ' ' + whoName + ' 한마디를 고쳤어요');
     },
 
     'note-delete': function () {
       var who = noteCtx.who;
       var whoName = noteAuthor(who).name;
-      var before = (notesNow()[who] || {}).text || '';
+      var date = noteCtx.date || Store.todayISO();
+      var before = (notesOn(date)[who] || {}).text || '';
       if (!before) return;
-      Store.clearParentNote(who);
+      Store.clearParentNote(who, date);
       closeSheets();
       renderNotes();
+      renderNoteArchiveBtn();
       toast(whoName + ' 한마디를 지웠어요', {
         label: '되돌리기',
         onAction: function () {
-          Store.setParentNote(who, before);
+          Store.setParentNote(who, before, date);
           renderNotes();
+          renderNoteArchiveBtn();
           toast('한마디를 되돌렸어요');
         }
       });
@@ -1671,7 +1851,12 @@
     'edit-book': function (el) {
       var b = Books.get(el.dataset.id);
       if (!b) return;
-      openBookSheet({ mode: 'edit', item: b });
+      openBookSheet({ mode: 'edit', item: b, fromArchive: el.dataset.arch === '1' });
+    },
+
+    'open-book-archive': function () {
+      renderBookArchive();
+      openSheet('sheet-book-archive');
     },
 
     'delete-book': function (el) {
@@ -1679,12 +1864,14 @@
       if (!b) return;
       renderBooks();
       renderRewards();
+      if (!byId('sheet-book-archive').hidden) renderBookArchive();
       toast('독서 기록을 지웠어요', {
         label: '되돌리기',
         onAction: function () {
           Books.restore(b);
           renderBooks();
           renderRewards();
+          if (!byId('sheet-book-archive').hidden) renderBookArchive();
           toast('기록을 되돌렸어요');
         }
       });
@@ -1705,6 +1892,7 @@
       var todayISO = Store.todayISO();
       var before = Books.countOn(todayISO);
       var wasEdit = bookCtx.mode === 'edit';
+      var backToArchive = wasEdit && bookCtx.fromArchive;
       if (wasEdit) {
         Books.update(bookCtx.id, payload);
       } else {
@@ -1713,6 +1901,8 @@
       closeSheets();
       renderBooks();
       renderRewards();
+      if (backToArchive || (!byId('sheet-book-archive').hidden)) { renderBookArchive(); }
+      if (backToArchive) openSheet('sheet-book-archive');
       var after = Books.countOn(todayISO);
       if (payload.date === todayISO && after > before) {
         if (Sound) Sound.playSuccess();
@@ -1729,10 +1919,12 @@
 
     'book-delete': function () {
       if (bookCtx.mode !== 'edit') return;
+      var backToArchive = bookCtx.fromArchive;
       Books.remove(bookCtx.id);
       closeSheets();
       renderBooks();
       renderRewards();
+      if (backToArchive) { renderBookArchive(); openSheet('sheet-book-archive'); }
       toast('독서 기록을 지웠어요');
     },
 
