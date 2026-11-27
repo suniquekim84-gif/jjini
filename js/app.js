@@ -238,6 +238,144 @@
     byId('btn-timetable').textContent = '🗓️ 주간 시간표 보기';
   }
 
+  /* ---------------- 오늘 학교 시간표 (그날그날) ---------------- */
+  /* 오늘이 schoolWeek 기간 밖이면(주말·방학 등) 미리 보는 날짜를 담아 둡니다. */
+  var schoolPreviewDate = null;
+
+  function schoolTarget() {
+    var today = Store.todayISO();
+    if (Sched.schoolDay(today)) return { date: today, preview: false };
+    if (schoolPreviewDate && Sched.schoolDay(schoolPreviewDate)) {
+      return { date: schoolPreviewDate, preview: true };
+    }
+    return null;
+  }
+
+  function schoolMorningHtml(entry) {
+    var list = entry.morning || [];
+    if (!list.length) return '';
+    return '<div class="school-line">' +
+      '<span class="school-tag">아침활동</span>' +
+      list.map(function (m) {
+        return '<span class="school-morning-chip' + (m.strong ? ' is-strong' : '') + '">' +
+          esc(m.text) + '</span>';
+      }).join('') +
+    '</div>';
+  }
+
+  function schoolPeriodsHtml(entry) {
+    var list = entry.periods || [];
+    if (!list.length) return '';
+    /* 교시 수만큼 같은 폭으로 한 줄에 — 5·6교시가 둘째 줄로 떨어지지 않게 */
+    var cols = 'grid-template-columns: repeat(' + list.length + ', minmax(0, 1fr))';
+    return '<div class="school-periods" style="' + cols + '">' + list.map(function (p, i) {
+      return '<div class="school-period' + (p.test ? ' is-test' : '') + '">' +
+        '<span class="school-num">' + (i + 1) + '교시</span>' +
+        '<span class="school-subject">' + esc(p.subject) + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  /* 수행평가와 수업 메모는 교시 칸 아래에 한 줄씩 또렷하게 */
+  function schoolAlertsHtml(entry) {
+    var list = entry.periods || [];
+    var rows = [];
+    list.forEach(function (p, i) {
+      var when = (i + 1) + '교시 ' + p.subject;
+      if (p.test) {
+        rows.push('<div class="school-alert is-test">' +
+          '<span class="school-alert-when">' + esc(when) + '</span>' +
+          '<span class="school-test"><b>수행평가</b> ' + esc(p.test) + '</span>' +
+        '</div>');
+      } else if (p.note) {
+        rows.push('<div class="school-alert">' +
+          '<span class="school-alert-when">' + esc(when) + '</span>' +
+          '<span class="school-alert-note">' + esc(p.note) + '</span>' +
+        '</div>');
+      }
+    });
+    return rows.length ? '<div class="school-alerts">' + rows.join('') + '</div>' : '';
+  }
+
+  function schoolPrepHtml(entry) {
+    var list = entry.prep || [];
+    if (!list.length) return '';
+    return '<div class="school-line school-prep-line">' +
+      '<span class="school-tag">준비물</span>' +
+      list.map(function (it) {
+        return '<span class="school-prep-chip">' + esc(it.emoji || '🎒') + ' ' + esc(it.label) + '</span>';
+      }).join('') +
+    '</div>';
+  }
+
+  function schoolButtonLabel(dateISO) {
+    var d = Store.parseDate(dateISO);
+    var nextWeek = Store.startOfWeek(dateISO) !== Store.startOfWeek(Store.todayISO());
+    return (nextWeek ? '다음 주 ' : '') + DAYS[d.getDay()] + '요일(' +
+      (d.getMonth() + 1) + '/' + d.getDate() + ') 시간표 미리보기';
+  }
+
+  function renderSchool() {
+    if (!state) return;
+    var today = Store.todayISO();
+    var d = Store.parseDate(today);
+    var target = schoolTarget();
+    var pill = byId('school-day');
+    var sub = byId('school-sub');
+    var body = byId('school-body');
+    var btn = byId('btn-school-preview');
+    if (!body) return;
+
+    if (!target) {
+      /* 오늘 시간표가 없는 날 — 지난 주 시간표를 오늘 것처럼 보여 주지 않습니다. */
+      var upcoming = Sched.nextSchoolDay(today);
+      var isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      pill.textContent = DAYS[d.getDay()] + '요일';
+      pill.className = 'pill pill-day';
+      btn.hidden = !upcoming;
+      if (upcoming) {
+        btn.textContent = schoolButtonLabel(upcoming);
+        sub.textContent = '오늘은 학교 시간표가 없어요';
+        body.innerHTML =
+          '<div class="school-empty">' +
+            '<div class="school-empty-emoji">🗓️</div>' +
+            '<p class="school-empty-title">' + esc(schoolButtonLabel(upcoming).replace(' 미리보기', '')) + '부터 새 시간표가 시작돼요</p>' +
+            '<p class="school-empty-sub">아래 버튼을 누르면 그날 배우는 과목과 준비물을 미리 볼 수 있어요</p>' +
+          '</div>';
+      } else {
+        sub.textContent = isWeekend ? '주말엔 학교에 가지 않아요' : '새 주간학습안내가 나오면 여기에 나와요';
+        body.innerHTML =
+          '<div class="school-empty">' +
+            '<div class="school-empty-emoji">🌈</div>' +
+            '<p class="school-empty-title">' + (isWeekend ? '주말엔 학교에 가지 않아요' : '이번 주 학교 시간표는 아직 없어요') + '</p>' +
+            '<p class="school-empty-sub">새 시간표를 받으면 대시보드에 그날그날 나와요</p>' +
+          '</div>';
+      }
+      return;
+    }
+
+    var entry = Sched.schoolDay(target.date);
+    var td = Store.parseDate(target.date);
+    pill.textContent = DAYS[td.getDay()] + '요일' + (target.preview ? ' · 미리보기' : '');
+    pill.className = 'pill pill-day' + (target.preview ? ' is-preview' : '');
+    sub.textContent = target.preview
+      ? (td.getMonth() + 1) + '/' + td.getDate() + ' ' + DAYS[td.getDay()] + '요일 시간표를 미리 봐요'
+      : '오늘 배우는 과목과 준비물이에요';
+
+    var periods = entry.periods || [];
+    var tests = periods.filter(function (p) { return p.test; }).length;
+    body.innerHTML = schoolMorningHtml(entry) + schoolPeriodsHtml(entry) + schoolAlertsHtml(entry) +
+      schoolPrepHtml(entry) +
+      '<p class="school-hint">' +
+        (target.preview ? '아직 오지 않은 날의 시간표예요 · ' : '') +
+        '수업 ' + periods.length + '교시' + (tests ? ' · 수행평가 ' + tests + '개' : '') +
+        ' · 준비물은 <b>준비</b> 탭에서 체크해요' +
+      '</p>';
+
+    btn.hidden = !target.preview;
+    btn.textContent = '오늘로 돌아가기';
+  }
+
   /* ---------------- 가족 카드 ---------------- */
   function renderMembers() {
     byId('member-list').innerHTML = state.members.map(function (m) {
@@ -535,6 +673,8 @@
       var schoolDep = Prep.minutesOf(Prep.SCHOOL_DEPART);
       var sState = Prep.status(schoolDep, null, now);
       var items = Prep.schoolList(dateISO);
+      var baseItems = items.filter(function (it) { return it.group !== 'school'; });
+      var schoolItems = items.filter(function (it) { return it.group === 'school'; });
       var doneCount = items.filter(function (it) { return it.checked; }).length;
       var allDone = doneCount === items.length;
 
@@ -549,7 +689,7 @@
           '<span class="prep-depart-label">출발</span>' +
           '<span class="prep-check-count' + (allDone ? ' is-done' : '') + '">' + doneCount + '/' + items.length + '</span>' +
         '</div>' +
-        '<div class="prep-checks">' + items.map(function (it) {
+        '<div class="prep-checks">' + baseItems.map(function (it) {
           return prepCheckButton({
             action: 'prep-school-toggle',
             id: it.id,
@@ -558,8 +698,21 @@
             checked: it.checked
           });
         }).join('') + '</div>' +
+        (schoolItems.length
+          ? '<p class="prep-group-label"><span aria-hidden="true">🏫</span> 오늘 학교 준비물</p>' +
+            '<div class="prep-checks prep-checks-school">' + schoolItems.map(function (it) {
+              return prepCheckButton({
+                action: 'prep-school-toggle',
+                id: it.id,
+                label: it.label,
+                emoji: it.emoji,
+                checked: it.checked
+              });
+            }).join('') + '</div>'
+          : '') +
         '<p class="prep-note' + (allDone ? ' is-done' : '') + '">' +
-          (allDone ? '다 챙겼어요! 등교 준비 완료 🎉' : '안경·외투·핸드폰을 하나씩 체크해요') +
+          (allDone ? '다 챙겼어요! 등교 준비 완료 🎉'
+            : (schoolItems.length ? '학교 준비물까지 하나씩 체크해요' : '안경·외투·핸드폰을 하나씩 체크해요')) +
         '</p>' +
       '</div>';
 
@@ -1340,6 +1493,7 @@
     renderHeader();
     renderWeather();
     renderSchedule();
+    renderSchool();
     renderMembers();
     renderTodos();
     renderRewards();
@@ -1389,6 +1543,7 @@
       renderLectures();
     } else {
       renderSchedule();
+      renderSchool();
       renderMembers();
       renderLectures();
       renderNotes();
@@ -1628,6 +1783,11 @@
         if (Sound) Sound.playUncheck();
         toast('도장을 지웠어요');
       }
+    },
+
+    'school-preview': function () {
+      schoolPreviewDate = schoolPreviewDate ? null : (Sched.nextSchoolDay(Store.todayISO()) || null);
+      renderSchool();
     },
 
     'open-timetable': function () {

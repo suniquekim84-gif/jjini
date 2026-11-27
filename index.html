@@ -138,6 +138,19 @@
       <button class="btn btn-light btn-wide" data-action="open-timetable" id="btn-timetable">🗓️ 주간 시간표 보기</button>
     </section>
 
+    <!-- ================= 오늘 학교 시간표 ================= -->
+    <section class="card school-section" id="school-section" data-vibe="sky" aria-label="오늘 학교 시간표">
+      <header class="section-head">
+        <div class="section-title-wrap">
+          <h2 class="section-title">🎒 오늘 학교 시간표</h2>
+          <p class="section-sub" id="school-sub">그날 배우는 과목과 준비물이에요</p>
+        </div>
+        <span class="pill pill-day" id="school-day">월요일</span>
+      </header>
+      <div class="school-body" id="school-body"><!-- rendered --></div>
+      <button class="btn btn-light btn-wide" data-action="school-preview" id="btn-school-preview" hidden>다음 주 월요일 시간표 미리보기</button>
+    </section>
+
     <!-- ================= 오늘 엄마 일정 (오늘 것만) ================= -->
     <section class="card lecture-mini-section" id="lecture-mini-section" data-vibe="rose" aria-label="오늘 엄마 일정">
       <header class="section-head">

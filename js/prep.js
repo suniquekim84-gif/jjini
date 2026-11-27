@@ -118,11 +118,28 @@
   }
 
   /* ---------------- 등교 ---------------- */
+  /* 그날 학교에 챙길 준비물 — js/schedule.js 의 schoolWeek[날짜].prep 을 씁니다.
+     (음악회 악기, 활동하기 편한 복장, 독서기록장처럼 날마다 달라지는 준비물) */
+  function schoolExtras(dateISO) {
+    var S = window.FamilySchedule;
+    var entry = (S && typeof S.schoolDay === 'function') ? S.schoolDay(dateISO) : null;
+    var list = (entry && entry.prep) || [];
+    return list.map(function (it) {
+      return { id: it.id, label: it.label, emoji: it.emoji, group: 'school' };
+    });
+  }
+
   function schoolList(dateISO) {
     var day = dayOf(read(), dateISO, false);
     var checked = (day && day.school) || {};
-    return SCHOOL_ITEMS.map(function (it) {
-      return { id: it.id, label: it.label, emoji: it.emoji, checked: !!checked[it.id] };
+    return SCHOOL_ITEMS.concat(schoolExtras(dateISO)).map(function (it) {
+      return {
+        id: it.id,
+        label: it.label,
+        emoji: it.emoji,
+        group: it.group || 'default',
+        checked: !!checked[it.id]
+      };
     });
   }
 
@@ -249,6 +266,7 @@
     departOf: departOf,
     status: status,
     schoolList: schoolList,
+    schoolExtras: schoolExtras,
     toggleSchool: toggleSchool,
     academyList: academyList,
     toggleAcademy: toggleAcademy,
